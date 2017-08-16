@@ -1,0 +1,125 @@
+package pacman;
+
+import java.awt.EventQueue;
+import java.awt.Point;
+import java.util.ArrayList;
+
+import javax.swing.JFrame;
+
+import miniMain.MiniMain;
+
+@SuppressWarnings("serial")
+public class Pacman extends JFrame 
+{
+	
+	private Board board;
+
+    public Pacman() 
+    {
+        initUI();
+    }
+    
+    public Pacman(MiniMain miniMain)
+    {
+    	initUI(miniMain);
+    }
+    
+    private void initUI() 
+    {
+        board = new Board();
+        add(board);
+        
+        setTitle("Pacman");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(380, 420);
+        setLocationRelativeTo(null);
+        setVisible(true);        
+    }
+    
+    private void initUI(MiniMain miniMain) 
+    {
+        board = new Board(miniMain);
+        add(board);
+        
+        setTitle("Pacman");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(380, 420);
+        setLocationRelativeTo(null);
+        setVisible(true);        
+    }
+
+    public static void main(String[] args) 
+    {
+    	
+        EventQueue.invokeLater(() -> {
+            Pacman ex = new Pacman();
+            ex.setVisible(true);
+        });
+    }
+    
+    public boolean isPlaying()
+    {
+    	return board.isPlaying();
+    }
+    
+    public int getPacmanX()
+    {
+    	return board.getPacmanX();
+    }
+    
+    public int getPacmanY()
+    {
+    	return board.getPacmanY();
+    }
+    
+    public int[] getGhostXs()
+    {
+    	return board.getGhostXs();
+    }
+    
+    public int getGhostX(int index)
+    {
+    	return board.getGhostX(index);
+    }
+    
+    public int[] getGhostYs()
+    {
+    	return board.getGhostYs();
+    }
+    
+    public int getGhostY(int index)
+    {
+    	return board.getGhostY(index);
+    }
+    
+    public int getLives()
+    {
+    	return board.getLives();
+    }
+    
+    public int getScore()
+    {
+    	return board.getScore();
+    }
+    
+    public ArrayList<Point> getPelletLocationss()
+    {
+    	return board.getPelletLocationss();
+    }
+    
+    public int getTileSize()
+    {
+    	return board.getTileSize();
+    }
+    
+    public int[] getWallX()
+    {
+    	return board.getWallX();
+    }
+    
+    public int[] getWallY()
+    {
+    	return board.getWallY();
+    }
+    
+}
