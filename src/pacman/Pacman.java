@@ -8,6 +8,8 @@ import javax.swing.JFrame;
 
 import miniMain.MiniMain;
 
+// Borrowed heavily from: http://zetcode.com/tutorials/javagamestutorial/pacman/
+
 @SuppressWarnings("serial")
 public class Pacman extends JFrame 
 {

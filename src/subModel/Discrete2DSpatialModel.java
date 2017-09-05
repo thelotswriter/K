@@ -63,11 +63,21 @@ public class Discrete2DSpatialModel
             for(int j = 0; j < worldDimensions[1] / tileDimensions[1]; j++)
             {
                 allowedSpaces[i][j] = true;
+            }
+        }
+        setUnallowedSpaces();
+    }
+
+    private void resetMaps()
+    {
+        for(int i = 0; i < finalMap.length; i++)
+        {
+            for(int j = 0; j < finalMap[0].length; j++)
+            {
                 workingMap[i][j] = 0;
                 finalMap[i][j] = 0;
             }
         }
-        setUnallowedSpaces();
     }
 
     /**
@@ -176,6 +186,7 @@ public class Discrete2DSpatialModel
             generateRandomPath();
         } else
         {
+            resetMaps();
             IDDFS searcher = new IDDFS(thingLocation, objectLocation);
             searcher.findPaths();
         }
@@ -293,15 +304,28 @@ public class Discrete2DSpatialModel
                     break;
                 }
             }
-            if(total != 0)
+            if(pathFound)
             {
-                for(double[] tileRow : finalMap)
+                for(int i = 0; i < finalMap.length; i++)
                 {
-                    for(double tileWeight : tileRow)
+                    for(int j = 0; j < finalMap[0].length; j++)
                     {
-                        tileWeight /= total;
+                        finalMap[i][j] = finalMap[i][j] / total;
                     }
                 }
+            } else
+            {
+                for(int i = 0; i < finalMap.length; i++)
+                {
+                    for(int j = 0; j < finalMap[0].length; j++)
+                    {
+                        finalMap[i][j] = workingMap[i][j] / total;
+                    }
+                }
+            }
+            if(total != 0)
+            {
+
             }
         }
 
@@ -318,10 +342,16 @@ public class Discrete2DSpatialModel
                 this.depth = depth;
             }
 
+            /**
+             * Checks if the node or its descendants can reach the goal
+             * @param maxDepth The maximum depth the tree is allowed to extend
+             * @return True if the node or any of its descendants reach the goal; otherwise false
+             */
             public boolean search(int maxDepth)
             {
-                visitedSpaces[location[0]][location[1]] = true;
-                boolean isGoal = false;
+                visitedSpaces[location[0]][location[1]] = true; // Set the current tile as visited, as we are now visiting it
+                boolean isGoal = false; // Assume the tile is not the goal
+                // Check if the current location actually is a goal location
                 for(int[] goalTile : goalTiles)
                 {
                     if(location[0] == goalTile[0] && location[1] == goalTile[1])
@@ -330,18 +360,43 @@ public class Discrete2DSpatialModel
                         break;
                     }
                 }
+                // If the current location is a goal, mark that the path has been found, increment the value on the final map, and allow for other paths to visit the current location
+                // by setting the visited space to unvisited. Finally, return true since the goal was reached
                 if(isGoal)
                 {
-                    pathFound = true;
+                    if(!pathFound)
+                    {
+                        total = 1;
+                        pathFound = true;
+                    } else
+                    {
+                        total++;
+                    }
                     finalMap[location[0]][location[1]]++;
                     visitedSpaces[location[0]][location[1]] = false;
                     return true;
-                } else if(maxDepth > depth)
+                } else if(maxDepth > depth) // If the maximum depth hasn't yet been reached, search any allowable locations next to the current location
                 {
+                    // Initially assume no descendants will reach the goal, no directions can be explored and (hence) none will be fruitful
                     boolean enRouteToGoal = false;
                     double nDirectionsExplored = 0;
                     double nFruitfulDirections = 0;
+                    // For each direction, check if the thing modeled can move in that direction, and that it won't leave the allowed spaces
                     if((moveCapabilities[0] == MoveType.BOTH || moveCapabilities[0] == MoveType.FORWARD)
+                            && location[0] < (visitedSpaces.length - 1) && !visitedSpaces[location[0] + 1][location[1]])
+                    {
+                        nDirectionsExplored++;
+                        int[] newLocation = new int[N_DIMENSIONS];
+                        newLocation[0] = location[0] + 1;
+                        newLocation[1] = location[1];
+                        boolean enRoute = new Node(newLocation, depth + 1).search(maxDepth);
+                        if(enRoute)
+                        {
+                            enRouteToGoal = true;
+                            nFruitfulDirections++;
+                        }
+                    }
+                    if((moveCapabilities[0] == MoveType.BOTH || moveCapabilities[0] == MoveType.BACKWARD)
                             && location[0] > 0 && !visitedSpaces[location[0] - 1][location[1]])
                     {
                         nDirectionsExplored++;
@@ -352,36 +407,76 @@ public class Discrete2DSpatialModel
                         if(enRoute)
                         {
                             enRouteToGoal = true;
-
-                        } else if(!pathFound)
-                        {
-                            
+                            nFruitfulDirections++;
                         }
                     }
-                    if((moveCapabilities[0] == MoveType.BOTH || moveCapabilities[0] == MoveType.BACKWARD)
-                            && location[0] < (visitedSpaces.length - 1) && !visitedSpaces[location[0] + 1][location[1]])
-                    {
-                        nDirectionsExplored++;
-                    }
                     if((moveCapabilities[1] == MoveType.BOTH || moveCapabilities[1] == MoveType.FORWARD)
-                            && location[1] > 0 && !visitedSpaces[location[0]][location[1] - 1])
+                            && location[1] > 0 && !visitedSpaces[location[0]][location[1] + 1])
                     {
                         nDirectionsExplored++;
+                        int[] newLocation = new int[N_DIMENSIONS];
+                        newLocation[0] = location[0];
+                        newLocation[1] = location[1] + 1;
+                        boolean enRoute = new Node(newLocation, depth + 1).search(maxDepth);
+                        if(enRoute)
+                        {
+                            enRouteToGoal = true;
+                            nFruitfulDirections++;
+                        }
                     }
                     if((moveCapabilities[1] == MoveType.BOTH || moveCapabilities[1] == MoveType.BACKWARD)
-                            && location[1] < (visitedSpaces[0].length - 1) && !visitedSpaces[location[0]][location[1] + 1])
+                            && location[1] < (visitedSpaces[0].length - 1) && !visitedSpaces[location[0]][location[1] - 1])
                     {
                         nDirectionsExplored++;
+                        int[] newLocation = new int[N_DIMENSIONS];
+                        newLocation[0] = location[0];
+                        newLocation[1] = location[1] - 1;
+                        boolean enRoute = new Node(newLocation, depth + 1).search(maxDepth);
+                        if(enRoute)
+                        {
+                            enRouteToGoal = true;
+                            nFruitfulDirections++;
+                        }
+                    }
+                    // If the node has descendants that reach the goal, calculate a score to add to the final map
+                    // Otherwise, if the path hasn't been found, add the inverse of the distance to the nearest goal
+                    if(enRouteToGoal)
+                    {
+                        double amountToAdd = nFruitfulDirections * (maxDepth - depth + 1);
+                        finalMap[location[0]][location[1]] += amountToAdd;
+                        total += amountToAdd;
+                    } else if(!pathFound)
+                    {
+                        double xDist = location[0] - goalTiles.get(0)[0];
+                        double yDist = location[1] - goalTiles.get(0)[1];
+                        if(goalTiles.size() > 1)
+                        {
+                            xDist = Math.min(xDist, location[0] - goalTiles.get(1)[0]);
+                            yDist = Math.min(yDist, location[1] - goalTiles.get(1)[1]);
+                        }
+                        double inverseDistance = 1 / (xDist + yDist);
+                        workingMap[location[0]][location[1]] += inverseDistance;
+                        total += inverseDistance;
                     }
                     visitedSpaces[location[0]][location[1]] = false;
                     return enRouteToGoal;
-                } else if(!pathFound)
+                } else if(!pathFound) // If a path has yet to be found which reaches the goal, and the farthest depth has been reached, add to the working map
                 {
-                    workingMap[location[0]][location[1]]++;
+                    double xDist = location[0] - goalTiles.get(0)[0];
+                    double yDist = location[1] - goalTiles.get(0)[1];
+                    if(goalTiles.size() > 1)
+                    {
+                        xDist = Math.min(xDist, location[0] - goalTiles.get(1)[0]);
+                        yDist = Math.min(yDist, location[1] - goalTiles.get(1)[1]);
+                    }
+                    double inverseDistance = 1 / (xDist + yDist);
+                    workingMap[location[0]][location[1]] += inverseDistance;
+                    total += inverseDistance;
                     visitedSpaces[location[0]][location[1]] = false;
                     return false;
-                } else
+                } else // If a path has been found, but the current node can't go deeper and isn't the goal it should allow revisiting the spaces and return false
                 {
+                    visitedSpaces[location[0]][location[1]] = false;
                     return false;
                 }
             }
