@@ -318,7 +318,7 @@ public class Discrete2DSpatialModel
                 this.depth = depth;
             }
 
-            public void search(int maxDepth)
+            public boolean search(int maxDepth)
             {
                 visitedSpaces[location[0]][location[1]] = true;
                 boolean isGoal = false;
@@ -334,132 +334,56 @@ public class Discrete2DSpatialModel
                 {
                     pathFound = true;
                     finalMap[location[0]][location[1]]++;
+                    visitedSpaces[location[0]][location[1]] = false;
+                    return true;
                 } else if(maxDepth > depth)
                 {
-                    switch(moveCapabilities[0])
+                    boolean enRouteToGoal = false;
+                    double nDirectionsExplored = 0;
+                    double nFruitfulDirections = 0;
+                    if((moveCapabilities[0] == MoveType.BOTH || moveCapabilities[0] == MoveType.FORWARD)
+                            && location[0] > 0 && !visitedSpaces[location[0] - 1][location[1]])
                     {
-                        case BOTH:
+                        nDirectionsExplored++;
+                        int[] newLocation = new int[N_DIMENSIONS];
+                        newLocation[0] = location[0] - 1;
+                        newLocation[1] = location[1];
+                        boolean enRoute = new Node(newLocation, depth + 1).search(maxDepth);
+                        if(enRoute)
                         {
-                            switch(moveCapabilities[1])
-                            {
-                                case BOTH:
-                                {
-                                    double nDirectionsExplored = 0;
-                                    double nFruitfulDirections = 0;
-                                    if(location[0] > 0 && !visitedSpaces[location[0] - 1][location[1]])
-                                    {
-                                        nDirectionsExplored++;
-                                        int[] newLocation = new int[N_DIMENSIONS];
-                                        newLocation[0] = location[0] - 1;
-                                        newLocation[1] = location[1];
-                                        new Node(newLocation, depth + 1).search(maxDepth);
-                                        if(pathFound && finalMap[newLocation[0]][newLocation[1]] > 0)
-                                        {
+                            enRouteToGoal = true;
 
-                                        } else if(!pathFound)
-                                        {
-
-                                        }
-                                    }
-                                    if(location[0] < (visitedSpaces.length - 1) && !visitedSpaces[location[0] + 1][location[1]])
-                                    {
-                                        nDirectionsExplored++;
-                                    }
-                                    if(location[1] > 0 && !visitedSpaces[location[0]][location[1] - 1])
-                                    {
-                                        nDirectionsExplored++;
-                                    }
-                                    if(location[1] < (visitedSpaces[0].length - 1) && !visitedSpaces[location[0]][location[1] + 1])
-                                    {
-                                        nDirectionsExplored++;
-                                    }
-                                    break;
-                                } case FORWARD:
-                            {
-
-                                break;
-                            } case BACKWARD:
-                            {
-
-                                break;
-                            } default:
-                            {
-
-                            }
-                            }
-                            break;
-                        } case FORWARD:
-                    {
-                        switch(moveCapabilities[1])
+                        } else if(!pathFound)
                         {
-                            case BOTH:
-                            {
-
-                                break;
-                            } case FORWARD:
-                        {
-
-                            break;
-                        } case BACKWARD:
-                        {
-
-                            break;
-                        } default:
-                        {
-
-                        }
-                        }
-                        break;
-                    } case BACKWARD:
-                    {
-                        switch(moveCapabilities[1])
-                        {
-                            case BOTH:
-                            {
-
-                                break;
-                            } case FORWARD:
-                        {
-
-                            break;
-                        } case BACKWARD:
-                        {
-
-                            break;
-                        } default:
-                        {
-
-                        }
-                        }
-                        break;
-                    } default:
-                    {
-                        switch(moveCapabilities[1])
-                        {
-                            case BOTH:
-                            {
-
-                                break;
-                            } case FORWARD:
-                        {
-
-                            break;
-                        } case BACKWARD:
-                        {
-
-                            break;
-                        } default:
-                        {
-
-                        }
+                            
                         }
                     }
+                    if((moveCapabilities[0] == MoveType.BOTH || moveCapabilities[0] == MoveType.BACKWARD)
+                            && location[0] < (visitedSpaces.length - 1) && !visitedSpaces[location[0] + 1][location[1]])
+                    {
+                        nDirectionsExplored++;
                     }
+                    if((moveCapabilities[1] == MoveType.BOTH || moveCapabilities[1] == MoveType.FORWARD)
+                            && location[1] > 0 && !visitedSpaces[location[0]][location[1] - 1])
+                    {
+                        nDirectionsExplored++;
+                    }
+                    if((moveCapabilities[1] == MoveType.BOTH || moveCapabilities[1] == MoveType.BACKWARD)
+                            && location[1] < (visitedSpaces[0].length - 1) && !visitedSpaces[location[0]][location[1] + 1])
+                    {
+                        nDirectionsExplored++;
+                    }
+                    visitedSpaces[location[0]][location[1]] = false;
+                    return enRouteToGoal;
                 } else if(!pathFound)
                 {
                     workingMap[location[0]][location[1]]++;
+                    visitedSpaces[location[0]][location[1]] = false;
+                    return false;
+                } else
+                {
+                    return false;
                 }
-                visitedSpaces[location[0]][location[1]] = false;
             }
 
         }
