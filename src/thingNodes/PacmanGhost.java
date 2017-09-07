@@ -10,7 +10,7 @@ public class PacmanGhost extends ThingNode
 	 */
 	private static final long serialVersionUID = -6346522976848669458L;
 	
-	public PacmanGhost(int locationX, int locationY, int width, int height)
+	public PacmanGhost(int locationX, int locationY, int width, int height, int speed)
 	{
 		setName("ghost");
 		addCategory("enemy");
@@ -27,6 +27,9 @@ public class PacmanGhost extends ThingNode
 		dimensionBuilder.append(height);
 		setAttribute("dimensions", dimensionBuilder.toString());
 		setAttribute("move", "both,both");
+		StringBuilder speedBuilder = new StringBuilder();
+		speedBuilder.append(speed);
+		setAttribute("speed", speedBuilder.toString());
 	}
 	
 	public void updateLocation(int x, int y)
@@ -36,6 +39,13 @@ public class PacmanGhost extends ThingNode
 		locationBuilder.append(',');
 		locationBuilder.append(y);
 		setAttribute("location", locationBuilder.toString());
+	}
+
+	public void updateSpeed(int speed)
+	{
+        StringBuilder speedBuilder = new StringBuilder();
+        speedBuilder.append(speed);
+        setAttribute("speed", speedBuilder.toString());
 	}
 	
 }

@@ -32,7 +32,7 @@ public class DiscreteSearchModel implements MiniMain
 		PacmanGame pacmanWorld = new PacmanGame(pMan);
 		PacmanGhost ghost = (PacmanGhost) pacmanWorld.getThing("ghost");
 		Discrete2DSpatialModel discrete2DSpatialModel = new Discrete2DSpatialModel(ghost, pacmanWorld);
-//		double[][] probabilityMap = discrete2DSpatialModel.generateProbabilityMap();
+		double[][] probabilityMap = discrete2DSpatialModel.generateProbabilityMap();
 		ArrayList<ColorCoordinate> coloredCoordinates = new ArrayList<>();
 		coloredCoordinates.add(new ColorCoordinate(0,0,Color.white));
 		coloredCoordinates.add(new ColorCoordinate(2,2,Color.red));

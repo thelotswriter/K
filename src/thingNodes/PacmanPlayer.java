@@ -10,7 +10,7 @@ public class PacmanPlayer extends ThingNode
 	 */
 	private static final long serialVersionUID = -844915845220596749L;
 
-	public PacmanPlayer(int locationX, int locationY, int width, int height)
+	public PacmanPlayer(int locationX, int locationY, int width, int height, int speed)
 	{
 		setName("Player");
 		StringBuilder locationBuilder = new StringBuilder();
@@ -24,6 +24,9 @@ public class PacmanPlayer extends ThingNode
 		dimensionBuilder.append(height);
 		setAttribute("dimensions", dimensionBuilder.toString());
 		setAttribute("move", "both,both");
+		StringBuilder speedBuilder = new StringBuilder();
+		speedBuilder.append(speed);
+		setAttribute("speed", speedBuilder.toString());
 	}
 	
 	public void updateLocation(int x, int y)
@@ -33,6 +36,13 @@ public class PacmanPlayer extends ThingNode
 		locationBuilder.append(',');
 		locationBuilder.append(y);
 		setAttribute("location", locationBuilder.toString());
+	}
+
+	public void updateSpeed(int speed)
+	{
+		StringBuilder speedBuilder = new StringBuilder();
+		speedBuilder.append(speed);
+		setAttribute("speed", speedBuilder.toString());
 	}
 	
 }

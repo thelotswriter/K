@@ -775,5 +775,15 @@ public class Board extends JPanel implements ActionListener {
     {
     	return wallY;
     }
+
+    public int getPacmanSpeed()
+    {
+        return PACMAN_SPEED;
+    }
+
+    public int getGhostSpeed()
+    {
+        return ghostSpeed[0];
+    }
     
 }

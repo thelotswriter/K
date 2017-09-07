@@ -35,7 +35,7 @@ public class PacmanGame extends ThingNode
 	
 	private void addElements()
 	{
-		player = new PacmanPlayer(pMan.getPacmanX(), pMan.getPacmanY(), pMan.getTileSize(), pMan.getTileSize());
+		player = new PacmanPlayer(pMan.getPacmanX(), pMan.getPacmanY(), pMan.getTileSize(), pMan.getTileSize(), pMan.getPacmanSpeed());
 		addElement(player);
 		PacmanWalls walls = new PacmanWalls();
 		int[] wallX = pMan.getWallX();
@@ -47,7 +47,8 @@ public class PacmanGame extends ThingNode
 			walls.addElement(wall);
 		}
 		addElement(walls);
-		ghost = new PacmanGhost(pMan.getGhostX(0), pMan.getGhostY(0), pMan.getTileSize(), pMan.getTileSize());
+		ghost = new PacmanGhost(pMan.getGhostX(0), pMan.getGhostY(0), pMan.getTileSize(), pMan.getTileSize(),
+				pMan.getPacmanSpeed());
 		StringBuilder ghostLocationBuilder = new StringBuilder();
 		ghostLocationBuilder.append(pMan.getGhostX(0));
 		ghostLocationBuilder.append(',');
@@ -64,7 +65,9 @@ public class PacmanGame extends ThingNode
 	public void update()
 	{
 		player.updateLocation(pMan.getPacmanX(), pMan.getPacmanY());
+		player.updateSpeed(pMan.getPacmanSpeed());
 		ghost.updateLocation(pMan.getGhostX(0), pMan.getGhostY(0));
+		ghost.updateSpeed(pMan.getGhostSpeed());
 	}
 	
 }

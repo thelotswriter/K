@@ -45,7 +45,10 @@ public class Discrete2DSpatialModel
         thingDimensions = new int[N_DIMENSIONS];
         objectDimensions = new int[N_DIMENSIONS];
         thingLocation = new int[N_DIMENSIONS];
-        ThingNode object = world.getThing(thing.getAttribute("goal").split(",")[1]);
+        objectLocation = new int[N_DIMENSIONS];
+//        String goalString = thing.getAttribute("goal");
+//        String objectWord = thing.getAttribute("goal").split(" ")[1];
+        ThingNode object = world.getThing(thing.getAttribute("goal").split(" ")[1]);
 
         for(int i = 0; i < N_DIMENSIONS; i++)
         {
@@ -146,7 +149,7 @@ public class Discrete2DSpatialModel
         {
             thingSpeed = Double.parseDouble(thing.getAttribute("speed"));
         }
-        ThingNode object = world.getThing(thing.getAttribute("goal").split(",")[1]);
+        ThingNode object = world.getThing(thing.getAttribute("goal").split(" ")[1]);
         if(object.hasAttribute("speed"))
         {
             objectSpeed = Double.parseDouble(object.getAttribute("speed"));
@@ -165,7 +168,7 @@ public class Discrete2DSpatialModel
      */
     private void updateLocations()
     {
-        ThingNode object = world.getThing(thing.getAttribute("goal").split(",")[1]);
+        ThingNode object = world.getThing(thing.getAttribute("goal").split(" ")[1]);
         for(int i = 0; i < N_DIMENSIONS; i++)
         {
             thingLocation[i] = Integer.parseInt(thing.getAttribute("location").split(",")[i]);
