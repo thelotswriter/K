@@ -31,8 +31,9 @@ public class DiscreteSearchModel implements MiniMain
 	{
 		PacmanGame pacmanWorld = new PacmanGame(pMan);
 		PacmanGhost ghost = (PacmanGhost) pacmanWorld.getThing("ghost");
-		Discrete2DSpatialModel discrete2DSpatialModel = new Discrete2DSpatialModel(ghost, pacmanWorld);
-		double[][] probabilityMap = discrete2DSpatialModel.generateProbabilityMap();
+//		Discrete2DSpatialModel discrete2DSpatialModel = new Discrete2DSpatialModel(ghost, pacmanWorld);
+//		double[][] probabilityMap = discrete2DSpatialModel.generateProbabilityMap();
+		pMan.drawTile(1,1);
 
 //		Model model = new Model(ghost, pacmanWorld);
 //		List<Collection<Instruction>> instructionCollectionList = model.generateActionSequence();

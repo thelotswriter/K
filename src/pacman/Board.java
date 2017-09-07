@@ -92,6 +92,8 @@ public class Board extends JPanel implements ActionListener {
     		14, 14, 14, 14, 14};
     private Timer timer;
     private MiniMain miniMain;
+    private Graphics graphics;
+    private Graphics2D graph2d;
 
     public Board() {
 
@@ -161,6 +163,7 @@ public class Board extends JPanel implements ActionListener {
 
     private void playGame(Graphics2D g2d) {
 
+        graph2d = g2d;
         if (dying) {
 
             death();
@@ -586,12 +589,15 @@ public class Board extends JPanel implements ActionListener {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        graphics = g;
         doDrawing(g);
     }
 
     private void doDrawing(Graphics g) {
 
         Graphics2D g2d = (Graphics2D) g;
+        graph2d = g2d;
+        drawTile(1,1);
 
         g2d.setColor(Color.black);
         g2d.fillRect(0, 0, d.width, d.height);
@@ -676,6 +682,14 @@ public class Board extends JPanel implements ActionListener {
     public boolean isPlaying()
     {
     	return inGame;
+    }
+
+    public void drawTile(int xCoord, int yCoord)
+    {
+        int x = xCoord * BLOCK_SIZE;
+        int y = yCoord * BLOCK_SIZE;
+        graph2d.setColor(Color.white);
+        graph2d.fillRect(x, y, x + BLOCK_SIZE, y + BLOCK_SIZE);
     }
     
     public int getPacmanX()

@@ -123,5 +123,11 @@ public class Pacman extends JFrame
     {
     	return board.getWallY();
     }
+
+    public void drawTile(int xCoord, int yCoord)
+    {
+        board.drawTile(xCoord, yCoord);
+        board.repaint();
+    }
     
 }
