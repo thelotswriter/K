@@ -16,11 +16,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import com.sun.prism.GraphicsPipeline;
+import miniMain.ColorCoordinate;
 import miniMain.MiniMain;
 
 @SuppressWarnings("serial")
@@ -94,12 +97,16 @@ public class Board extends JPanel implements ActionListener {
     private MiniMain miniMain;
     private Graphics graphics;
     private Graphics2D graph2d;
+    private boolean drawTiles;
+    private List<ColorCoordinate> tilesToDraw;
 
     public Board() {
 
         loadImages();
         initVariables();
         initBoard();
+        drawTiles = false;
+        tilesToDraw = null;
     }
     
     public Board(MiniMain miniMain) {
@@ -597,10 +604,19 @@ public class Board extends JPanel implements ActionListener {
 
         Graphics2D g2d = (Graphics2D) g;
         graph2d = g2d;
-        drawTile(1,1);
 
         g2d.setColor(Color.black);
         g2d.fillRect(0, 0, d.width, d.height);
+
+        if(drawTiles)
+        {
+            for(ColorCoordinate colorCoord : tilesToDraw)
+            {
+                drawTile(colorCoord.getX(), colorCoord.getY(), colorCoord.getColor());
+            }
+            drawTiles = false;
+
+        }
 
         drawMaze(g2d);
         drawScore(g2d);
@@ -684,12 +700,20 @@ public class Board extends JPanel implements ActionListener {
     	return inGame;
     }
 
-    public void drawTile(int xCoord, int yCoord)
+    public void drawTiles(List<ColorCoordinate> coloredTiles)
+    {
+        tilesToDraw = coloredTiles;
+        drawTiles = true;
+    }
+
+    public void drawTile(int xCoord, int yCoord, Color color)
     {
         int x = xCoord * BLOCK_SIZE;
         int y = yCoord * BLOCK_SIZE;
-        graph2d.setColor(Color.white);
-        graph2d.fillRect(x, y, x + BLOCK_SIZE, y + BLOCK_SIZE);
+//        graph2d.setColor(Color.white);
+//        graph2d.fillRect(0,0,BLOCK_SIZE, BLOCK_SIZE);
+        graph2d.setColor(color);
+        graph2d.fillRect(x, y, BLOCK_SIZE, BLOCK_SIZE);
     }
     
     public int getPacmanX()

@@ -3,9 +3,11 @@ package pacman;
 import java.awt.EventQueue;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.List;
 
-import javax.swing.JFrame;
+import javax.swing.*;
 
+import miniMain.ColorCoordinate;
 import miniMain.MiniMain;
 
 // Borrowed heavily from: http://zetcode.com/tutorials/javagamestutorial/pacman/
@@ -124,10 +126,13 @@ public class Pacman extends JFrame
     	return board.getWallY();
     }
 
-    public void drawTile(int xCoord, int yCoord)
+    public void drawTile(List<ColorCoordinate> coloredTiles)
     {
-        board.drawTile(xCoord, yCoord);
-        board.repaint();
+        board.drawTiles(coloredTiles);
+//        board.drawTile(xCoord, yCoord);
+        Timer tileTimer = new Timer(0,board);
+        tileTimer.setRepeats(false);
+        tileTimer.start();
     }
     
 }
