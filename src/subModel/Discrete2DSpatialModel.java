@@ -414,7 +414,7 @@ public class Discrete2DSpatialModel
                         }
                     }
                     if((moveCapabilities[1] == MoveType.BOTH || moveCapabilities[1] == MoveType.FORWARD)
-                            && location[1] > 0 && !visitedSpaces[location[0]][location[1] + 1])
+                            && location[1] < (visitedSpaces[0].length - 1) && !visitedSpaces[location[0]][location[1] + 1])
                     {
                         nDirectionsExplored++;
                         int[] newLocation = new int[N_DIMENSIONS];
@@ -428,7 +428,7 @@ public class Discrete2DSpatialModel
                         }
                     }
                     if((moveCapabilities[1] == MoveType.BOTH || moveCapabilities[1] == MoveType.BACKWARD)
-                            && location[1] < (visitedSpaces[0].length - 1) && !visitedSpaces[location[0]][location[1] - 1])
+                            && location[1] > 0 && !visitedSpaces[location[0]][location[1] - 1])
                     {
                         nDirectionsExplored++;
                         int[] newLocation = new int[N_DIMENSIONS];

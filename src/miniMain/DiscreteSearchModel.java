@@ -34,9 +34,16 @@ public class DiscreteSearchModel implements MiniMain
 		Discrete2DSpatialModel discrete2DSpatialModel = new Discrete2DSpatialModel(ghost, pacmanWorld);
 		double[][] probabilityMap = discrete2DSpatialModel.generateProbabilityMap();
 		ArrayList<ColorCoordinate> coloredCoordinates = new ArrayList<>();
-		coloredCoordinates.add(new ColorCoordinate(0,0,Color.white));
-		coloredCoordinates.add(new ColorCoordinate(2,2,Color.red));
-		coloredCoordinates.add(new ColorCoordinate(4,4,Color.blue));
+		for(int i = 0; i < probabilityMap.length; i++)
+		{
+			for(int j = 0; j < probabilityMap[0].length; j++)
+			{
+				if(probabilityMap[i][j] > 0)
+				{
+//					coloredCoordinates.add(new ColorCoordinate(i, j, new Color(255 * probabilityMap[i][j], 255 * probabilityMap[i][j], 255 * probabilityMap[i][j])));
+				}
+			}
+		}
 		pMan.drawTile(coloredCoordinates);
 
 //		Model model = new Model(ghost, pacmanWorld);
