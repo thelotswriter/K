@@ -8,8 +8,8 @@ import processTree.ThingNode;
 public class Discrete2DSpatialModel
 {
     private final int N_DIMENSIONS = 2;
-    private final int MAX_SEARCH = 10;
-    private final double STEP_COEFFICIENT = 10;
+    private final int MAX_SEARCH = 12;
+    private final double STEP_COEFFICIENT = 12;
 
     private ThingNode thing;
     private ThingNode world;
@@ -246,7 +246,7 @@ public class Discrete2DSpatialModel
             startTile0[1] = startState[1] / tileDimensions[1];
             startTiles.add(startTile0);
             goalTile0[0] = goalState[0] / tileDimensions[0];
-            goalTile0[0] = goalState[1] / tileDimensions[1];
+            goalTile0[1] = goalState[1] / tileDimensions[1];
             goalTiles.add(goalTile0);
             if(startState[0] % tileDimensions[0] != 0)
             {
@@ -296,8 +296,9 @@ public class Discrete2DSpatialModel
                 }
             }
             pathFound = false;
-            for(int i = 0; i < MAX_SEARCH; i ++)
+            for(int i = 0; i < steps; i ++)
             {
+                resetMaps();
                 for(Node root : roots)
                 {
                     root.search(i);
@@ -325,10 +326,6 @@ public class Discrete2DSpatialModel
                         finalMap[i][j] = workingMap[i][j] / total;
                     }
                 }
-            }
-            if(total != 0)
-            {
-
             }
         }
 
@@ -450,12 +447,12 @@ public class Discrete2DSpatialModel
                         total += amountToAdd;
                     } else if(!pathFound)
                     {
-                        double xDist = location[0] - goalTiles.get(0)[0];
-                        double yDist = location[1] - goalTiles.get(0)[1];
+                        double xDist = Math.abs(location[0] - goalTiles.get(0)[0]);
+                        double yDist = Math.abs(location[1] - goalTiles.get(0)[1]);
                         if(goalTiles.size() > 1)
                         {
-                            xDist = Math.min(xDist, location[0] - goalTiles.get(1)[0]);
-                            yDist = Math.min(yDist, location[1] - goalTiles.get(1)[1]);
+                            xDist = Math.min(xDist, Math.abs(location[0] - goalTiles.get(1)[0]));
+                            yDist = Math.min(yDist, Math.abs(location[1] - goalTiles.get(1)[1]));
                         }
                         double inverseDistance = 1 / (xDist + yDist);
                         workingMap[location[0]][location[1]] += inverseDistance;
@@ -465,12 +462,12 @@ public class Discrete2DSpatialModel
                     return enRouteToGoal;
                 } else if(!pathFound) // If a path has yet to be found which reaches the goal, and the farthest depth has been reached, add to the working map
                 {
-                    double xDist = location[0] - goalTiles.get(0)[0];
-                    double yDist = location[1] - goalTiles.get(0)[1];
+                    double xDist = Math.abs(location[0] - goalTiles.get(0)[0]);
+                    double yDist = Math.abs(location[1] - goalTiles.get(0)[1]);
                     if(goalTiles.size() > 1)
                     {
-                        xDist = Math.min(xDist, location[0] - goalTiles.get(1)[0]);
-                        yDist = Math.min(yDist, location[1] - goalTiles.get(1)[1]);
+                        xDist = Math.min(xDist, Math.abs(location[0] - goalTiles.get(1)[0]));
+                        yDist = Math.min(yDist, Math.abs(location[1] - goalTiles.get(1)[1]));
                     }
                     double inverseDistance = 1 / (xDist + yDist);
                     workingMap[location[0]][location[1]] += inverseDistance;

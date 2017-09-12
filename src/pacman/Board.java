@@ -688,8 +688,12 @@ public class Board extends JPanel implements ActionListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-
+    public void actionPerformed(ActionEvent e)
+    {
+        if(inGame)
+        {
+            miniMain.running();
+        }
         repaint();
     }
     

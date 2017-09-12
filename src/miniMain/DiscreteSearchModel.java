@@ -27,12 +27,68 @@ public class DiscreteSearchModel implements MiniMain
 		pMan = new Pacman(new DiscreteSearchModel());
 	}
 
+	public void running()
+	{
+        PacmanGame pacmanWorld = new PacmanGame(pMan);
+        PacmanGhost ghost = (PacmanGhost) pacmanWorld.getThing("ghost");
+        Discrete2DSpatialModel discrete2DSpatialModel = new Discrete2DSpatialModel(ghost, pacmanWorld);
+        double[][] probabilityMap = discrete2DSpatialModel.generateProbabilityMap();
+        double maxProbability = 0;
+        for(int i = 0; i < probabilityMap.length; i++)
+        {
+            for(int j = 0; j < probabilityMap[0].length; j++)
+            {
+                if(probabilityMap[i][j] > maxProbability)
+                {
+                    maxProbability = probabilityMap[i][j];
+                }
+            }
+        }
+        ArrayList<ColorCoordinate> coloredCoordinates = new ArrayList<>();
+        for(int i = 0; i < probabilityMap.length; i++)
+        {
+            for(int j = 0; j < probabilityMap[0].length; j++)
+            {
+                if(probabilityMap[i][j] > 0)
+                {
+                    double probability = probabilityMap[i][j] / maxProbability;
+                    double blueVal = Math.max(1 - 2 * probability, 0);
+                    double greenVal = 0;
+                    if(probability < 0.5)
+                    {
+                        greenVal = 2 * probability;
+                    } else
+                    {
+                        greenVal = 2 - 2 * probability;
+                    }
+                    double redVal = Math.max(2 * probability - 1, 0);
+                	Color probabilityColor = new Color((float) redVal,
+                            (float) greenVal,
+                            (float) blueVal);
+                    coloredCoordinates.add(new ColorCoordinate(i, j, probabilityColor));
+                }
+            }
+        }
+        pMan.drawRunningTiles(coloredCoordinates);
+	}
+
 	public void paused() 
 	{
 		PacmanGame pacmanWorld = new PacmanGame(pMan);
 		PacmanGhost ghost = (PacmanGhost) pacmanWorld.getThing("ghost");
 		Discrete2DSpatialModel discrete2DSpatialModel = new Discrete2DSpatialModel(ghost, pacmanWorld);
 		double[][] probabilityMap = discrete2DSpatialModel.generateProbabilityMap();
+		double maxProbability = 0;
+        for(int i = 0; i < probabilityMap.length; i++)
+        {
+            for(int j = 0; j < probabilityMap[0].length; j++)
+            {
+                if(probabilityMap[i][j] > maxProbability)
+                {
+                    maxProbability = probabilityMap[i][j];
+                }
+            }
+        }
 		ArrayList<ColorCoordinate> coloredCoordinates = new ArrayList<>();
 		for(int i = 0; i < probabilityMap.length; i++)
 		{
@@ -40,7 +96,21 @@ public class DiscreteSearchModel implements MiniMain
 			{
 				if(probabilityMap[i][j] > 0)
 				{
-//					coloredCoordinates.add(new ColorCoordinate(i, j, new Color(255 * probabilityMap[i][j], 255 * probabilityMap[i][j], 255 * probabilityMap[i][j])));
+                    double probability = probabilityMap[i][j] / maxProbability;
+                    double blueVal = Math.max(1 - 2 * probability, 0);
+                    double greenVal = 0;
+                    if(probability < 0.5)
+                    {
+                        greenVal = 2 * probability;
+                    } else
+                    {
+                        greenVal = 2 - 2 * probability;
+                    }
+                    double redVal = Math.max(2 * probability - 1, 0);
+                    Color probabilityColor = new Color((float) redVal,
+                            (float) greenVal,
+                            (float) blueVal);
+                    coloredCoordinates.add(new ColorCoordinate(i, j, probabilityColor));
 				}
 			}
 		}

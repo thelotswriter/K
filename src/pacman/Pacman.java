@@ -144,5 +144,14 @@ public class Pacman extends JFrame
         tileTimer.setRepeats(false);
         tileTimer.start();
     }
+
+    public void drawRunningTiles(List<ColorCoordinate> coloredTiles)
+    {
+        board.drawTiles(coloredTiles);
+//        board.drawTile(xCoord, yCoord);
+//        Timer tileTimer = new Timer(0,board);
+//        tileTimer.setRepeats(false);
+//        tileTimer.start();
+    }
     
 }
