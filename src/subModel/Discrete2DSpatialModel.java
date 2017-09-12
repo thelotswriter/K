@@ -8,8 +8,11 @@ import processTree.ThingNode;
 public class Discrete2DSpatialModel
 {
     private final int N_DIMENSIONS = 2;
-    private final int MAX_SEARCH = 12;
-    private final double STEP_COEFFICIENT = 12;
+    private final int MAX_SEARCH = 9;
+    private final double STEP_COEFFICIENT = 9;
+
+    private double EN_ROUTE_WEIGHT = 1.75;
+    private double UNFOUND_WEIGHT = 1;
 
     private ThingNode thing;
     private ThingNode world;
@@ -442,7 +445,7 @@ public class Discrete2DSpatialModel
                     // Otherwise, if the path hasn't been found, add the inverse of the distance to the nearest goal
                     if(enRouteToGoal)
                     {
-                        double amountToAdd = nFruitfulDirections * (maxDepth - depth + 1);
+                        double amountToAdd = nFruitfulDirections * Math.pow(maxDepth - depth + 1, EN_ROUTE_WEIGHT);
                         finalMap[location[0]][location[1]] += amountToAdd;
                         total += amountToAdd;
                     } else if(!pathFound)
@@ -456,7 +459,7 @@ public class Discrete2DSpatialModel
                         }
                         double inverseDistance = 1 / (xDist + yDist);
                         workingMap[location[0]][location[1]] += inverseDistance;
-                        total += inverseDistance;
+                        total += Math.pow(inverseDistance, UNFOUND_WEIGHT);
                     }
                     visitedSpaces[location[0]][location[1]] = false;
                     return enRouteToGoal;
@@ -471,7 +474,7 @@ public class Discrete2DSpatialModel
                     }
                     double inverseDistance = 1 / (xDist + yDist);
                     workingMap[location[0]][location[1]] += inverseDistance;
-                    total += inverseDistance;
+                    total += Math.pow(inverseDistance, UNFOUND_WEIGHT);
                     visitedSpaces[location[0]][location[1]] = false;
                     return false;
                 } else // If a path has been found, but the current node can't go deeper and isn't the goal it should allow revisiting the spaces and return false

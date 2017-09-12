@@ -16,6 +16,7 @@ import processTree.ThingNode;
 import subModel.Discrete2DSpatialModel;
 import thingNodes.PacmanGame;
 import thingNodes.PacmanGhost;
+import thingNodes.PacmanGhosts;
 
 public class DiscreteSearchModel implements MiniMain
 {
@@ -30,28 +31,46 @@ public class DiscreteSearchModel implements MiniMain
 	public void running()
 	{
         PacmanGame pacmanWorld = new PacmanGame(pMan);
-        PacmanGhost ghost = (PacmanGhost) pacmanWorld.getThing("ghost");
-        Discrete2DSpatialModel discrete2DSpatialModel = new Discrete2DSpatialModel(ghost, pacmanWorld);
-        double[][] probabilityMap = discrete2DSpatialModel.generateProbabilityMap();
-        double maxProbability = 0;
-        for(int i = 0; i < probabilityMap.length; i++)
+        PacmanGhosts ghosts = (PacmanGhosts) pacmanWorld.getThing("ghosts");
+        List<ThingNode> ghostList = ghosts.getElements();
+        List<double[][]> probabilityMaps = new ArrayList<>();
+        for(int i = 0; i < ghostList.size(); i++)
         {
-            for(int j = 0; j < probabilityMap[0].length; j++)
+            Discrete2DSpatialModel discrete2DSpatialModel = new Discrete2DSpatialModel(ghostList.get(i), pacmanWorld);
+            double[][] probabilityMap = discrete2DSpatialModel.generateProbabilityMap();
+            probabilityMaps.add(probabilityMap);
+        }
+		double[][] finalProbabilityMap = probabilityMaps.get(0);
+        for(int i = 1; i < probabilityMaps.size(); i++)
+        {
+            double[][] probabilityMap = probabilityMaps.get(i);
+            for(int j = 0; j < finalProbabilityMap.length; j++)
             {
-                if(probabilityMap[i][j] > maxProbability)
+                for(int k = 0; k < finalProbabilityMap[0].length; k++)
                 {
-                    maxProbability = probabilityMap[i][j];
+                    finalProbabilityMap[j][k] += probabilityMap[j][k];
+                }
+            }
+        }
+        double maxProbability = 0;
+        for(int i = 0; i < finalProbabilityMap.length; i++)
+        {
+            for(int j = 0; j < finalProbabilityMap[0].length; j++)
+            {
+                if(finalProbabilityMap[i][j] > maxProbability)
+                {
+                    maxProbability = finalProbabilityMap[i][j];
                 }
             }
         }
         ArrayList<ColorCoordinate> coloredCoordinates = new ArrayList<>();
-        for(int i = 0; i < probabilityMap.length; i++)
+        for(int i = 0; i < finalProbabilityMap.length; i++)
         {
-            for(int j = 0; j < probabilityMap[0].length; j++)
+            for(int j = 0; j < finalProbabilityMap[0].length; j++)
             {
-                if(probabilityMap[i][j] > 0)
+                if(finalProbabilityMap[i][j] > 0)
                 {
-                    double probability = probabilityMap[i][j] / maxProbability;
+                    double probability = finalProbabilityMap[i][j] / maxProbability;
                     double blueVal = Math.max(1 - 2 * probability, 0);
                     double greenVal = 0;
                     if(probability < 0.5)
@@ -62,6 +81,16 @@ public class DiscreteSearchModel implements MiniMain
                         greenVal = 2 - 2 * probability;
                     }
                     double redVal = Math.max(2 * probability - 1, 0);
+//                    double blueVal = 1 - probability;
+//                    double greenVal = 0;
+//                    if(probability < 0.5)
+//                    {
+//                        greenVal = 2 * probability;
+//                    } else
+//                    {
+//                        greenVal = 2 - 2 * probability;
+//                    }
+//                    double redVal = probability;
                 	Color probabilityColor = new Color((float) redVal,
                             (float) greenVal,
                             (float) blueVal);

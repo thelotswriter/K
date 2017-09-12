@@ -13,7 +13,7 @@ public class PacmanGame extends ThingNode
 	
 	Pacman pMan;
 	PacmanPlayer player;
-	PacmanGhost ghost;
+	PacmanGhosts ghosts;
 	
 	public PacmanGame(Pacman pacman)
 	{
@@ -47,27 +47,35 @@ public class PacmanGame extends ThingNode
 			walls.addElement(wall);
 		}
 		addElement(walls);
-		ghost = new PacmanGhost(pMan.getGhostX(0), pMan.getGhostY(0), pMan.getTileSize(), pMan.getTileSize(),
-				pMan.getPacmanSpeed());
-		StringBuilder ghostLocationBuilder = new StringBuilder();
-		ghostLocationBuilder.append(pMan.getGhostX(0));
-		ghostLocationBuilder.append(',');
-		ghostLocationBuilder.append(pMan.getGhostY(0));
-		ghost.setAttribute("location", ghostLocationBuilder.toString());
-		StringBuilder ghostDimensionsBuilder = new StringBuilder();
-		ghostDimensionsBuilder.append(pMan.getTileSize());
-		ghostDimensionsBuilder.append(',');
-		ghostDimensionsBuilder.append(pMan.getTileSize());
-		ghost.setAttribute("dimensions", ghostDimensionsBuilder.toString());
-		addElement(ghost);
+		ghosts = new PacmanGhosts();
+        StringBuilder ghostDimensionsBuilder = new StringBuilder();
+        ghostDimensionsBuilder.append(pMan.getTileSize());
+        ghostDimensionsBuilder.append(',');
+        ghostDimensionsBuilder.append(pMan.getTileSize());
+        int[] ghostXs = pMan.getGhostXs();
+        int[] ghostYs = pMan.getGhostYs();
+		for(int i = 0; i < ghostXs.length; i++)
+        {
+            PacmanGhost ghost = new PacmanGhost(pMan.getGhostX(i), pMan.getGhostY(i), pMan.getTileSize(), pMan.getTileSize(),
+                    pMan.getPacmanSpeed());
+            StringBuilder ghostLocationBuilder = new StringBuilder();
+            ghostLocationBuilder.append(pMan.getGhostX(i));
+            ghostLocationBuilder.append(',');
+            ghostLocationBuilder.append(pMan.getGhostY(i));
+            ghost.setAttribute("location", ghostLocationBuilder.toString());
+
+            ghost.setAttribute("dimensions", ghostDimensionsBuilder.toString());
+            ghosts.addElement(ghost);
+        }
+		addElement(ghosts);
 	}
 	
 	public void update()
 	{
 		player.updateLocation(pMan.getPacmanX(), pMan.getPacmanY());
 		player.updateSpeed(pMan.getPacmanSpeed());
-		ghost.updateLocation(pMan.getGhostX(0), pMan.getGhostY(0));
-		ghost.updateSpeed(pMan.getGhostSpeed());
+		ghosts.updateLocations(pMan.getGhostXs(), pMan.getGhostYs());
+		ghosts.updateSpeeds(pMan.getGhostSpeeds());
 	}
 	
 }

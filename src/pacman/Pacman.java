@@ -131,9 +131,9 @@ public class Pacman extends JFrame
         return board.getPacmanSpeed();
     }
 
-    public int getGhostSpeed()
+    public int[] getGhostSpeeds()
     {
-        return board.getGhostSpeed();
+        return board.getGhostSpeeds();
     }
 
     public void drawTile(List<ColorCoordinate> coloredTiles)

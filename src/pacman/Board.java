@@ -732,7 +732,12 @@ public class Board extends JPanel implements ActionListener {
     
     public int[] getGhostXs()
     {
-    	return ghost_x;
+        int[] ghostXs = new int[N_GHOSTS];
+        for(int i = 0; i < N_GHOSTS; i++)
+        {
+            ghostXs[i] = ghost_x[i];
+        }
+    	return ghostXs;
     }
     
     public int getGhostX(int index)
@@ -742,7 +747,12 @@ public class Board extends JPanel implements ActionListener {
     
     public int[] getGhostYs()
     {
-    	return ghost_y;
+        int[] ghostYs = new int[N_GHOSTS];
+        for(int i = 0; i < N_GHOSTS; i++)
+        {
+            ghostYs[i] = ghost_y[i];
+        }
+    	return ghostYs;
     }
     
     public int getGhostY(int index)
@@ -785,9 +795,14 @@ public class Board extends JPanel implements ActionListener {
         return PACMAN_SPEED;
     }
 
-    public int getGhostSpeed()
+    public int[] getGhostSpeeds()
     {
-        return ghostSpeed[0];
+        int[] speeds = new int[N_GHOSTS];
+        for(int i = 0; i < N_GHOSTS; i++)
+        {
+            speeds[i] = ghostSpeed[i];
+        }
+        return speeds;
     }
     
 }
