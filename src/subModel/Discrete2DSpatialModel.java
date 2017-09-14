@@ -16,6 +16,7 @@ public class Discrete2DSpatialModel
 
     private ThingNode thing;
     private ThingNode world;
+    private ThingNode object;
     private int[] tileDimensions;
     private int[] worldDimensions;
     private int[] thingDimensions;
@@ -23,6 +24,7 @@ public class Discrete2DSpatialModel
     private int[] thingLocation;
     private int[] objectLocation;
     private MoveType[] moveCapabilities;
+    private MoveType[] objectMoveCapabilities;
     private boolean[][] allowedSpaces;
     private double[][] workingMap;
     private double[][] finalMap;
@@ -32,6 +34,22 @@ public class Discrete2DSpatialModel
     {
         this.thing = thing;
         this.world = world;
+        object = null;
+        String[] goal = thing.getAttribute("goal").split(" ");
+        if(goal.length > 1)
+        {
+            object = world.getThing(goal[1]);
+            if(object == null && object == null)
+            {
+                if(goal[1].equalsIgnoreCase("ahead") && goal.length > 3)
+                {
+                    object = world.getThing(goal[3]);
+                } else if(goal[1].equalsIgnoreCase("behind") && goal.length > 2)
+                {
+                    object = world.getThing(goal[2]);
+                }
+            }
+        }
         initializeMaps();
         checkMovementCapabilities();
         setTilesToSearch();
@@ -49,16 +67,24 @@ public class Discrete2DSpatialModel
         objectDimensions = new int[N_DIMENSIONS];
         thingLocation = new int[N_DIMENSIONS];
         objectLocation = new int[N_DIMENSIONS];
-//        String goalString = thing.getAttribute("goal");
-//        String objectWord = thing.getAttribute("goal").split(" ")[1];
-        ThingNode object = world.getThing(thing.getAttribute("goal").split(" ")[1]);
-
-        for(int i = 0; i < N_DIMENSIONS; i++)
+        if(object != null)
         {
-            tileDimensions[i] = Integer.parseInt(world.getAttribute("grid").split(",")[i]);
-            worldDimensions[i] = Integer.parseInt(world.getAttribute("dimensions").split(",")[i]);
-            thingDimensions[i] = Integer.parseInt(thing.getAttribute("dimensions").split(",")[i]);
-            objectDimensions[i] = Integer.parseInt(object.getAttribute("dimensions").split(",")[i]);
+            for(int i = 0; i < N_DIMENSIONS; i++)
+            {
+                tileDimensions[i] = Integer.parseInt(world.getAttribute("grid").split(",")[i]);
+                worldDimensions[i] = Integer.parseInt(world.getAttribute("dimensions").split(",")[i]);
+                thingDimensions[i] = Integer.parseInt(thing.getAttribute("dimensions").split(",")[i]);
+                objectDimensions[i] = Integer.parseInt(object.getAttribute("dimensions").split(",")[i]);
+            }
+        } else
+        {
+            for(int i = 0; i < N_DIMENSIONS; i++)
+            {
+                tileDimensions[i] = Integer.parseInt(world.getAttribute("grid").split(",")[i]);
+                worldDimensions[i] = Integer.parseInt(world.getAttribute("dimensions").split(",")[i]);
+                thingDimensions[i] = Integer.parseInt(thing.getAttribute("dimensions").split(",")[i]);
+                objectDimensions[i] = tileDimensions[i];
+            }
         }
 
         allowedSpaces = new boolean[worldDimensions[0] / tileDimensions[0]][worldDimensions[1] / tileDimensions[1]];
@@ -74,6 +100,9 @@ public class Discrete2DSpatialModel
         setUnallowedSpaces();
     }
 
+    /**
+     * Resets finalMap and workingMap to be arrays of zeroes
+     */
     private void resetMaps()
     {
         for(int i = 0; i < finalMap.length; i++)
@@ -134,10 +163,31 @@ public class Discrete2DSpatialModel
     private void checkMovementCapabilities()
     {
         moveCapabilities = new MoveType[N_DIMENSIONS];
-        String[] moveStrings = thing.getAttribute("move").split(",");
+        objectMoveCapabilities = new MoveType[N_DIMENSIONS];
+        String moveString = thing.getAttribute("move");
+        if(moveString != null)
+        {
+            String[] moveStrings = moveString.split(",");
+            for(int i = 0; i < N_DIMENSIONS; i++)
+            {
+                moveCapabilities[i] = MoveType.stringToMoveType(moveStrings[i]);
+            }
+        }
         for(int i = 0; i < N_DIMENSIONS; i++)
         {
-            moveCapabilities[i] = MoveType.stringToMoveType(moveStrings[i]);
+            objectMoveCapabilities[i] = MoveType.NEITHER;
+        }
+        if(object != null)
+        {
+            String objectMoveString = object.getAttribute("move");
+            if(moveString != null)
+            {
+                String[] moveStrings = objectMoveString.split(",");
+                for(int i = 0; i < N_DIMENSIONS; i++)
+                {
+                    moveCapabilities[i] = MoveType.stringToMoveType(moveStrings[i]);
+                }
+            }
         }
     }
 
@@ -153,7 +203,7 @@ public class Discrete2DSpatialModel
             thingSpeed = Double.parseDouble(thing.getAttribute("speed"));
         }
         ThingNode object = world.getThing(thing.getAttribute("goal").split(" ")[1]);
-        if(object.hasAttribute("speed"))
+        if(object != null && object.hasAttribute("speed"))
         {
             objectSpeed = Double.parseDouble(object.getAttribute("speed"));
         }
@@ -171,11 +221,32 @@ public class Discrete2DSpatialModel
      */
     private void updateLocations()
     {
-        ThingNode object = world.getThing(thing.getAttribute("goal").split(" ")[1]);
         for(int i = 0; i < N_DIMENSIONS; i++)
         {
             thingLocation[i] = Integer.parseInt(thing.getAttribute("location").split(",")[i]);
-            objectLocation[i] = Integer.parseInt(object.getAttribute("location").split(",")[i]);
+        }
+        if(object != null)
+        {
+            String[] goal = thing.getAttribute("goal").split(" ");
+            int[] extra = new int[N_DIMENSIONS];
+            for(int i = 0; i < N_DIMENSIONS; i++)
+            {
+                extra[i] = 0;
+            }
+            if(goal[1].equalsIgnoreCase("ahead"))
+            {
+
+            } else if(goal[1].equalsIgnoreCase("behind"))
+            {
+                
+            }
+            for(int i = 0; i < N_DIMENSIONS; i++)
+            {
+                objectLocation[i] = Integer.parseInt(object.getAttribute("location").split(",")[i]) + extra[i];
+            }
+        } else
+        {
+
         }
     }
 
