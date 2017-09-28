@@ -35,7 +35,8 @@ public class PacmanGame extends ThingNode
 	
 	private void addElements()
 	{
-		player = new PacmanPlayer(pMan.getPacmanX(), pMan.getPacmanY(), pMan.getTileSize(), pMan.getTileSize(), pMan.getPacmanSpeed());
+		player = new PacmanPlayer(pMan.getPacmanX(), pMan.getPacmanY(), pMan.getTileSize(), pMan.getTileSize(),
+				pMan.getPacmanSpeed(), pMan.getPacmanDirection());
 		addElement(player);
 		PacmanWalls walls = new PacmanWalls();
 		int[] wallX = pMan.getWallX();

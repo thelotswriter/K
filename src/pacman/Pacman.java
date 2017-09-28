@@ -131,6 +131,11 @@ public class Pacman extends JFrame
         return board.getPacmanSpeed();
     }
 
+    public int[] getPacmanDirection()
+    {
+        return board.getPacmanDirection();
+    }
+
     public int[] getGhostSpeeds()
     {
         return board.getGhostSpeeds();

@@ -521,7 +521,7 @@ public class Board extends JPanel implements ActionListener {
         pacsLeft = 3;
         score = 0;
         initLevel();
-        N_GHOSTS = 1;
+//        N_GHOSTS = 2;
         currentSpeed = 3;
     }
 
@@ -793,6 +793,14 @@ public class Board extends JPanel implements ActionListener {
     public int getPacmanSpeed()
     {
         return PACMAN_SPEED;
+    }
+
+    public int[] getPacmanDirection()
+    {
+        int[] direction = new int[2];
+        direction[0] = pacmand_x;
+        direction[1] = pacmand_y;
+        return direction;
     }
 
     public int[] getGhostSpeeds()
