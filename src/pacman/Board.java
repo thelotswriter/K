@@ -151,7 +151,7 @@ public class Board extends JPanel implements ActionListener {
     public void addNotify() {
         super.addNotify();
 
-        initGame();
+//        initGame();
     }
 
     private void doAnim() {
@@ -518,6 +518,7 @@ public class Board extends JPanel implements ActionListener {
 
     private void initGame() {
 
+        inGame = true;
         pacsLeft = 3;
         score = 0;
         initLevel();
@@ -668,7 +669,6 @@ public class Board extends JPanel implements ActionListener {
                 }
             } else {
                 if (key == 's' || key == 'S') {
-                    inGame = true;
                     initGame();
                 }
             }
@@ -690,7 +690,7 @@ public class Board extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e)
     {
-        if(inGame)
+        if(inGame && miniMain != null)
         {
             miniMain.running();
         }
@@ -698,7 +698,19 @@ public class Board extends JPanel implements ActionListener {
     }
     
     //------------------------------------------------Begin custom code (so we can pull pieces out)--------------------------------
-    
+
+    /**
+     * Starts the game
+     */
+    public void play()
+    {
+        initGame();
+    }
+
+    /**
+     * Tells whether the game is currently playing
+     * @return True if the game is in session, or false if the game hasn't been started, has ended, or is paused
+     */
     public boolean isPlaying()
     {
     	return inGame;
@@ -812,5 +824,5 @@ public class Board extends JPanel implements ActionListener {
         }
         return speeds;
     }
-    
+
 }

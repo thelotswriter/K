@@ -2,8 +2,9 @@ package thingNodes;
 
 import pacman.Pacman;
 import processTree.ThingNode;
+import thingNodes.CategoryNodes.GameNode;
 
-public class PacmanGame extends ThingNode 
+public class PacmanGame extends GameNode
 {
 	
 	/**
@@ -14,6 +15,14 @@ public class PacmanGame extends ThingNode
 	Pacman pMan;
 	PacmanPlayer player;
 	PacmanGhosts ghosts;
+
+	public PacmanGame()
+    {
+        setName("PacmanGame");
+        pMan = new Pacman();
+        setAttributes();
+        addElements();
+    }
 	
 	public PacmanGame(Pacman pacman)
 	{
@@ -22,6 +31,11 @@ public class PacmanGame extends ThingNode
 		setAttributes();
 		addElements();
 	}
+
+	public void startGame()
+    {
+        pMan.play();
+    }
 	
 	private void setAttributes()
 	{

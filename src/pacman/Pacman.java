@@ -60,6 +60,11 @@ public class Pacman extends JFrame
             ex.setVisible(true);
         });
     }
+
+    public void play()
+    {
+        board.play();
+    }
     
     public boolean isPlaying()
     {

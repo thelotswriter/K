@@ -238,7 +238,7 @@ public class Discrete2DSpatialModel
 
             } else if(goal[1].equalsIgnoreCase("behind"))
             {
-                
+
             }
             for(int i = 0; i < N_DIMENSIONS; i++)
             {
