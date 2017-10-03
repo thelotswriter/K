@@ -308,8 +308,8 @@ public class Discrete2DSpatialModel
         {
             for(int j = 0; j < finalMap[0].length; j++)
             {
-                vector[0] += finalMap[i][j] * (i - objectLocation[0] / tileDimensions[0]);
-                vector[1] += finalMap[i][j] * (j - objectLocation[1] / tileDimensions[1]);
+                vector[0] += finalMap[i][j] / (i - objectLocation[0] / tileDimensions[0]);
+                vector[1] += finalMap[i][j] / (j - objectLocation[1] / tileDimensions[1]);
             }
         }
         return vector;
@@ -330,11 +330,57 @@ public class Discrete2DSpatialModel
         {
             for(int j = 0; j < finalMap[0].length; j++)
             {
-                vector[0] += finalMap[i][j] * (i - location[0]);
-                vector[1] += finalMap[i][j] * (j - location[1]);
+                vector[0] += finalMap[i][j] / (i - location[0]);
+                vector[1] += finalMap[i][j] / (j - location[1]);
             }
         }
         return vector;
+    }
+
+    public boolean isAllowableMovement(int[] location, double[] direction)
+    {
+        // Check if the location is between tiles. If so, set the location be the tile in the direction headed
+        for(int i = 0; i < N_DIMENSIONS; i++)
+        {
+            if(location[i] % tileDimensions[i] != 0)
+            {
+                if(direction[i] > 0)
+                {
+                    location[i] = 1 + location[i] / tileDimensions[i];
+                } else
+                {
+                    location[i] /= tileDimensions[i];
+                }
+            } else
+            {
+                location[i] /= tileDimensions[i];
+            }
+        }
+        // Since the space is discrete, a mixed direction is not allowed. Therefore, we only care about the highest weighted direction
+        int[] discreteDirection = new int[N_DIMENSIONS];
+        if(Math.abs(direction[0]) > Math.abs(direction[1]))
+        {
+            if(direction[0] > 0)
+            {
+                discreteDirection[0] = 1;
+            } else
+            {
+                discreteDirection[0] = -1;
+            }
+            discreteDirection[1] = 0;
+        } else
+        {
+            discreteDirection[0] = 0;
+            if(direction[1] > 0)
+            {
+                discreteDirection[1] = 1;
+            } else
+            {
+                discreteDirection[1] = -1;
+            }
+            discreteDirection[1] = 1;
+        }
+        return allowedSpaces[location[0] + discreteDirection[0]][location[1] + discreteDirection[1]];
     }
 
 }
