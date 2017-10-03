@@ -23,7 +23,8 @@ public class ThingNode extends ProcessNode
 	 * 
 	 */
 	private static final long serialVersionUID = 8491656821785497689L;
-	
+
+	private ThingNode parent;
 	private ArrayList<ThingNode> elements;
 	
 	private List<Adjective> adjectives;
@@ -45,10 +46,19 @@ public class ThingNode extends ProcessNode
 	 */
 	public ThingNode()
 	{
+	    parent = null;
 		elements = new ArrayList<>();
 		attributes = new HashMap<String, String>();
 		categories = new ArrayList<>();
 	}
+
+    public ThingNode(ThingNode parentNode)
+    {
+        parent = parentNode;
+        elements = new ArrayList<>();
+        attributes = new HashMap<String, String>();
+        categories = new ArrayList<>();
+    }
 	
 	/**
 	 * Creates a new thing node based on the given data
@@ -225,6 +235,15 @@ public class ThingNode extends ProcessNode
 	{
 		attributes.put(attribute, value);
 	}
+
+    /**
+     * Gets the parent node of the thing node, if it has one
+     * @return The parent node of the thing node
+     */
+	public ThingNode getParent()
+    {
+        return parent;
+    }
 
 	/**
 	 * Searches for the thing named by the string

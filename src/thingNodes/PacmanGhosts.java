@@ -8,9 +8,9 @@ import java.util.List;
 public class PacmanGhosts extends ThingsNode
 {
 
-    public PacmanGhosts()
+    public PacmanGhosts(ThingNode parent)
     {
-        super();
+        super(parent);
         setName("ghosts");
         addCategory("enemy");
         addCategory("monster");

@@ -10,8 +10,9 @@ public class PacmanGhost extends ThingNode
 	 */
 	private static final long serialVersionUID = -6346522976848669458L;
 	
-	public PacmanGhost(int locationX, int locationY, int width, int height, int speed)
+	public PacmanGhost(ThingNode parent, int locationX, int locationY, int width, int height, int speed)
 	{
+		super(parent);
 		setName("ghost");
 		addCategory("enemy");
 		addCategory("monster");

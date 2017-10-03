@@ -136,7 +136,7 @@ public abstract class ActionNode extends ProcessNode
 	/**
 	 * A method where any extra setup can be done
 	 */
-	public abstract void initialize();
+	public abstract void initialize() throws NotAnActionNodeException, UnknownActionException, UnreadableActionNodeException, IOException;
 	
 	/**
 	 * Runs the action node (called once every cycle), returning a list of instructions which may be executed
@@ -258,6 +258,15 @@ public abstract class ActionNode extends ProcessNode
 	public double getUrgency()
 	{
 		return urgency;
+	}
+
+	public void addElement(ActionNode element)
+	{
+	    if(elements == null)
+        {
+            elements = new ArrayList<>();
+        }
+		elements.add(element);
 	}
 	
 //	/**

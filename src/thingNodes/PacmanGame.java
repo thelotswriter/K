@@ -39,6 +39,7 @@ public class PacmanGame extends GameNode
 	
 	private void setAttributes()
 	{
+		setAttribute("goal", "avoid ghosts");
 		setAttribute("dimensions", "360,360");
 		StringBuilder tileBuilder = new StringBuilder();
 		tileBuilder.append(pMan.getTileSize());
@@ -52,7 +53,7 @@ public class PacmanGame extends GameNode
 		player = new PacmanPlayer(pMan.getPacmanX(), pMan.getPacmanY(), pMan.getTileSize(), pMan.getTileSize(),
 				pMan.getPacmanSpeed(), pMan.getPacmanDirection());
 		addElement(player);
-		PacmanWalls walls = new PacmanWalls();
+		PacmanWalls walls = new PacmanWalls(this);
 		int[] wallX = pMan.getWallX();
 		int[] wallY = pMan.getWallY();
 		for(int i = 0; i < wallX.length; i++)
@@ -62,7 +63,7 @@ public class PacmanGame extends GameNode
 			walls.addElement(wall);
 		}
 		addElement(walls);
-		ghosts = new PacmanGhosts();
+		ghosts = new PacmanGhosts(this);
         StringBuilder ghostDimensionsBuilder = new StringBuilder();
         ghostDimensionsBuilder.append(pMan.getTileSize());
         ghostDimensionsBuilder.append(',');
@@ -71,7 +72,7 @@ public class PacmanGame extends GameNode
         int[] ghostYs = pMan.getGhostYs();
 		for(int i = 0; i < ghostXs.length; i++)
         {
-            PacmanGhost ghost = new PacmanGhost(pMan.getGhostX(i), pMan.getGhostY(i), pMan.getTileSize(), pMan.getTileSize(),
+            PacmanGhost ghost = new PacmanGhost(ghosts, pMan.getGhostX(i), pMan.getGhostY(i), pMan.getTileSize(), pMan.getTileSize(),
                     pMan.getPacmanSpeed());
             StringBuilder ghostLocationBuilder = new StringBuilder();
             ghostLocationBuilder.append(pMan.getGhostX(i));

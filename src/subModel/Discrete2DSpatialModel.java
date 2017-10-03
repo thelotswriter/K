@@ -293,4 +293,48 @@ public class Discrete2DSpatialModel
 
     }
 
+    public double[] getVector()
+    {
+        double[] vector = new double[N_DIMENSIONS];
+        for(int i = 0; i < N_DIMENSIONS; i++)
+        {
+            vector[i] = 0;
+        }
+        if(finalMap == null)
+        {
+            generateProbabilityMap();
+        }
+        for(int i = 0; i < finalMap.length; i++)
+        {
+            for(int j = 0; j < finalMap[0].length; j++)
+            {
+                vector[0] += finalMap[i][j] * (i - objectLocation[0] / tileDimensions[0]);
+                vector[1] += finalMap[i][j] * (j - objectLocation[1] / tileDimensions[1]);
+            }
+        }
+        return vector;
+    }
+
+    public double[] getVector(double[] location)
+    {
+        double[] vector = new double[N_DIMENSIONS];
+        for(int i = 0; i < N_DIMENSIONS; i++)
+        {
+            vector[i] = 0;
+        }
+        if(finalMap == null)
+        {
+            generateProbabilityMap();
+        }
+        for(int i = 0; i < finalMap.length; i++)
+        {
+            for(int j = 0; j < finalMap[0].length; j++)
+            {
+                vector[0] += finalMap[i][j] * (i - location[0]);
+                vector[1] += finalMap[i][j] * (j - location[1]);
+            }
+        }
+        return vector;
+    }
+
 }
