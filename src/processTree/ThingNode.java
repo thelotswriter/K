@@ -128,6 +128,14 @@ public class ThingNode extends ProcessNode
 	{
 		return new ArrayList<String>(attributes.keySet());
 	}
+
+	public void update()
+    {
+        for(ThingNode element : elements)
+        {
+            element.update();
+        }
+    }
 	
 	/**
 	 * Checks whether the thing node is part of the specified category

@@ -219,7 +219,7 @@ public class Discrete2DSpatialModel
     /**
      * Updates the locations of the thing and object in the world
      */
-    private void updateLocations()
+    public void updateLocations()
     {
         for(int i = 0; i < N_DIMENSIONS; i++)
         {
@@ -308,8 +308,14 @@ public class Discrete2DSpatialModel
         {
             for(int j = 0; j < finalMap[0].length; j++)
             {
-                vector[0] += finalMap[i][j] / (i - objectLocation[0] / tileDimensions[0]);
-                vector[1] += finalMap[i][j] / (j - objectLocation[1] / tileDimensions[1]);
+                if(i != objectLocation[0] / tileDimensions[0])
+                {
+                    vector[0] += finalMap[i][j] / (i - objectLocation[0] / tileDimensions[0]);
+                }
+                if(j != objectLocation[1] / tileDimensions[1])
+                {
+                    vector[1] += finalMap[i][j] / (j - objectLocation[1] / tileDimensions[1]);
+                }
             }
         }
         return vector;
@@ -330,8 +336,14 @@ public class Discrete2DSpatialModel
         {
             for(int j = 0; j < finalMap[0].length; j++)
             {
-                vector[0] += finalMap[i][j] / (i - location[0]);
-                vector[1] += finalMap[i][j] / (j - location[1]);
+                if(i != location[0])
+                {
+                    vector[0] += finalMap[i][j] / (i - location[0]);
+                }
+                if(j != location[1])
+                {
+                    vector[1] += finalMap[i][j] / (j - location[1]);
+                }
             }
         }
         return vector;

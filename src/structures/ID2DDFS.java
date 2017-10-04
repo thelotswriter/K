@@ -64,15 +64,16 @@ public class ID2DDFS
 //                }
 //            }
 //        } else
-//        {
-//            for(int i = 0; i < finalMap.length; i++)
-//            {
-//                for(int j = 0; j < finalMap[0].length; j++)
-//                {
-//                    finalMap[i][j] = workingMap[i][j] / total;
-//                }
-//            }
-//        }
+        if(!pathFound)
+        {
+            for(int i = 0; i < finalMap.length; i++)
+            {
+                for(int j = 0; j < finalMap[0].length; j++)
+                {
+                    finalMap[i][j] = workingMap[i][j];
+                }
+            }
+        }
         return finalMap;
     }
 

@@ -1,6 +1,8 @@
 package actionNodes;
 
+import instructions.Instruction;
 import instructions.InstructionPacket;
+import instructions.InstructionType;
 import kaiExceptions.NotAnActionNodeException;
 import kaiExceptions.UnknownActionException;
 import kaiExceptions.UnreadableActionNodeException;
@@ -20,10 +22,7 @@ public class Avoid extends ActionNode
 
     // Weights determining direction. Variable sideWeight is multiplied by the magnitude of the and used to make
     // instructions to go left/right.
-    // Variable reverseWeight is multiplied in the direction opposite the subject's current movement to discourage
-    // backtracking (should be < 1)
     private double sideWeight = 0.25;
-    private double reverseWeight = 0.8;
 
     private List<Discrete2DSpatialModel> models;
     private ThingNode subject;
@@ -57,7 +56,7 @@ public class Avoid extends ActionNode
     public List<InstructionPacket> run()
     {
         List<InstructionPacket> instructionPackets = new ArrayList<>();
-        double[] vector = new double[getDirectObject().getAttribute("dimensions").split(",").length];
+        double[] vector = new double[getDirectObject().getParent().getAttribute("dimensions").split(",").length];
         for(double oneDVector : vector)
         {
             oneDVector = 0;
@@ -65,6 +64,7 @@ public class Avoid extends ActionNode
         double urgency = 0;
         for(Discrete2DSpatialModel model : models)
         {
+            model.updateLocations();
             model.generateProbabilityMap();
             double[] currentVector = model.getVector();
             for(int i = 0; i < vector.length; i++)
@@ -77,18 +77,60 @@ public class Avoid extends ActionNode
         List<double[]> sideVectors = new ArrayList<>();
         double[] sideVector1 = new double[vector.length];
         double[] sideVector2 = new double[vector.length];
-        int varsRemaining = 0;
+        int varsIndex = -1;
+        double sideVectorLength = 0;
+        double vectorLength = 0;
         for(int i = 0; i < vector.length; i++)
         {
             if(vector[i] == 0)
             {
                 sideVector1[i] = 1;
+                sideVectorLength++;
+            } else if(varsIndex < 0) // Mark the variable we will solve for with a -1
+            {
+                sideVector1[i] = -1;
+                varsIndex = i;
             } else
             {
                 sideVector1[i] = 0;
-                varsRemaining++;
+            }
+            vectorLength += vector[i] * vector[i];
+        }
+        vectorLength = Math.sqrt(vectorLength);
+        double unknownDimension = 0;
+        for(int i = 0; i < vector.length; i++)
+        {
+            if(sideVector1[i] == 1)
+            {
+                unknownDimension -= vector[i];
             }
         }
+        unknownDimension /= vector[varsIndex];
+        sideVector1[varsIndex] = unknownDimension;
+        sideVectorLength += unknownDimension * unknownDimension;
+        sideVectorLength = Math.sqrt(sideVectorLength);
+        for(int i = 0; i < sideVector1.length; i++)
+        {
+            sideVector1[i] *= vectorLength / sideVectorLength;
+            sideVector2[i] = -1 * sideVector1[i];
+        }
+        sideVectors.add(sideVector1);
+        sideVectors.add(sideVector2);
+        for(double[] sideVector : sideVectors)
+        {
+            List<String> params = new ArrayList<>();
+            for(int i = 0; i < sideVector.length; i++)
+            {
+                params.add(Double.toString(sideVector[i] * sideWeight));
+            }
+            instructionPackets.add(new InstructionPacket(new Instruction(InstructionType.MOVE, params), this));
+        }
+        List<String> params = new ArrayList<>();
+        for(int i = 0; i < vector.length; i++)
+        {
+            params.add(Double.toString(vector[i]));
+        }
+        instructionPackets.add(new InstructionPacket(new Instruction(InstructionType.MOVE, params), this));
         return instructionPackets;
     }
 }
