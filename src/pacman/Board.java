@@ -549,8 +549,8 @@ public class Board extends JPanel implements ActionListener {
 
         for (i = 0; i < N_GHOSTS; i++) {
 
-            ghost_y[i] = 4 * BLOCK_SIZE;
-            ghost_x[i] = 4 * BLOCK_SIZE;
+            ghost_y[i] = 12 * BLOCK_SIZE;
+            ghost_x[i] = 6 * BLOCK_SIZE;
             ghost_dy[i] = 0;
             ghost_dx[i] = dx;
             dx = -dx;
@@ -563,8 +563,8 @@ public class Board extends JPanel implements ActionListener {
             ghostSpeed[i] = validSpeeds[random];
         }
 
-        pacman_x = 7 * BLOCK_SIZE;
-        pacman_y = 11 * BLOCK_SIZE;
+        pacman_x = 12 * BLOCK_SIZE;
+        pacman_y = 2 * BLOCK_SIZE;
         pacmand_x = 0;
         pacmand_y = 0;
         req_dx = 0;

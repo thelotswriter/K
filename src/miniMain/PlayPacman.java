@@ -38,7 +38,7 @@ public class PlayPacman implements MiniMain
                 double[] probabilityVector = generateProbabilityVector(game.getAttribute("dimensions").split(",").length,
                         instructionPackets);
                 double rand = Math.random();
-                if(rand < probabilityVector[0])
+                if(rand < Math.abs(probabilityVector[0]))
                 {
                     if(probabilityVector[0] > 0)
                     {

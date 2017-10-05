@@ -69,7 +69,7 @@ public class Avoid extends ActionNode
             double[] currentVector = model.getVector();
             for(int i = 0; i < vector.length; i++)
             {
-                vector[i] += currentVector[i];
+                vector[i] -= currentVector[i]; // The vector given will point toward rather than away
                 urgency += Math.abs(currentVector[i]);
             }
         }
@@ -82,19 +82,20 @@ public class Avoid extends ActionNode
         double vectorLength = 0;
         for(int i = 0; i < vector.length; i++)
         {
-            if(vector[i] == 0)
-            {
-                sideVector1[i] = 1;
-                sideVectorLength++;
-            } else if(varsIndex < 0) // Mark the variable we will solve for with a -1
+            if(vector[i] != 0 && varsIndex < 0) // Mark the variable with a -1. We don't want it multiplied by zero
             {
                 sideVector1[i] = -1;
                 varsIndex = i;
             } else
             {
-                sideVector1[i] = 0;
+                sideVector1[i] = 1;
+                sideVectorLength++;
             }
             vectorLength += vector[i] * vector[i];
+        }
+        if(varsIndex < 0)
+        {
+            return instructionPackets;
         }
         vectorLength = Math.sqrt(vectorLength);
         double unknownDimension = 0;
