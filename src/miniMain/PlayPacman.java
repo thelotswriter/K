@@ -18,7 +18,10 @@ import java.util.List;
 public class PlayPacman implements MiniMain
 {
 
+    public static boolean pause_play;
+
     public static void main(String[] args) throws AWTException {
+        pause_play = false;
         PacmanGame game = new PacmanGame();
 //        try {
 //            Thread.sleep(2000);
@@ -42,10 +45,12 @@ public class PlayPacman implements MiniMain
                 {
                     if(probabilityVector[0] > 0)
                     {
+                        pause_play = false;
                         robot.keyPress(KeyEvent.VK_RIGHT);
                         System.out.println("Right");
                     } else
                     {
+                        pause_play = false;
                         robot.keyPress(KeyEvent.VK_LEFT);
                         System.out.println("Left");
                     }
@@ -53,10 +58,12 @@ public class PlayPacman implements MiniMain
                 {
                     if(probabilityVector[0] > 0)
                     {
+                        pause_play = true;
                         robot.keyPress(KeyEvent.VK_DOWN);
                         System.out.println("Down");
                     } else
                     {
+                        pause_play = false;
                         robot.keyPress(KeyEvent.VK_UP);
                         System.out.println("Up");
                     }

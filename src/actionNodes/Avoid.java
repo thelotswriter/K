@@ -7,6 +7,7 @@ import kaiExceptions.NotAnActionNodeException;
 import kaiExceptions.UnknownActionException;
 import kaiExceptions.UnreadableActionNodeException;
 import knowledgeAccess.ActionElement;
+import miniMain.PlayPacman;
 import processTree.ActionNode;
 import processTree.CommandNode;
 import processTree.ThingNode;
@@ -22,7 +23,7 @@ public class Avoid extends ActionNode
 
     // Weights determining direction. Variable sideWeight is multiplied by the magnitude of the and used to make
     // instructions to go left/right.
-    private double sideWeight = 0.25;
+    private double sideWeight = 0.0;
 
     private List<Discrete2DSpatialModel> models;
     private ThingNode subject;
@@ -56,6 +57,11 @@ public class Avoid extends ActionNode
     public List<InstructionPacket> run()
     {
         List<InstructionPacket> instructionPackets = new ArrayList<>();
+        if(PlayPacman.pause_play)
+        {
+            int x = 0;
+            int y = x;
+        }
         double[] vector = new double[getDirectObject().getParent().getAttribute("dimensions").split(",").length];
         for(double oneDVector : vector)
         {

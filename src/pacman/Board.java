@@ -60,6 +60,9 @@ public class Board extends JPanel implements ActionListener {
     private Image pacman3up, pacman3down, pacman3left, pacman3right;
     private Image pacman4up, pacman4down, pacman4left, pacman4right;
 
+    private int[] pacStart = {12,2};
+    private int[] ghostStart = {11,8};
+
     private int pacman_x, pacman_y, pacmand_x, pacmand_y;
     private int req_dx, req_dy, view_dx, view_dy;
 
@@ -82,7 +85,7 @@ public class Board extends JPanel implements ActionListener {
     };
 
     private final int validSpeeds[] = {1, 2, 3, 4, 6, 8};
-    private final int maxSpeed = 6;
+    private final int maxSpeed = 3;
 
     private int currentSpeed = 3;
     private short[] screenData;
@@ -549,8 +552,8 @@ public class Board extends JPanel implements ActionListener {
 
         for (i = 0; i < N_GHOSTS; i++) {
 
-            ghost_y[i] = 12 * BLOCK_SIZE;
-            ghost_x[i] = 6 * BLOCK_SIZE;
+            ghost_y[i] = ghostStart[1] * BLOCK_SIZE;
+            ghost_x[i] = ghostStart[0] * BLOCK_SIZE;
             ghost_dy[i] = 0;
             ghost_dx[i] = dx;
             dx = -dx;
@@ -563,8 +566,8 @@ public class Board extends JPanel implements ActionListener {
             ghostSpeed[i] = validSpeeds[random];
         }
 
-        pacman_x = 12 * BLOCK_SIZE;
-        pacman_y = 2 * BLOCK_SIZE;
+        pacman_x = pacStart[0] * BLOCK_SIZE;
+        pacman_y = pacStart[1] * BLOCK_SIZE;
         pacmand_x = 0;
         pacmand_y = 0;
         req_dx = 0;
