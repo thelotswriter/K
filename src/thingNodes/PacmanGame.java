@@ -93,5 +93,10 @@ public class PacmanGame extends GameNode
 		ghosts.updateLocations(pMan.getGhostXs(), pMan.getGhostYs());
 		ghosts.updateSpeeds(pMan.getGhostSpeeds());
 	}
+
+	public Pacman getGame()
+	{
+		return pMan;
+	}
 	
 }

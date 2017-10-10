@@ -34,40 +34,64 @@ public class PlayPacman implements MiniMain
             playNode.initialize();
             Instruction instruction = new Instruction(InstructionType.START, null);
             Robot robot = new Robot();
+            int count = 0;
             while(instruction.getType() != InstructionType.FINISH)
             {
                 game.update();
                 List<InstructionPacket> instructionPackets = playNode.run();
                 double[] probabilityVector = generateProbabilityVector(game.getAttribute("dimensions").split(",").length,
                         instructionPackets);
-                double rand = Math.random();
-                if(rand < Math.abs(probabilityVector[0]))
+                if(Math.abs(probabilityVector[0]) > Math.abs(probabilityVector[1]))
                 {
                     if(probabilityVector[0] > 0)
                     {
-                        pause_play = false;
                         robot.keyPress(KeyEvent.VK_RIGHT);
-                        System.out.println("Right");
                     } else
                     {
-                        pause_play = false;
                         robot.keyPress(KeyEvent.VK_LEFT);
-                        System.out.println("Left");
                     }
                 } else
                 {
-                    if(probabilityVector[0] > 0)
+                    if(probabilityVector[1] > 0)
                     {
-                        pause_play = true;
                         robot.keyPress(KeyEvent.VK_DOWN);
-                        System.out.println("Down");
                     } else
                     {
-                        pause_play = false;
                         robot.keyPress(KeyEvent.VK_UP);
-                        System.out.println("Up");
                     }
                 }
+//                double rand = Math.random();
+//                if(rand < Math.abs(probabilityVector[0]))
+//                {
+//                    if(probabilityVector[0] > 0)
+//                    {
+//                        pause_play = false;
+//                        robot.keyPress(KeyEvent.VK_RIGHT);
+//                        System.out.println("Right");
+//                    } else
+//                    {
+//                        pause_play = false;
+//                        robot.keyPress(KeyEvent.VK_LEFT);
+//                        System.out.println("Left");
+//                    }
+//                } else
+//                {
+//                    if(probabilityVector[0] > 0)
+//                    {
+//                        count++;
+//                        if(count > 50)
+//                        {
+//                            pause_play = true;
+//                        }
+//                        robot.keyPress(KeyEvent.VK_DOWN);
+//                        System.out.println("Down");
+//                    } else
+//                    {
+//                        pause_play = false;
+//                        robot.keyPress(KeyEvent.VK_UP);
+//                        System.out.println("Up");
+//                    }
+//                }
             }
         } catch (NotAnActionNodeException e)
         {

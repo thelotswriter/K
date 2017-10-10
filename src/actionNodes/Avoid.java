@@ -7,13 +7,17 @@ import kaiExceptions.NotAnActionNodeException;
 import kaiExceptions.UnknownActionException;
 import kaiExceptions.UnreadableActionNodeException;
 import knowledgeAccess.ActionElement;
+import miniMain.ColorCoordinate;
 import miniMain.PlayPacman;
+import pacman.Pacman;
 import processTree.ActionNode;
 import processTree.CommandNode;
 import processTree.ThingNode;
 import subModel.Discrete2DSpatialModel;
+import thingNodes.PacmanGame;
 import words.Adverb;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,14 +72,15 @@ public class Avoid extends ActionNode
             oneDVector = 0;
         }
         double urgency = 0;
+        List<double[][]> probMaps = new ArrayList<>();
         for(Discrete2DSpatialModel model : models)
         {
             model.updateLocations();
-            model.generateProbabilityMap();
+            probMaps.add(model.generateProbabilityMap());
             double[] currentVector = model.getVector();
             for(int i = 0; i < vector.length; i++)
             {
-                vector[i] -= currentVector[i]; // The vector given will point toward rather than away
+                vector[i] += currentVector[i]; // The vector given will point toward rather than away
                 urgency += Math.abs(currentVector[i]);
             }
         }
@@ -138,6 +143,73 @@ public class Avoid extends ActionNode
             params.add(Double.toString(vector[i]));
         }
         instructionPackets.add(new InstructionPacket(new Instruction(InstructionType.MOVE, params), this));
+        drawMaps(probMaps);
         return instructionPackets;
     }
+
+    private void drawMaps(List<double[][]> probabilityMaps)
+    {
+        Pacman pMan = ((PacmanGame) getDirectObject().getParent()).getGame();
+
+        double[][] finalProbabilityMap = probabilityMaps.get(0);
+        for(int i = 1; i < probabilityMaps.size(); i++)
+        {
+            double[][] probabilityMap = probabilityMaps.get(i);
+            for(int j = 0; j < finalProbabilityMap.length; j++)
+            {
+                for(int k = 0; k < finalProbabilityMap[0].length; k++)
+                {
+                    finalProbabilityMap[j][k] += probabilityMap[j][k];
+                }
+            }
+        }
+        double maxProbability = 0;
+        for(int i = 0; i < finalProbabilityMap.length; i++)
+        {
+            for(int j = 0; j < finalProbabilityMap[0].length; j++)
+            {
+                if(finalProbabilityMap[i][j] > maxProbability)
+                {
+                    maxProbability = finalProbabilityMap[i][j];
+                }
+            }
+        }
+        ArrayList<ColorCoordinate> coloredCoordinates = new ArrayList<>();
+        for(int i = 0; i < finalProbabilityMap.length; i++)
+        {
+            for(int j = 0; j < finalProbabilityMap[0].length; j++)
+            {
+                if(finalProbabilityMap[i][j] > 0)
+                {
+                    double probability = finalProbabilityMap[i][j] / maxProbability;
+                    double blueVal = Math.max(1 - 2 * probability, 0);
+                    double greenVal = 0;
+                    if(probability < 0.5)
+                    {
+                        greenVal = 2 * probability;
+                    } else
+                    {
+                        greenVal = 2 - 2 * probability;
+                    }
+                    double redVal = Math.max(2 * probability - 1, 0);
+//                    double blueVal = 1 - probability;
+//                    double greenVal = 0;
+//                    if(probability < 0.5)
+//                    {
+//                        greenVal = 2 * probability;
+//                    } else
+//                    {
+//                        greenVal = 2 - 2 * probability;
+//                    }
+//                    double redVal = probability;
+                    Color probabilityColor = new Color((float) redVal,
+                            (float) greenVal,
+                            (float) blueVal);
+                    coloredCoordinates.add(new ColorCoordinate(i, j, probabilityColor));
+                }
+            }
+        }
+        pMan.drawRunningTiles(coloredCoordinates);
+    }
+
 }

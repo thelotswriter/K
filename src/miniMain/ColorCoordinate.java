@@ -8,7 +8,7 @@ public class ColorCoordinate
     private int y;
     private Color color;
 
-    ColorCoordinate(int x, int y, Color color)
+    public ColorCoordinate(int x, int y, Color color)
     {
         this.x = x;
         this.y = y;

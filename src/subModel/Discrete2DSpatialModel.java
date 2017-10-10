@@ -100,21 +100,6 @@ public class Discrete2DSpatialModel
         setUnallowedSpaces();
     }
 
-//    /**
-//     * Resets finalMap and workingMap to be arrays of zeroes
-//     */
-//    private void resetMaps()
-//    {
-//        for(int i = 0; i < finalMap.length; i++)
-//        {
-//            for(int j = 0; j < finalMap[0].length; j++)
-//            {
-//                workingMap[i][j] = 0;
-//                finalMap[i][j] = 0;
-//            }
-//        }
-//    }
-
     /**
      * Determines which spaces are blocked and blocks them
      */
@@ -308,13 +293,13 @@ public class Discrete2DSpatialModel
         {
             for(int j = 0; j < finalMap[0].length; j++)
             {
-                if(i != objectLocation[0] / tileDimensions[0])
+                int xDiff = objectLocation[0] / tileDimensions[0] - i;
+                int yDiff = objectLocation[1] / tileDimensions[1] - j;
+                int dist = xDiff + yDiff;
+                if(dist != 0)
                 {
-                    vector[0] += finalMap[i][j] / (i - objectLocation[0] / tileDimensions[0]);
-                }
-                if(j != objectLocation[1] / tileDimensions[1])
-                {
-                    vector[1] += finalMap[i][j] / (j - objectLocation[1] / tileDimensions[1]);
+                    vector[0] += finalMap[i][j] * Math.abs(Math.cos(Math.atan2(yDiff, xDiff))) / dist;
+                    vector[1] += finalMap[i][j] * Math.abs(Math.sin(Math.atan2(yDiff, xDiff))) / dist;
                 }
             }
         }
