@@ -20,10 +20,10 @@ import java.util.List;
 public class Play extends ActionNode
 {
 
-    public Play(CommandNode root, ThingNode directObject, ThingNode indirectObject, List<Adverb> adverbs, List<ActionElement> elements,
+    public Play(CommandNode root, ThingNode subject, ThingNode directObject, ThingNode indirectObject, List<Adverb> adverbs, List<ActionElement> elements,
                 double confidence, double priority, double urgency) throws NotAnActionNodeException, UnknownActionException, IOException, UnreadableActionNodeException
     {
-        super(root, directObject, indirectObject, adverbs, elements, confidence, priority, urgency);
+        super(root, subject, directObject, indirectObject, adverbs, elements, confidence, priority, urgency);
     }
 
     @Override

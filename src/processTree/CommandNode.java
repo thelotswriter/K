@@ -112,7 +112,7 @@ public class CommandNode extends ProcessNode implements Runnable
 			{
 				if(word.getType() == WordType.VERB)
 				{
-					addActionTree(word, directObject, indirectObject, adverbs);
+					addActionTree(word, null, directObject, indirectObject, adverbs);
 					break;
 				}
 			}
@@ -166,10 +166,10 @@ public class CommandNode extends ProcessNode implements Runnable
 		return newThing;
 	}
 	
-	private void addActionTree(Word word, ThingNode directObject, ThingNode indirectObject, List<Adverb> adverbs) throws UnknownActionException, UnreadableActionNodeException, 
+	private void addActionTree(Word word, ThingNode subject, ThingNode directObject, ThingNode indirectObject, List<Adverb> adverbs) throws UnknownActionException, UnreadableActionNodeException,
 	NotAnActionNodeException, FileNotFoundException, IOException
 	{
-		actionTree = ActionNodeLoader.getInstance().loadNode(word.toString(), this, directObject, indirectObject, adverbs);
+		actionTree = ActionNodeLoader.getInstance().loadNode(word.toString(), this, subject, directObject, indirectObject, adverbs);
 	}
 	
 	public NodeType getType()

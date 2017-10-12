@@ -46,7 +46,7 @@ public class ActionNodeLoader
 		return SINGLETON;
 	}
 	
-	public ActionNode loadNode(String actionVerb, CommandNode root, ThingNode directObject, ThingNode indirectObject, List<Adverb> adverbs) 
+	public ActionNode loadNode(String actionVerb, CommandNode root, ThingNode subject, ThingNode directObject, ThingNode indirectObject, List<Adverb> adverbs)
 			throws UnknownActionException, UnreadableActionNodeException, NotAnActionNodeException, FileNotFoundException, IOException
 	{
 		KnowledgePacket packet = KnowledgeAccessor.getInstance().getVerbKnowledge(actionVerb);
@@ -83,7 +83,7 @@ public class ActionNodeLoader
                     // Cast to ActionNode
                     loadedNode = (ActionNode) obj;
                     classLoader.close();
-                    loadedNode.load(root, directObject, indirectObject, adverbs, elements, confidence, priority, urgency);
+                    loadedNode.load(root, subject, directObject, indirectObject, adverbs, elements, confidence, priority, urgency);
                     return loadedNode;
                 } else
                 {

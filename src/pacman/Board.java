@@ -50,7 +50,7 @@ public class Board extends JPanel implements ActionListener {
     private int pacAnimCount = PAC_ANIM_DELAY;
     private int pacAnimDir = 1;
     private int pacmanAnimPos = 0;
-    private int N_GHOSTS = 1;
+    private int N_GHOSTS = 2;
     private int pacsLeft, score;
     private int[] dx, dy;
     private int[] ghost_x, ghost_y, ghost_dx, ghost_dy, ghostSpeed;

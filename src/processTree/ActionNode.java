@@ -22,7 +22,8 @@ public abstract class ActionNode extends ProcessNode
 	private static final long serialVersionUID = -5372233803154204549L;
 	
 	private CommandNode root;
-	
+
+	private ThingNode subject;
 	private ThingNode directObject;
 	private ThingNode indirectObject;
 	private ArrayList<ActionElement> elementInfo;
@@ -36,6 +37,7 @@ public abstract class ActionNode extends ProcessNode
 	/**
 	 * Creates a new action node with the given properties
 	 * @param root The command node at the base of the process tree
+     * @param subject The subject associated with the action node
 	 * @param directObject The direct object associated with the action node
 	 * @param indirectObject The indirect object associated with the action node
 	 * @param adverbs List of adverbs affecting the action node
@@ -49,10 +51,11 @@ public abstract class ActionNode extends ProcessNode
 	 * @throws IOException Thrown if there is a problem accessing the file related to the action
 	 * @throws FileNotFoundException 
 	 */
-	public ActionNode(CommandNode root, ThingNode directObject, ThingNode indirectObject, List<Adverb> adverbs, List<ActionElement> elements, 
+	public ActionNode(CommandNode root, ThingNode subject, ThingNode directObject, ThingNode indirectObject, List<Adverb> adverbs, List<ActionElement> elements,
 			double confidence, double priority, double urgency) throws UnknownActionException, UnreadableActionNodeException, NotAnActionNodeException, FileNotFoundException, IOException
 	{
 		this.root = root;
+		this.subject = subject;
 		this.directObject = directObject;
 		this.indirectObject = indirectObject;
 		this.adverbs = new ArrayList<Adverb>();
@@ -76,6 +79,7 @@ public abstract class ActionNode extends ProcessNode
 	/**
 	 * Loads the action node with the given properties
 	 * @param root The command node at the base of the process tree
+     * @param subject The subject associated with the action node
 	 * @param directObject The direct object associated with the action node
 	 * @param indirectObject The indirect object associated with the action node
 	 * @param adverbs List of adverbs affecting the action node
@@ -89,10 +93,11 @@ public abstract class ActionNode extends ProcessNode
 	 * @throws IOException Thrown if there is a problem loading a file relating to the action
 	 * @throws FileNotFoundException 
 	 */
-	public void load(CommandNode root, ThingNode directObject, ThingNode indirectObject, List<Adverb> adverbs, List<ActionElement> elements, 
+	public void load(CommandNode root, ThingNode subject, ThingNode directObject, ThingNode indirectObject, List<Adverb> adverbs, List<ActionElement> elements,
 			double confidence, double priority, double urgency) throws UnknownActionException, UnreadableActionNodeException, NotAnActionNodeException, FileNotFoundException, IOException
 	{
 		this.root = root;
+		this.subject = subject;
 		this.directObject = directObject;
 		this.indirectObject = indirectObject;
 		this.adverbs = new ArrayList<Adverb>();
@@ -126,10 +131,11 @@ public abstract class ActionNode extends ProcessNode
 		for(ActionElement actionElement : elementInfo)
 		{
 			String elementName = actionElement.getName();
+			ThingNode subject = root.getThing(actionElement.getSubject().toString());
 			ThingNode directObject = root.getThing(actionElement.getDirectObject().toString());
 			ThingNode indirectObject = root.getThing(actionElement.getIndirectObject().toString());
 			List<Adverb> adverbs = actionElement.getAdverbs();
-			elements.add(ActionNodeLoader.getInstance().loadNode(elementName, root, directObject, indirectObject, adverbs));
+			elements.add(ActionNodeLoader.getInstance().loadNode(elementName, root, subject, directObject, indirectObject, adverbs));
 		}
 	}
 	
@@ -179,8 +185,17 @@ public abstract class ActionNode extends ProcessNode
 	{
 		return root;
 	}
-	
-	/**
+
+    /**
+     * Gets the subject associated with the action node
+     * @return The subject associated with the action node
+     */
+    public ThingNode getSubject()
+    {
+        return subject;
+    }
+
+    /**
 	 * Gets the direct object associated with the action node
 	 * @return The direct object associated with the action node
 	 */

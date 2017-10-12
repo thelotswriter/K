@@ -6,6 +6,9 @@ import java.util.List;
 import words.Adverb;
 import words.DirectObject;
 import words.IndirectObject;
+import words.Noun;
+
+import javax.security.auth.Subject;
 
 public class ActionElement implements Serializable
 {
@@ -16,6 +19,7 @@ public class ActionElement implements Serializable
 	private static final long serialVersionUID = 8741156051768476281L;
 	
 	private String elementName;
+	private Noun subject;
 	private DirectObject directObject;
 	private IndirectObject indirectObject;
 	private List<Adverb> adverbs;
@@ -27,9 +31,10 @@ public class ActionElement implements Serializable
 	 * @param indirectObject The indirect object associated with the action
 	 * @param adverbs The adverbs associated with the action
 	 */
-	public ActionElement(String name, DirectObject directObject, IndirectObject indirectObject, List<Adverb> adverbs)
+	public ActionElement(String name, Noun subject, DirectObject directObject, IndirectObject indirectObject, List<Adverb> adverbs)
 	{
 		this.elementName = name;
+		this.subject = subject;
 		this.directObject = directObject;
 		this.indirectObject = indirectObject;
 		this.adverbs = adverbs;
@@ -43,7 +48,12 @@ public class ActionElement implements Serializable
 	{
 		return elementName;
 	}
-	
+
+	public Noun getSubject()
+    {
+        return subject;
+    }
+
 	/**
 	 * Gets the direct object associated with the action
 	 * @return The direct object associated with the action
@@ -70,5 +80,5 @@ public class ActionElement implements Serializable
 	{
 		return adverbs;
 	}
-	
+
 }

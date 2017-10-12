@@ -30,7 +30,7 @@ public class PlayPacman implements MiniMain
 //        }
         try
         {
-            Play playNode = new Play(null, game, null, null, null, 1, 1, 1);
+            Play playNode = new Play(null, null, game, null, null, null, 1, 1, 1);
             playNode.initialize();
             Instruction instruction = new Instruction(InstructionType.START, null);
             Robot robot = new Robot();
@@ -41,25 +41,6 @@ public class PlayPacman implements MiniMain
                 List<InstructionPacket> instructionPackets = playNode.run();
                 double[] probabilityVector = generateProbabilityVector(game.getAttribute("dimensions").split(",").length,
                         instructionPackets);
-//                if(Math.abs(probabilityVector[0]) > Math.abs(probabilityVector[1]))
-//                {
-//                    if(probabilityVector[0] > 0)
-//                    {
-//                        robot.keyPress(KeyEvent.VK_RIGHT);
-//                    } else
-//                    {
-//                        robot.keyPress(KeyEvent.VK_LEFT);
-//                    }
-//                } else
-//                {
-//                    if(probabilityVector[1] > 0)
-//                    {
-//                        robot.keyPress(KeyEvent.VK_DOWN);
-//                    } else
-//                    {
-//                        robot.keyPress(KeyEvent.VK_UP);
-//                    }
-//                }
                 double rand = Math.random();
                 if(rand < probabilityVector[0])
                 {

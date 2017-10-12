@@ -4,17 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import processTree.ThingNode;
+import processTree.ToolNodes.Model;
 import structures.ID2DDFS;
 import structures.MoveType2D;
 
-public class Discrete2DSpatialModel
+public class Discrete2DSpatialModel extends Model
 {
     private final int N_DIMENSIONS = 2;
     private final int MAX_SEARCH = 10;
     private final double STEP_COEFFICIENT = 10;
 
-    private ThingNode thing;
-    private ThingNode world;
     private ThingNode object;
     private int[] tileDimensions;
     private int[] worldDimensions;
@@ -29,10 +28,14 @@ public class Discrete2DSpatialModel
     private double[][] finalMap;
     private int steps;
 
+    /**
+     * Creates a model made for a two-dimensional, discrete world
+     * @param thing The thing being modeled
+     * @param world The world the model exists in
+     */
     public Discrete2DSpatialModel(ThingNode thing, ThingNode world)
     {
-        this.thing = thing;
-        this.world = world;
+        super(thing, world);
         object = null;
         String[] goal = thing.getAttribute("goal").split(" ");
         if(goal.length > 1)
@@ -71,18 +74,18 @@ public class Discrete2DSpatialModel
         {
             for(int i = 0; i < N_DIMENSIONS; i++)
             {
-                tileDimensions[i] = Integer.parseInt(world.getAttribute("grid").split(",")[i]);
-                worldDimensions[i] = Integer.parseInt(world.getAttribute("dimensions").split(",")[i]);
-                thingDimensions[i] = Integer.parseInt(thing.getAttribute("dimensions").split(",")[i]);
+                tileDimensions[i] = Integer.parseInt(getWorld().getAttribute("grid").split(",")[i]);
+                worldDimensions[i] = Integer.parseInt(getWorld().getAttribute("dimensions").split(",")[i]);
+                thingDimensions[i] = Integer.parseInt(getThing().getAttribute("dimensions").split(",")[i]);
                 objectDimensions[i] = Integer.parseInt(object.getAttribute("dimensions").split(",")[i]);
             }
         } else
         {
             for(int i = 0; i < N_DIMENSIONS; i++)
             {
-                tileDimensions[i] = Integer.parseInt(world.getAttribute("grid").split(",")[i]);
-                worldDimensions[i] = Integer.parseInt(world.getAttribute("dimensions").split(",")[i]);
-                thingDimensions[i] = Integer.parseInt(thing.getAttribute("dimensions").split(",")[i]);
+                tileDimensions[i] = Integer.parseInt(getWorld().getAttribute("grid").split(",")[i]);
+                worldDimensions[i] = Integer.parseInt(getWorld().getAttribute("dimensions").split(",")[i]);
+                thingDimensions[i] = Integer.parseInt(getThing().getAttribute("dimensions").split(",")[i]);
                 objectDimensions[i] = tileDimensions[i];
             }
         }
@@ -105,7 +108,7 @@ public class Discrete2DSpatialModel
      */
     private void setUnallowedSpaces()
     {
-        for(ThingNode node : world.getElements())
+        for(ThingNode node : getWorld().getElements())
         {
             if(node.getCategories().contains("obstacle"))
             {
@@ -149,7 +152,7 @@ public class Discrete2DSpatialModel
     {
         moveCapabilities = new MoveType2D[N_DIMENSIONS];
         objectMoveCapabilities = new MoveType2D[N_DIMENSIONS];
-        String moveString = thing.getAttribute("move");
+        String moveString = getThing().getAttribute("move");
         if(moveString != null)
         {
             String[] moveStrings = moveString.split(",");
@@ -183,11 +186,11 @@ public class Discrete2DSpatialModel
     {
         double thingSpeed = 0;
         double objectSpeed = 0;
-        if(thing.hasAttribute("speed"))
+        if(getThing().hasAttribute("speed"))
         {
-            thingSpeed = Double.parseDouble(thing.getAttribute("speed"));
+            thingSpeed = Double.parseDouble(getThing().getAttribute("speed"));
         }
-        ThingNode object = world.getThing(thing.getAttribute("goal").split(" ")[1]);
+        ThingNode object = getWorld().getThing(getThing().getAttribute("goal").split(" ")[1]);
         if(object != null && object.hasAttribute("speed"))
         {
             objectSpeed = Double.parseDouble(object.getAttribute("speed"));
@@ -201,18 +204,15 @@ public class Discrete2DSpatialModel
         }
     }
 
-    /**
-     * Updates the locations of the thing and object in the world
-     */
     public void updateLocations()
     {
         for(int i = 0; i < N_DIMENSIONS; i++)
         {
-            thingLocation[i] = Integer.parseInt(thing.getAttribute("location").split(",")[i]);
+            thingLocation[i] = Integer.parseInt(getThing().getAttribute("location").split(",")[i]);
         }
         if(object != null)
         {
-            String[] goal = thing.getAttribute("goal").split(" ");
+            String[] goal = getThing().getAttribute("goal").split(" ");
             int[] extra = new int[N_DIMENSIONS];
             for(int i = 0; i < N_DIMENSIONS; i++)
             {
@@ -233,6 +233,7 @@ public class Discrete2DSpatialModel
         {
 
         }
+        finalMap = null;
     }
 
     /**
@@ -241,9 +242,9 @@ public class Discrete2DSpatialModel
      * @return A 2D array representing the likelihood that the thing being modeled will be in a given location, weighted
      * by how soon they will be in the specified location
      */
-    public double[][] generateProbabilityMap()
+    private void generateProbabilityMap()
     {
-        if(thing.hasAttribute("intelligence") && thing.getAttribute("intelligence").equalsIgnoreCase("random"))
+        if(getThing().hasAttribute("intelligence") && getThing().getAttribute("intelligence").equalsIgnoreCase("random"))
         {
             generateRandomPath();
         } else
@@ -270,7 +271,6 @@ public class Discrete2DSpatialModel
             ID2DDFS searcher = new ID2DDFS(steps, startTiles, goalTiles, visitedSpaces, moveCapabilities);
             finalMap = searcher.findPaths();
         }
-        return finalMap;
     }
 
     private void generateRandomPath()
@@ -278,7 +278,7 @@ public class Discrete2DSpatialModel
 
     }
 
-    public double[] getVector()
+    public double[] getVector(int[] location)
     {
         double[] vector = new double[N_DIMENSIONS];
         for(int i = 0; i < N_DIMENSIONS; i++)
@@ -293,116 +293,37 @@ public class Discrete2DSpatialModel
         {
             for(int j = 0; j < finalMap[0].length; j++)
             {
-                int xDiff = objectLocation[0] / tileDimensions[0] - i;
-                int yDiff = objectLocation[1] / tileDimensions[1] - j;
+                int xDiff = location[0] / tileDimensions[0] - i;
+                int yDiff = location[1] / tileDimensions[1] - j;
                 int dist = xDiff + yDiff;
                 if(dist != 0)
                 {
-                    vector[0] += finalMap[i][j] * Math.abs(Math.cos(Math.atan2(yDiff, xDiff))) / dist;
-                    vector[1] += finalMap[i][j] * Math.abs(Math.sin(Math.atan2(yDiff, xDiff))) / dist;
+                    vector[0] += finalMap[i][j] * Math.abs(Math.cos(Math.atan2(yDiff, xDiff))) / Math.pow(dist, 2);
+                    vector[1] += finalMap[i][j] * Math.abs(Math.sin(Math.atan2(yDiff, xDiff))) / Math.pow(dist, 2);
                 }
             }
         }
         return vector;
-    }
-
-    public double[] getVector(double[] location)
-    {
-        double[] vector = new double[N_DIMENSIONS];
-        for(int i = 0; i < N_DIMENSIONS; i++)
-        {
-            vector[i] = 0;
-        }
-        if(finalMap == null)
-        {
-            generateProbabilityMap();
-        }
-        for(int i = 0; i < finalMap.length; i++)
-        {
-            for(int j = 0; j < finalMap[0].length; j++)
-            {
-                int xDiff = ((int) location[0] / tileDimensions[0]) - i;
-                int yDiff = ((int) location[1] / tileDimensions[1]) - j;
-                int dist = xDiff + yDiff;
-                if(dist != 0)
-                {
-                    vector[0] += finalMap[i][j] * Math.abs(Math.cos(Math.atan2(yDiff, xDiff))) / dist;
-                    vector[1] += finalMap[i][j] * Math.abs(Math.sin(Math.atan2(yDiff, xDiff))) / dist;
-                }
-            }
-        }
-        return vector;
-    }
-
-    public boolean isAllowableMovement(double[] direction)
-    {
-        int[] location = new int[N_DIMENSIONS];
-        // Check if the location is between tiles. If so, set the location be the tile in the direction headed
-        for(int i = 0; i < N_DIMENSIONS; i++)
-        {
-            if(objectLocation[i] % tileDimensions[i] != 0)
-            {
-                if(direction[i] > 0)
-                {
-                    location[i] = 1 + objectLocation[i] / tileDimensions[i];
-                } else
-                {
-                    location[i] = objectLocation[i] / tileDimensions[i];
-                }
-            } else
-            {
-                location[i] = objectLocation[i] / tileDimensions[i];
-            }
-        }
-        // Since the space is discrete, a mixed direction is not allowed. Therefore, we only care about the highest weighted direction
-        int[] discreteDirection = new int[N_DIMENSIONS];
-        if(Math.abs(direction[0]) > Math.abs(direction[1]))
-        {
-            if(direction[0] > 0)
-            {
-                discreteDirection[0] = 1;
-            } else
-            {
-                discreteDirection[0] = -1;
-            }
-            discreteDirection[1] = 0;
-        } else
-        {
-            discreteDirection[0] = 0;
-            if(direction[1] > 0)
-            {
-                discreteDirection[1] = 1;
-            } else
-            {
-                discreteDirection[1] = -1;
-            }
-            discreteDirection[1] = 1;
-        }
-        if(location[0] + discreteDirection[0] < 0 || location[0] + discreteDirection[0] >= allowedSpaces.length
-                || ((int) location[1]) + discreteDirection[1] < 0 || ((int) location[1]) + discreteDirection[1] >= allowedSpaces[0].length)
-        {
-            return false;
-        }
-        return allowedSpaces[((int) location[0]) + discreteDirection[0]][((int) location[1]) + discreteDirection[1]];
     }
 
     public boolean isAllowableMovement(int[] location, double[] direction)
     {
+        int[] tileLocation = new int[location.length];
         // Check if the location is between tiles. If so, set the location be the tile in the direction headed
         for(int i = 0; i < N_DIMENSIONS; i++)
         {
             if(location[i] % tileDimensions[i] != 0)
             {
-                if(direction[i] > 0)
+                if(direction[i] < 0)
                 {
-                    location[i] = 1 + location[i] / tileDimensions[i];
+                    tileLocation[i] = 1 + location[i] / tileDimensions[i];
                 } else
                 {
-                    location[i] /= tileDimensions[i];
+                    tileLocation[i] = location[i] / tileDimensions[i];
                 }
             } else
             {
-                location[i] /= tileDimensions[i];
+                tileLocation[i] = location[i] / tileDimensions[i];
             }
         }
         // Since the space is discrete, a mixed direction is not allowed. Therefore, we only care about the highest weighted direction
@@ -427,9 +348,42 @@ public class Discrete2DSpatialModel
             {
                 discreteDirection[1] = -1;
             }
-            discreteDirection[1] = 1;
         }
-        return allowedSpaces[((int) location[0]) + discreteDirection[0]][((int) location[1]) + discreteDirection[1]];
+        int[] newLocation = new int[N_DIMENSIONS];
+        for(int i = 0; i < N_DIMENSIONS; i++)
+        {
+            newLocation[i] = tileLocation[i] + discreteDirection[i];
+        }
+        if(newLocation[0] < 0 || newLocation[0] >= allowedSpaces.length || newLocation[1] < 0 || newLocation[1] >= allowedSpaces[0].length)
+        {
+            return false;
+        }
+        return allowedSpaces[newLocation[0]][newLocation[1]];
+    }
+
+    public boolean isSameDirection(double[] direction1, double[] direction2)
+    {
+        int[] discreteDirection1 = new int[N_DIMENSIONS];
+        int[] discreteDirection2 = new int[N_DIMENSIONS];
+        if(Math.abs(direction1[0]) > Math.abs(direction1[1]))
+        {
+            discreteDirection1[0] = (int) (direction1[0] / Math.abs(direction1[0]));
+            discreteDirection1[1] = 0;
+        } else
+        {
+            discreteDirection1[0] = 0;
+            discreteDirection1[1] = (int) (direction1[1] / Math.abs(direction1[1]));
+        }
+        if(Math.abs(direction2[0]) > Math.abs(direction2[1]))
+        {
+            discreteDirection2[0] = (int) (direction2[0] / Math.abs(direction2[0]));
+            discreteDirection2[1] = 0;
+        } else
+        {
+            discreteDirection2[0] = 0;
+            discreteDirection2[1] = (int) (direction2[1] / Math.abs(direction2[1]));
+        }
+        return (discreteDirection1[0] == discreteDirection2[0] && discreteDirection1[1] == discreteDirection2[1]);
     }
 
 }

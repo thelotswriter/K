@@ -13,6 +13,7 @@ import pacman.Pacman;
 import processTree.ActionNode;
 import processTree.CommandNode;
 import processTree.ThingNode;
+import processTree.ToolNodes.Model;
 import subModel.Discrete2DSpatialModel;
 import thingNodes.PacmanGame;
 import words.Adverb;
@@ -25,19 +26,20 @@ import java.util.List;
 public class Avoid extends ActionNode
 {
 
+    private int count;
+
     // Weights determining direction. Variable sideWeight is multiplied by the magnitude of the and used to make
     // instructions to go left/right.
     private double sideWeight = 0.01;
     private double momentumWeight = 0.1;
 
-    private List<Discrete2DSpatialModel> models;
-    private ThingNode subject;
+    private List<Model> models;
 
     public Avoid(CommandNode root, ThingNode subject, ThingNode directObject, ThingNode indirectObject, List<Adverb> adverbs, List<ActionElement> elements,
                  double confidence, double priority, double urgency) throws NotAnActionNodeException, UnknownActionException, IOException, UnreadableActionNodeException
     {
-        super(root, directObject, indirectObject, adverbs, elements, confidence, priority, urgency);
-        this.subject = subject;
+        super(root, subject, directObject, indirectObject, adverbs, elements, confidence, priority, urgency);
+        count = 0;
     }
 
     @Override
@@ -62,26 +64,30 @@ public class Avoid extends ActionNode
     public List<InstructionPacket> run()
     {
         List<InstructionPacket> instructionPackets = new ArrayList<>();
-        if(PlayPacman.pause_play)
-        {
-            int x = 0;
-            int y = x;
-        }
         double[] vector = new double[getDirectObject().getParent().getAttribute("dimensions").split(",").length];
         for(double oneDVector : vector)
         {
             oneDVector = 0;
         }
         double urgency = 0;
-        List<double[][]> probMaps = new ArrayList<>();
-        for(Discrete2DSpatialModel model : models)
+        String[] subjectLocationStrings = getSubject().getAttribute("location").split(",");
+        int[] subjectLocation = new int[subjectLocationStrings.length];
+        for(int i = 0; i < subjectLocation.length; i++)
+        {
+            subjectLocation[i] = Integer.parseInt(subjectLocationStrings[i]);
+        }
+        count++;
+        if(count % 1001 == 1000)
+        {
+            int x = 0;
+        }
+        for(Model model : models)
         {
             model.updateLocations();
-            probMaps.add(model.generateProbabilityMap());
-            double[] currentVector = model.getVector();
+            double[] currentVector = model.getVector(subjectLocation);
             for(int i = 0; i < vector.length; i++)
             {
-                vector[i] += currentVector[i]; // The vector given will point toward rather than away
+                vector[i] += currentVector[i];
                 urgency += Math.abs(currentVector[i]);
             }
         }
@@ -105,6 +111,7 @@ public class Avoid extends ActionNode
             }
             vectorLength += vector[i] * vector[i];
         }
+        // If the vector is a zero vector, return an empty list
         if(varsIndex < 0)
         {
             return instructionPackets;
@@ -131,7 +138,7 @@ public class Avoid extends ActionNode
         sideVectors.add(sideVector2);
         for(double[] sideVector : sideVectors)
         {
-            if(models.get(0).isAllowableMovement(sideVector))
+            if(models.get(0).isAllowableMovement(subjectLocation, sideVector))
             {
                 List<String> params = new ArrayList<>();
                 for(int i = 0; i < sideVector.length; i++)
@@ -141,7 +148,7 @@ public class Avoid extends ActionNode
                 instructionPackets.add(new InstructionPacket(new Instruction(InstructionType.MOVE, params), this));
             }
         }
-        if(models.get(0).isAllowableMovement(vector))
+        if(models.get(0).isAllowableMovement(subjectLocation, vector))
         {
             List<String> params = new ArrayList<>();
             for(int i = 0; i < vector.length; i++)
@@ -150,73 +157,7 @@ public class Avoid extends ActionNode
             }
             instructionPackets.add(new InstructionPacket(new Instruction(InstructionType.MOVE, params), this));
         }
-        drawMaps(probMaps);
         return instructionPackets;
-    }
-
-    private void drawMaps(List<double[][]> probabilityMaps)
-    {
-        Pacman pMan = ((PacmanGame) getDirectObject().getParent()).getGame();
-
-        double[][] finalProbabilityMap = probabilityMaps.get(0);
-        for(int i = 1; i < probabilityMaps.size(); i++)
-        {
-            double[][] probabilityMap = probabilityMaps.get(i);
-            for(int j = 0; j < finalProbabilityMap.length; j++)
-            {
-                for(int k = 0; k < finalProbabilityMap[0].length; k++)
-                {
-                    finalProbabilityMap[j][k] += probabilityMap[j][k];
-                }
-            }
-        }
-        double maxProbability = 0;
-        for(int i = 0; i < finalProbabilityMap.length; i++)
-        {
-            for(int j = 0; j < finalProbabilityMap[0].length; j++)
-            {
-                if(finalProbabilityMap[i][j] > maxProbability)
-                {
-                    maxProbability = finalProbabilityMap[i][j];
-                }
-            }
-        }
-        ArrayList<ColorCoordinate> coloredCoordinates = new ArrayList<>();
-        for(int i = 0; i < finalProbabilityMap.length; i++)
-        {
-            for(int j = 0; j < finalProbabilityMap[0].length; j++)
-            {
-                if(finalProbabilityMap[i][j] > 0)
-                {
-                    double probability = finalProbabilityMap[i][j] / maxProbability;
-                    double blueVal = Math.max(1 - 2 * probability, 0);
-                    double greenVal = 0;
-                    if(probability < 0.5)
-                    {
-                        greenVal = 2 * probability;
-                    } else
-                    {
-                        greenVal = 2 - 2 * probability;
-                    }
-                    double redVal = Math.max(2 * probability - 1, 0);
-//                    double blueVal = 1 - probability;
-//                    double greenVal = 0;
-//                    if(probability < 0.5)
-//                    {
-//                        greenVal = 2 * probability;
-//                    } else
-//                    {
-//                        greenVal = 2 - 2 * probability;
-//                    }
-//                    double redVal = probability;
-                    Color probabilityColor = new Color((float) redVal,
-                            (float) greenVal,
-                            (float) blueVal);
-                    coloredCoordinates.add(new ColorCoordinate(i, j, probabilityColor));
-                }
-            }
-        }
-        pMan.drawRunningTiles(coloredCoordinates);
     }
 
 }
