@@ -41,57 +41,43 @@ public class PlayPacman implements MiniMain
                 List<InstructionPacket> instructionPackets = playNode.run();
                 double[] probabilityVector = generateProbabilityVector(game.getAttribute("dimensions").split(",").length,
                         instructionPackets);
-                if(Math.abs(probabilityVector[0]) > Math.abs(probabilityVector[1]))
-                {
-                    if(probabilityVector[0] > 0)
-                    {
-                        robot.keyPress(KeyEvent.VK_RIGHT);
-                    } else
-                    {
-                        robot.keyPress(KeyEvent.VK_LEFT);
-                    }
-                } else
-                {
-                    if(probabilityVector[1] > 0)
-                    {
-                        robot.keyPress(KeyEvent.VK_DOWN);
-                    } else
-                    {
-                        robot.keyPress(KeyEvent.VK_UP);
-                    }
-                }
-//                double rand = Math.random();
-//                if(rand < Math.abs(probabilityVector[0]))
+//                if(Math.abs(probabilityVector[0]) > Math.abs(probabilityVector[1]))
 //                {
 //                    if(probabilityVector[0] > 0)
 //                    {
-//                        pause_play = false;
 //                        robot.keyPress(KeyEvent.VK_RIGHT);
-//                        System.out.println("Right");
 //                    } else
 //                    {
-//                        pause_play = false;
 //                        robot.keyPress(KeyEvent.VK_LEFT);
-//                        System.out.println("Left");
 //                    }
 //                } else
 //                {
-//                    if(probabilityVector[0] > 0)
+//                    if(probabilityVector[1] > 0)
 //                    {
-//                        count++;
-//                        if(count > 50)
-//                        {
-//                            pause_play = true;
-//                        }
 //                        robot.keyPress(KeyEvent.VK_DOWN);
-//                        System.out.println("Down");
 //                    } else
 //                    {
-//                        pause_play = false;
 //                        robot.keyPress(KeyEvent.VK_UP);
-//                        System.out.println("Up");
 //                    }
 //                }
+                double rand = Math.random();
+                if(rand < probabilityVector[0])
+                {
+                    robot.keyPress(KeyEvent.VK_RIGHT);
+                    System.out.println("Right");
+                } else if(rand < probabilityVector[0] + probabilityVector[1])
+                {
+                    robot.keyPress(KeyEvent.VK_LEFT);
+                    System.out.println("Left");
+                } else if(rand < probabilityVector[0] + probabilityVector[1] + probabilityVector[2])
+                {
+                    robot.keyPress(KeyEvent.VK_DOWN);
+                    System.out.println("Down");
+                } else
+                {
+                    robot.keyPress(KeyEvent.VK_UP);
+                    System.out.println("Up");
+                }
             }
         } catch (NotAnActionNodeException e)
         {
@@ -111,7 +97,7 @@ public class PlayPacman implements MiniMain
 
     private static double[] generateProbabilityVector(int nDimensions, List<InstructionPacket> instructionPackets)
     {
-        double[] probVector = new double[nDimensions];
+        double[] probVector = new double[nDimensions * 2];
         for(int i = 0; i < probVector.length; i++)
         {
             probVector[i] =0;
@@ -119,11 +105,35 @@ public class PlayPacman implements MiniMain
         for(InstructionPacket packet : instructionPackets)
         {
             List<String> params = packet.getInstruction().getParameters();
-            for(int i = 0; i < probVector.length; i++)
+            double[] paramDoubles = new double[params.size()];
+            int indexOfLargest = 0;
+            double largestVal = 0;
+            for(int i = 0; i < params.size(); i++)
             {
-                double paramVal = Double.parseDouble(params.get(i));;
-                probVector[i] += paramVal;
+                paramDoubles[i] = Double.parseDouble(params.get(i));
+                if(Math.abs(paramDoubles[i]) > Math.abs(largestVal))
+                {
+                    indexOfLargest = i;
+                    largestVal = paramDoubles[i];
+                }
             }
+            for(int i = 0; i < paramDoubles.length; i++)
+            {
+                if(i != indexOfLargest)
+                {
+                    paramDoubles[i] = 0;
+                } else if(largestVal != 0)
+                {
+                    if(largestVal > 0)
+                    {
+                        probVector[2 * i] += largestVal;
+                    } else
+                    {
+                        probVector[2 * i + 1] -= largestVal;
+                    }
+                }
+            }
+            System.out.print("Urgency: " + packet.getOriginNode().getUrgency() + " | ");
         }
         double vectorLength = 0;
         for(int i = 0; i < probVector.length; i++)

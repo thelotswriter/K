@@ -27,7 +27,8 @@ public class Avoid extends ActionNode
 
     // Weights determining direction. Variable sideWeight is multiplied by the magnitude of the and used to make
     // instructions to go left/right.
-    private double sideWeight = 0.0;
+    private double sideWeight = 0.01;
+    private double momentumWeight = 0.1;
 
     private List<Discrete2DSpatialModel> models;
     private ThingNode subject;
@@ -130,19 +131,25 @@ public class Avoid extends ActionNode
         sideVectors.add(sideVector2);
         for(double[] sideVector : sideVectors)
         {
-            List<String> params = new ArrayList<>();
-            for(int i = 0; i < sideVector.length; i++)
+            if(models.get(0).isAllowableMovement(sideVector))
             {
-                params.add(Double.toString(sideVector[i] * sideWeight));
+                List<String> params = new ArrayList<>();
+                for(int i = 0; i < sideVector.length; i++)
+                {
+                    params.add(Double.toString(sideVector[i] * sideWeight));
+                }
+                instructionPackets.add(new InstructionPacket(new Instruction(InstructionType.MOVE, params), this));
+            }
+        }
+        if(models.get(0).isAllowableMovement(vector))
+        {
+            List<String> params = new ArrayList<>();
+            for(int i = 0; i < vector.length; i++)
+            {
+                params.add(Double.toString(vector[i]));
             }
             instructionPackets.add(new InstructionPacket(new Instruction(InstructionType.MOVE, params), this));
         }
-        List<String> params = new ArrayList<>();
-        for(int i = 0; i < vector.length; i++)
-        {
-            params.add(Double.toString(vector[i]));
-        }
-        instructionPackets.add(new InstructionPacket(new Instruction(InstructionType.MOVE, params), this));
         drawMaps(probMaps);
         return instructionPackets;
     }

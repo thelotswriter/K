@@ -321,17 +321,69 @@ public class Discrete2DSpatialModel
         {
             for(int j = 0; j < finalMap[0].length; j++)
             {
-                if(i != location[0])
+                int xDiff = ((int) location[0] / tileDimensions[0]) - i;
+                int yDiff = ((int) location[1] / tileDimensions[1]) - j;
+                int dist = xDiff + yDiff;
+                if(dist != 0)
                 {
-                    vector[0] += finalMap[i][j] / (i - location[0]);
-                }
-                if(j != location[1])
-                {
-                    vector[1] += finalMap[i][j] / (j - location[1]);
+                    vector[0] += finalMap[i][j] * Math.abs(Math.cos(Math.atan2(yDiff, xDiff))) / dist;
+                    vector[1] += finalMap[i][j] * Math.abs(Math.sin(Math.atan2(yDiff, xDiff))) / dist;
                 }
             }
         }
         return vector;
+    }
+
+    public boolean isAllowableMovement(double[] direction)
+    {
+        int[] location = new int[N_DIMENSIONS];
+        // Check if the location is between tiles. If so, set the location be the tile in the direction headed
+        for(int i = 0; i < N_DIMENSIONS; i++)
+        {
+            if(objectLocation[i] % tileDimensions[i] != 0)
+            {
+                if(direction[i] > 0)
+                {
+                    location[i] = 1 + objectLocation[i] / tileDimensions[i];
+                } else
+                {
+                    location[i] = objectLocation[i] / tileDimensions[i];
+                }
+            } else
+            {
+                location[i] = objectLocation[i] / tileDimensions[i];
+            }
+        }
+        // Since the space is discrete, a mixed direction is not allowed. Therefore, we only care about the highest weighted direction
+        int[] discreteDirection = new int[N_DIMENSIONS];
+        if(Math.abs(direction[0]) > Math.abs(direction[1]))
+        {
+            if(direction[0] > 0)
+            {
+                discreteDirection[0] = 1;
+            } else
+            {
+                discreteDirection[0] = -1;
+            }
+            discreteDirection[1] = 0;
+        } else
+        {
+            discreteDirection[0] = 0;
+            if(direction[1] > 0)
+            {
+                discreteDirection[1] = 1;
+            } else
+            {
+                discreteDirection[1] = -1;
+            }
+            discreteDirection[1] = 1;
+        }
+        if(location[0] + discreteDirection[0] < 0 || location[0] + discreteDirection[0] >= allowedSpaces.length
+                || ((int) location[1]) + discreteDirection[1] < 0 || ((int) location[1]) + discreteDirection[1] >= allowedSpaces[0].length)
+        {
+            return false;
+        }
+        return allowedSpaces[((int) location[0]) + discreteDirection[0]][((int) location[1]) + discreteDirection[1]];
     }
 
     public boolean isAllowableMovement(int[] location, double[] direction)
@@ -377,7 +429,7 @@ public class Discrete2DSpatialModel
             }
             discreteDirection[1] = 1;
         }
-        return allowedSpaces[location[0] + discreteDirection[0]][location[1] + discreteDirection[1]];
+        return allowedSpaces[((int) location[0]) + discreteDirection[0]][((int) location[1]) + discreteDirection[1]];
     }
 
 }

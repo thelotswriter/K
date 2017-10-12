@@ -74,6 +74,13 @@ public class ID2DDFS
                 }
             }
         }
+        for(int i = 0; i < finalMap.length; i++)
+        {
+            for(int j = 0; j < finalMap[0].length; j++)
+            {
+                finalMap[i][j] /= total;
+            }
+        }
         return finalMap;
     }
 
