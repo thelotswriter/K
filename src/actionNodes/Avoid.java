@@ -7,26 +7,21 @@ import kaiExceptions.NotAnActionNodeException;
 import kaiExceptions.UnknownActionException;
 import kaiExceptions.UnreadableActionNodeException;
 import knowledgeAccess.ActionElement;
-import miniMain.ColorCoordinate;
-import miniMain.PlayPacman;
-import pacman.Pacman;
 import processTree.ActionNode;
 import processTree.CommandNode;
 import processTree.ThingNode;
-import processTree.ToolNodes.Model;
+import processTree.subActionNodes.PlannableActionNode;
+import processTree.toolNodes.Model;
+import processTree.toolNodes.ModelPicker;
 import subModel.Discrete2DSpatialModel;
-import thingNodes.PacmanGame;
 import words.Adverb;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Avoid extends ActionNode
+public class Avoid extends PlannableActionNode
 {
-
-    private int count;
 
     // Weights determining direction. Variable sideWeight is multiplied by the magnitude of the and used to make
     // instructions to go left/right.
@@ -35,11 +30,11 @@ public class Avoid extends ActionNode
 
     private List<Model> models;
 
-    public Avoid(CommandNode root, ThingNode subject, ThingNode directObject, ThingNode indirectObject, List<Adverb> adverbs, List<ActionElement> elements,
-                 double confidence, double priority, double urgency) throws NotAnActionNodeException, UnknownActionException, IOException, UnreadableActionNodeException
+    public Avoid(CommandNode root, ActionNode parent, ThingNode subject, ThingNode directObject, ThingNode indirectObject,
+                 List<Adverb> adverbs, List<ActionElement> elements, double confidence, double priority, double urgency)
+            throws NotAnActionNodeException, UnknownActionException, IOException, UnreadableActionNodeException
     {
-        super(root, subject, directObject, indirectObject, adverbs, elements, confidence, priority, urgency);
-        count = 0;
+        super(root, parent, subject, directObject, indirectObject, adverbs, elements, confidence, priority, urgency);
     }
 
     @Override
@@ -52,11 +47,11 @@ public class Avoid extends ActionNode
         {
             for(ThingNode singleObject : getDirectObject().getElements())
             {
-                models.add(new Discrete2DSpatialModel(singleObject, getDirectObject().getParent()));
+                models.add(ModelPicker.getInstance().getModel(getDirectObject().getParent(), getSubject(), singleObject, getIndirectObject()));
             }
         } else
         {
-            models.add(new Discrete2DSpatialModel(getDirectObject(), getDirectObject().getParent()));
+            models.add(ModelPicker.getInstance().getModel(getDirectObject().getParent(), getSubject(), getDirectObject(), getIndirectObject()));
         }
     }
 
@@ -75,11 +70,6 @@ public class Avoid extends ActionNode
         for(int i = 0; i < subjectLocation.length; i++)
         {
             subjectLocation[i] = Integer.parseInt(subjectLocationStrings[i]);
-        }
-        count++;
-        if(count % 1001 == 1000)
-        {
-            int x = 0;
         }
         for(Model model : models)
         {

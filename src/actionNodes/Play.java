@@ -20,10 +20,11 @@ import java.util.List;
 public class Play extends ActionNode
 {
 
-    public Play(CommandNode root, ThingNode subject, ThingNode directObject, ThingNode indirectObject, List<Adverb> adverbs, List<ActionElement> elements,
-                double confidence, double priority, double urgency) throws NotAnActionNodeException, UnknownActionException, IOException, UnreadableActionNodeException
+    public Play(CommandNode root, ActionNode parent, ThingNode subject, ThingNode directObject, ThingNode indirectObject,
+                List<Adverb> adverbs, List<ActionElement> elements, double confidence, double priority, double urgency)
+            throws NotAnActionNodeException, UnknownActionException, IOException, UnreadableActionNodeException
     {
-        super(root, subject, directObject, indirectObject, adverbs, elements, confidence, priority, urgency);
+        super(root, parent, subject, directObject, indirectObject, adverbs, elements, confidence, priority, urgency);
     }
 
     @Override
@@ -55,7 +56,7 @@ public class Play extends ActionNode
     private ActionNode getAction(String[] goal) throws NotAnActionNodeException, UnknownActionException, UnreadableActionNodeException, IOException {
         if(goal[0].equalsIgnoreCase("avoid"))
         {
-            return new Avoid(getRoot(), getDirectObject().getThing("Player"), getDirectObject().getThing(goal[1]), getIndirectObject(),
+            return new Avoid(getRoot(), this, getDirectObject().getThing("Player"), getDirectObject().getThing(goal[1]), getIndirectObject(),
                     getAdverbs(), null,1, 1, 1);
         }
         return null;

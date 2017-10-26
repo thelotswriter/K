@@ -3,8 +3,9 @@ package subModel;
 import java.util.ArrayList;
 import java.util.List;
 
+import instructions.Instruction;
 import processTree.ThingNode;
-import processTree.ToolNodes.Model;
+import processTree.toolNodes.Model;
 import structures.ID2DDFS;
 import structures.MoveType2D;
 
@@ -384,6 +385,18 @@ public class Discrete2DSpatialModel extends Model
             discreteDirection2[1] = (int) (direction2[1] / Math.abs(direction2[1]));
         }
         return (discreteDirection1[0] == discreteDirection2[0] && discreteDirection1[1] == discreteDirection2[1]);
+    }
+
+    @Override
+    public List<ThingNode> getFutureWorldStates(Instruction action)
+    {
+        return null;
+    }
+
+    @Override
+    public List<Instruction> getPossibleActions()
+    {
+        return null;
     }
 
 }

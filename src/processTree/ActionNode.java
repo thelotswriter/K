@@ -23,6 +23,8 @@ public abstract class ActionNode extends ProcessNode
 	
 	private CommandNode root;
 
+	private ActionNode parent;
+
 	private ThingNode subject;
 	private ThingNode directObject;
 	private ThingNode indirectObject;
@@ -37,6 +39,7 @@ public abstract class ActionNode extends ProcessNode
 	/**
 	 * Creates a new action node with the given properties
 	 * @param root The command node at the base of the process tree
+     * @param parent The action node which spawned the new action node
      * @param subject The subject associated with the action node
 	 * @param directObject The direct object associated with the action node
 	 * @param indirectObject The indirect object associated with the action node
@@ -51,10 +54,11 @@ public abstract class ActionNode extends ProcessNode
 	 * @throws IOException Thrown if there is a problem accessing the file related to the action
 	 * @throws FileNotFoundException 
 	 */
-	public ActionNode(CommandNode root, ThingNode subject, ThingNode directObject, ThingNode indirectObject, List<Adverb> adverbs, List<ActionElement> elements,
+	public ActionNode(CommandNode root, ActionNode parent, ThingNode subject, ThingNode directObject, ThingNode indirectObject, List<Adverb> adverbs, List<ActionElement> elements,
 			double confidence, double priority, double urgency) throws UnknownActionException, UnreadableActionNodeException, NotAnActionNodeException, FileNotFoundException, IOException
 	{
 		this.root = root;
+		this.parent = parent;
 		this.subject = subject;
 		this.directObject = directObject;
 		this.indirectObject = indirectObject;
@@ -79,6 +83,7 @@ public abstract class ActionNode extends ProcessNode
 	/**
 	 * Loads the action node with the given properties
 	 * @param root The command node at the base of the process tree
+     * @param parent The action node which spawned  the new action node
      * @param subject The subject associated with the action node
 	 * @param directObject The direct object associated with the action node
 	 * @param indirectObject The indirect object associated with the action node
@@ -93,10 +98,11 @@ public abstract class ActionNode extends ProcessNode
 	 * @throws IOException Thrown if there is a problem loading a file relating to the action
 	 * @throws FileNotFoundException 
 	 */
-	public void load(CommandNode root, ThingNode subject, ThingNode directObject, ThingNode indirectObject, List<Adverb> adverbs, List<ActionElement> elements,
+	public void load(CommandNode root, ActionNode parent, ThingNode subject, ThingNode directObject, ThingNode indirectObject, List<Adverb> adverbs, List<ActionElement> elements,
 			double confidence, double priority, double urgency) throws UnknownActionException, UnreadableActionNodeException, NotAnActionNodeException, FileNotFoundException, IOException
 	{
 		this.root = root;
+		this.parent = parent;
 		this.subject = subject;
 		this.directObject = directObject;
 		this.indirectObject = indirectObject;
@@ -185,6 +191,15 @@ public abstract class ActionNode extends ProcessNode
 	{
 		return root;
 	}
+
+    /**
+     * Gets the parent node of the current node
+     * @return The parent of the current node
+     */
+    public ActionNode getParent()
+    {
+        return parent;
+    }
 
     /**
      * Gets the subject associated with the action node

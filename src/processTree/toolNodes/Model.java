@@ -1,6 +1,9 @@
-package processTree.ToolNodes;
+package processTree.toolNodes;
 
+import instructions.Instruction;
 import processTree.ThingNode;
+
+import java.util.List;
 
 public abstract class Model
 {
@@ -64,5 +67,18 @@ public abstract class Model
      * @return True if the directions are effectively the same, otherwise false
      */
     public abstract boolean isSameDirection(double[] direction1, double[] direction2);
+
+    /**
+     * Creates a list of Thing Nodes for versions of the world that could exist from the current world
+     * @return A list of Thing Nodes representing possible future states of the world. This includes all relevant Thing
+     * Nodes included in the current model
+     */
+    public abstract List<ThingNode> getFutureWorldStates(Instruction action);
+
+    /**
+     * Gets a list of possible actions that could be taken in the model
+     * @return A list of possible actions, givne as instructions
+     */
+    public abstract List<Instruction> getPossibleActions();
 
 }
