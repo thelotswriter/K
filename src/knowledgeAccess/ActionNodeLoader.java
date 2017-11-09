@@ -83,7 +83,7 @@ public class ActionNodeLoader
                     // Cast to ActionNode
                     loadedNode = (ActionNode) obj;
                     classLoader.close();
-                    loadedNode.load(root, subject, directObject, indirectObject, adverbs, elements, confidence, priority, urgency);
+                    loadedNode.load(root, null, subject, directObject, indirectObject, adverbs, elements, confidence, priority, urgency);
                     return loadedNode;
                 } else
                 {

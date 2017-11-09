@@ -30,8 +30,8 @@ public class InstructionAggregator
 	
 	/**
 	 * Aggregates instructions of the same type
-	 * @param instructions The instructions to be aggregated
-	 * @param weights The weights given to the instructions
+//	 * @param instructions The instructions to be aggregated
+//	 * @param weights The weights given to the instructions
 	 * @return The aggregated instruction
 	 */
 	public Instruction aggregateSameInstructionType(List<InstructionPacket> instructionPackets)
@@ -44,7 +44,7 @@ public class InstructionAggregator
 				for(InstructionPacket instructionPacket : instructionPackets)
 				{
 					List<String> parameters = instructionPacket.getInstruction().getParameters();
-					double weight = instructionPacket.getOriginNode().getScore() * instructionPacket.getOriginNode().getPriority()
+					double weight = 1 * instructionPacket.getOriginNode().getPriority()
 							* instructionPacket.getOriginNode().getUrgency();
 					for(int i = 0; i < weightedAverage.length; i++)
 					{
@@ -76,7 +76,7 @@ public class InstructionAggregator
 				double weightedAverageScroll = 0;
 				for(InstructionPacket instructionPacket : instructionPackets)
 				{
-					double weight = instructionPacket.getOriginNode().getScore() * instructionPacket.getOriginNode().getPriority()
+					double weight = 1 * instructionPacket.getOriginNode().getPriority()
 							* instructionPacket.getOriginNode().getUrgency();
 					weightedAverageScroll += weight * Double.parseDouble(instructionPacket.getInstruction().getParameters().get(0));
 				}
@@ -94,7 +94,7 @@ public class InstructionAggregator
 				double highestWeightSoFar = 0;
 				for(InstructionPacket instructionPacket : instructionPackets)
 				{
-					double weight = instructionPacket.getOriginNode().getScore() * instructionPacket.getOriginNode().getPriority()
+					double weight = 1 * instructionPacket.getOriginNode().getPriority()
 							* instructionPacket.getOriginNode().getUrgency();
 					if(weight > highestWeightSoFar)
 					{

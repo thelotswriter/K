@@ -22,7 +22,7 @@ public class PlayPacman implements MiniMain
 
     public static void main(String[] args) throws AWTException {
         pause_play = false;
-        PacmanGame game = new PacmanGame();
+        PacmanGame game = new PacmanGame(null, null, null, null, 1);
 //        try {
 //            Thread.sleep(2000);
 //        } catch (InterruptedException e) {
@@ -30,7 +30,7 @@ public class PlayPacman implements MiniMain
 //        }
         try
         {
-            Play playNode = new Play(null, null, game, null, null, null, 1, 1, 1);
+            Play playNode = new Play(null, null, null, game, null, null, null, 1, 1, 1);
             playNode.initialize();
             Instruction instruction = new Instruction(InstructionType.START, null);
             Robot robot = new Robot();

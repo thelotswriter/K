@@ -24,101 +24,127 @@ public class ThingNode extends ProcessNode
 	 */
 	private static final long serialVersionUID = 8491656821785497689L;
 
-	private ThingNode parent;
-	private ArrayList<ThingNode> elements;
-	
-	private List<Adjective> adjectives;
 	@Expose
-	private List<String> categories;
-	@Expose
-	private ArrayList<String> elementNames;
-	@Expose
-	private Map<String, String> attributes;
-	@Expose
-	private Map<String, Model> models;
-	@Expose
-	private String primaryModelName;
-	@Expose
-	private InstructionInterpreter interpreter;
-	
-	/**
-	 * The default constructor for a thing node
-	 */
-	public ThingNode()
-	{
-	    parent = null;
-		elements = new ArrayList<>();
-		attributes = new HashMap<String, String>();
-		categories = new ArrayList<>();
-	}
+	private List<ThingNode> elements;
 
-    public ThingNode(ThingNode parentNode)
+    @Expose
+    private List<String> categories;
+    @Expose
+    private Map<String, String> attributes;
+
+//	private List<Adjective> adjectives;
+//	@Expose
+//	private ArrayList<String> elementNames;
+//	@Expose
+//	private Map<String, Model> models;
+//	@Expose
+//	private String primaryModelName;
+//	@Expose
+//	private InstructionInterpreter interpreter;
+	
+//	/**
+//	 * The default constructor for a thing node
+//	 */
+//	public ThingNode()
+//	{
+//	    parent = null;
+//		elements = new ArrayList<>();
+//		attributes = new HashMap<String, String>();
+//		categories = new ArrayList<>();
+//	}
+//
+//    public ThingNode(ThingNode parentNode)
+//    {
+//        parent = parentNode;
+//        elements = new ArrayList<>();
+//        attributes = new HashMap<String, String>();
+//        categories = new ArrayList<>();
+//    }
+//
+//	/**
+//	 * Creates a new thing node based on the given data
+//	 * @param categories The categories to which the thing belongs
+//	 * @param attributes The attributes of the thing
+//	 * @param models Any models representing the thing
+//	 * @param confidence The confidence score of the thing
+//	 * @param elementNames The names of the elements of the thing
+//	 * @throws IOException Thrown if there is a problem accessing a file relating to the thing
+//	 * @throws UnknownThingException Thrown if the thing is unknown
+//	 * @throws FileNotFoundException Thrown if there is a problem accessing a file relating to the thing
+//	 */
+//	public ThingNode(ThingNode parent, Word word, List<Adjective> adjectives, List<String> categories, Map<String, String> attributes,
+//			Map<String, Model> models, String primaryModel, InstructionInterpreter interpreter, double confidence,
+//			List<String> elementNames) throws FileNotFoundException, UnknownThingException, IOException
+//	{
+//		this.parent = parent;
+//		setName(word.toString());
+//		this.adjectives = new ArrayList<Adjective>();
+//		if(adjectives != null)
+//		{
+//			this.adjectives.addAll(adjectives);
+//		}
+//		this.categories = new ArrayList<String>();
+//		if(categories != null)
+//		{
+//			this.categories.addAll(categories);
+//		}
+//		this.attributes = new HashMap<String, String>(attributes);
+//		if(models != null)
+//		{
+//			this.models = new HashMap<String, Model>(models);
+//		} else
+//		{
+//			this.models = new HashMap<String, Model>();
+//		}
+//		primaryModelName = primaryModel;
+//		this.interpreter = interpreter;
+//		setConfidence(confidence);
+//		this.elementNames = new ArrayList<String>();
+//		this.elementNames.addAll(elementNames);
+//		loadElements();
+//		setScore(0);
+//	}
+
+    public ThingNode(ProcessNode parent, List<ThingNode> elements, List<String> categories, Map<String, String> attributes, double confidence)
     {
-        parent = parentNode;
-        elements = new ArrayList<>();
-        attributes = new HashMap<String, String>();
-        categories = new ArrayList<>();
+        super(parent, null, confidence);
+        this.elements = new ArrayList<>();
+        if(elements != null)
+        {
+            this.elements.addAll(elements);
+        }
+        if(categories != null)
+        {
+            this.categories = categories;
+        } else
+        {
+            this.categories = new ArrayList<>();
+        }
+        if(attributes != null)
+        {
+            this.attributes = attributes;
+        } else
+        {
+            this.attributes = new HashMap<>();
+        }
     }
 	
-	/**
-	 * Creates a new thing node based on the given data
-	 * @param categories The categories to which the thing belongs
-	 * @param attributes The attributes of the thing
-	 * @param models Any models representing the thing
-	 * @param confidence The confidence score of the thing
-	 * @param elementNames The names of the elements of the thing
-	 * @throws IOException Thrown if there is a problem accessing a file relating to the thing
-	 * @throws UnknownThingException Thrown if the thing is unknown
-	 * @throws FileNotFoundException Thrown if there is a problem accessing a file relating to the thing
-	 */
-	public ThingNode(Word word, List<Adjective> adjectives, List<String> categories, Map<String, String> attributes, 
-			Map<String, Model> models, String primaryModel, InstructionInterpreter interpreter, double confidence, 
-			List<String> elementNames) throws FileNotFoundException, UnknownThingException, IOException
-	{
-		setName(word.toString());
-		this.adjectives = new ArrayList<Adjective>();
-		if(adjectives != null)
-		{
-			this.adjectives.addAll(adjectives);
-		}
-		this.categories = new ArrayList<String>();
-		if(categories != null)
-		{
-			this.categories.addAll(categories);			
-		}
-		this.attributes = new HashMap<String, String>(attributes);
-		if(models != null)
-		{
-			this.models = new HashMap<String, Model>(models);			
-		} else
-		{
-			this.models = new HashMap<String, Model>();
-		}
-		primaryModelName = primaryModel;
-		this.interpreter = interpreter;
-		setConfidence(confidence);
-		this.elementNames = new ArrayList<String>();
-		this.elementNames.addAll(elementNames);
-		loadElements();
-		setScore(0);
-	}
-	
-	/**
-	 * Loads elements once the names have been loaded
-	 * @throws IOException Thrown if there is a problem accessing a file relating to the thing
-	 * @throws UnknownThingException Thrown if the thing is unknown
-	 * @throws FileNotFoundException Thrown if there is a problem accessing a file relating to the thing
-	 */
-	private void loadElements() throws FileNotFoundException, UnknownThingException, IOException
-	{
-		for(String elementName : elementNames)
-		{
-			KnowledgePacket elementData = KnowledgeAccessor.getInstance().getNounKnowledge(elementName);
-			elements.add(new ThingNode(new Noun(elementName), null, elementData.getCategories(), elementData.getAttributes(),
-					elementData.getModels(), elementData.getPrimaryModelName(), elementData.getInstructionInterpreter(), 
-					elementData.getConfidence(), elementData.getElements()));
-		}
-	}
+//	/**
+//	 * Loads elements once the names have been loaded
+//	 * @throws IOException Thrown if there is a problem accessing a file relating to the thing
+//	 * @throws UnknownThingException Thrown if the thing is unknown
+//	 * @throws FileNotFoundException Thrown if there is a problem accessing a file relating to the thing
+//	 */
+//	private void loadElements() throws FileNotFoundException, UnknownThingException, IOException
+//	{
+//		for(String elementName : elementNames)
+//		{
+//			KnowledgePacket elementData = KnowledgeAccessor.getInstance().getNounKnowledge(elementName);
+//			elements.add(new ThingNode(this, new Noun(elementName), null, elementData.getCategories(), elementData.getAttributes(),
+//					elementData.getModels(), elementData.getPrimaryModelName(), elementData.getInstructionInterpreter(),
+//					elementData.getConfidence(), elementData.getElements()));
+//		}
+//	}
 	
 	/**
 	 * Gets a list of all attributes
@@ -168,14 +194,14 @@ public class ThingNode extends ProcessNode
 		return attributes.get(attributeValue).equalsIgnoreCase(attributeValue);
 	}
 	
-	/**
-	 * Adds the specified adjective
-	 * @param adjective The adjective being added
-	 */
-	public void addAdjective(Adjective adjective)
-	{
-		adjectives.add(adjective);
-	}
+//	/**
+//	 * Adds the specified adjective
+//	 * @param adjective The adjective being added
+//	 */
+//	public void addAdjective(Adjective adjective)
+//	{
+//		adjectives.add(adjective);
+//	}
 	
 	/**
 	 * Adds the specified category
@@ -194,27 +220,33 @@ public class ThingNode extends ProcessNode
 	{
 		elements.add(element);
 	}
+
+	public void removeElements()
+    {
+        super.removeElements();
+        elements.clear();
+    }
 	
-	/**
-	 * Removes the specified adjective, if it's contained by the thing node
-	 * @param adjective The adjective to be removed
-	 */
-	public void removeAdjective(Adjective adjective)
-	{
-		Adjective toRemove = null;
-		for(Adjective adj : adjectives)
-		{
-			if(adj.toString().equalsIgnoreCase(adjective.toString()))
-			{
-				toRemove = adj;
-				break;
-			}
-		}
-		if(toRemove != null)
-		{
-			adjectives.remove(toRemove);
-		}
-	}
+//	/**
+//	 * Removes the specified adjective, if it's contained by the thing node
+//	 * @param adjective The adjective to be removed
+//	 */
+//	public void removeAdjective(Adjective adjective)
+//	{
+//		Adjective toRemove = null;
+//		for(Adjective adj : adjectives)
+//		{
+//			if(adj.toString().equalsIgnoreCase(adjective.toString()))
+//			{
+//				toRemove = adj;
+//				break;
+//			}
+//		}
+//		if(toRemove != null)
+//		{
+//			adjectives.remove(toRemove);
+//		}
+//	}
 	
 	/**
 	 * Removes the named category from the thing's list of categories
@@ -244,14 +276,15 @@ public class ThingNode extends ProcessNode
 		attributes.put(attribute, value);
 	}
 
-    /**
-     * Gets the parent node of the thing node, if it has one
-     * @return The parent node of the thing node
-     */
-	public ThingNode getParent()
-    {
-        return parent;
-    }
+//    /**
+//     * Gets the parent node of the thing node, if it has one
+//     * @return The parent node of the thing node
+//     */
+//	public ThingNode getParent()
+//    {
+//        ThingNode parent = (ThingNode) super.getParent();
+//        return parent;
+//    }
 
 	/**
 	 * Searches for the thing named by the string
@@ -277,41 +310,47 @@ public class ThingNode extends ProcessNode
 		}
 		return theThing;
 	}
+
+	public List<ThingNode> getThingElements()
+    {
+        return elements;
+    }
 	
-	/**
-	 * Gets a list of the elements of the thing node
-	 * @return A list of the elements of the thing node
-	 */
-	public List<ThingNode> getElements()
-	{
-		return elements;
-	}
+//	/**
+//	 * Gets a list of the elements of the thing node
+//	 * @return A list of the elements of the thing node
+//	 */
+//	public List<ThingNode> getElements()
+//	{
+//	    List<ProcessNode> elements = super.getElements();
+//		return elements;
+//	}
 	
-	/**
-	 * Gets a list of adjectives associated with the thing node
-	 * @return A list of adjectives associated with the thing node
-	 */
-	public List<Adjective> getAdjectives()
-	{
-		return adjectives;
-	}
+//	/**
+//	 * Gets a list of adjectives associated with the thing node
+//	 * @return A list of adjectives associated with the thing node
+//	 */
+//	public List<Adjective> getAdjectives()
+//	{
+//		return adjectives;
+//	}
 	
-	/**
-	 * Gets the listed adjective
-	 * @param adjective The adjective being requested
-	 * @return The specified adjective if it is part of the thing node, or null otherwise
-	 */
-	public Adjective getAdjective(Adjective adjective)
-	{
-		for(Adjective adj : adjectives)
-		{
-			if(adj.toString().equalsIgnoreCase(adjective.toString()))
-			{
-				return adj;
-			}
-		}
-		return null;
-	}
+//	/**
+//	 * Gets the listed adjective
+//	 * @param adjective The adjective being requested
+//	 * @return The specified adjective if it is part of the thing node, or null otherwise
+//	 */
+//	public Adjective getAdjective(Adjective adjective)
+//	{
+//		for(Adjective adj : adjectives)
+//		{
+//			if(adj.toString().equalsIgnoreCase(adjective.toString()))
+//			{
+//				return adj;
+//			}
+//		}
+//		return null;
+//	}
 	
 	/**
 	 * Gets a list of the categories to which the thing node belongs
@@ -331,34 +370,39 @@ public class ThingNode extends ProcessNode
 	{
 		return attributes.get(attributeName);
 	}
-	
-	/**
-	 * Gets a map of models associated with the thing node
-	 * @return A map of models associated with the thing node
-	 */
-	public Map<String, Model> getModels()
+
+	public Map<String, String> getAttributes()
 	{
-		return models;
+		return attributes;
 	}
 	
-	/**
-	 * Gets the active model associated with the thing node
-	 * @return The active model
-	 */
-	public Model getModel()
-	{
-		return models.get(primaryModelName);
-	}
+//	/**
+//	 * Gets a map of models associated with the thing node
+//	 * @return A map of models associated with the thing node
+//	 */
+//	public Map<String, Model> getModels()
+//	{
+//		return models;
+//	}
 	
-	/**
-	 * Gets the named model associated with the thing node
-	 * @param modelName The name of the model being requested
-	 * @return The requested model
-	 */
-	public Model getModel(String modelName)
-	{
-		return models.get(modelName);
-	}
+//	/**
+//	 * Gets the active model associated with the thing node
+//	 * @return The active model
+//	 */
+//	public Model getModel()
+//	{
+//		return models.get(primaryModelName);
+//	}
+	
+//	/**
+//	 * Gets the named model associated with the thing node
+//	 * @param modelName The name of the model being requested
+//	 * @return The requested model
+//	 */
+//	public Model getModel(String modelName)
+//	{
+//		return models.get(modelName);
+//	}
 	
 	public NodeType getType()
 	{

@@ -59,6 +59,7 @@ public class CommandNode extends ProcessNode implements Runnable
 	 */
 	public CommandNode(List<Word> command) throws UnknownWordsException, UnreadableActionNodeException, NotAnActionNodeException, FileNotFoundException, IOException
 	{
+		super(null, null, 1);
 		boolean understood = true;
 		List<Word> unrecognizedWords = new ArrayList<>();
 		words = new ArrayList<Word>();
@@ -68,44 +69,44 @@ public class CommandNode extends ProcessNode implements Runnable
 		ThingNode indirectObject = null;
 		List<Adverb> adverbs = new ArrayList<>();
 		// Construct thing trees first so the thing nodes can be passed to action nodes as needed. Simultaneously collect adverbs
-		for(Word word : words)
-		{
-			if(word.getType() == WordType.NOUN || word.getType() == WordType.SINGULAR_NOUN || word.getType() == WordType.PLURAL_NOUN
-					|| word.getType() == WordType.PROPER_NOUN)
-			{
-				try
-				{
-					addThingTree(word);
-				} catch(UnknownThingException e)
-				{
-					unrecognizedWords.add(new Noun(e.getMessage()));
-					understood = false;
-				}
-			} else if(word.getType() == WordType.DIRECT_OBJECT)
-			{
-				try
-				{
-					directObject = addThingTree(word);
-				} catch(UnknownThingException e)
-				{
-					unrecognizedWords.add(new Noun(e.getMessage()));
-					understood = false;
-				}
-			} else if(word.getType() == WordType.INDIRECT_OBJECT)
-			{
-				try
-				{
-					indirectObject = addThingTree(word);
-				} catch(UnknownThingException e)
-				{
-					unrecognizedWords.add(new Noun(e.getMessage()));
-					understood = false;
-				}
-			} else if(word.getType() == WordType.ADVERB)
-			{
-				adverbs.add((Adverb) word);
-			}
-		}
+//		for(Word word : words)
+//		{
+//			if(word.getType() == WordType.NOUN || word.getType() == WordType.SINGULAR_NOUN || word.getType() == WordType.PLURAL_NOUN
+//					|| word.getType() == WordType.PROPER_NOUN)
+//			{
+//				try
+//				{
+////					addThingTree(word);
+//				} catch(UnknownThingException e)
+//				{
+//					unrecognizedWords.add(new Noun(e.getMessage()));
+//					understood = false;
+//				}
+//			} else if(word.getType() == WordType.DIRECT_OBJECT)
+//			{
+//				try
+//				{
+//					directObject = addThingTree(word);
+//				} catch(UnknownThingException e)
+//				{
+//					unrecognizedWords.add(new Noun(e.getMessage()));
+//					understood = false;
+//				}
+//			} else if(word.getType() == WordType.INDIRECT_OBJECT)
+//			{
+//				try
+//				{
+//					indirectObject = addThingTree(word);
+//				} catch(UnknownThingException e)
+//				{
+//					unrecognizedWords.add(new Noun(e.getMessage()));
+//					understood = false;
+//				}
+//			} else if(word.getType() == WordType.ADVERB)
+//			{
+//				adverbs.add((Adverb) word);
+//			}
+//		}
 		try
 		{
 			for(Word word : words)
@@ -127,44 +128,44 @@ public class CommandNode extends ProcessNode implements Runnable
 		}
 	}
 	
-	private ThingNode addThingTree(Word word) throws FileNotFoundException, UnknownThingException, IOException
-	{
-		KnowledgePacket thingKnowledge = KnowledgeAccessor.getInstance().getNounKnowledge(word.toString());
-		ThingNode newThing = new ThingNode(word, null, thingKnowledge.getCategories(), thingKnowledge.getAttributes(), 
-				thingKnowledge.getModels(), thingKnowledge.getPrimaryModelName(), thingKnowledge.getInstructionInterpreter(), thingKnowledge.getConfidence(), 
-				thingKnowledge.getElements()); 
-		thingTrees.add(newThing);
-		if(newThing.hasAttribute("Goals"))
-		{
-			String[] goals = newThing.getAttribute("Goals").split(",");
-			for(String goal : goals)
-			{
-				this.goals.add(goal);
-			}
-		} else if(newThing.hasAttribute("goals"))
-		{
-			String[] goals = newThing.getAttribute("goals").split(",");
-			for(String goal : goals)
-			{
-				this.goals.add(goal);
-			}
-		} else if(newThing.hasAttribute("Goal"))
-		{
-			String[] goals = newThing.getAttribute("Goal").split(",");
-			for(String goal : goals)
-			{
-				this.goals.add(goal);
-			}
-		} else if(newThing.hasAttribute("goal"))
-		{
-			String[] goals = newThing.getAttribute("goal").split(",");
-			for(String goal : goals)
-			{
-				this.goals.add(goal);
-			}
-		}
-		return newThing;
-	}
+//	private ThingNode addThingTree(Word word) throws FileNotFoundException, UnknownThingException, IOException
+//	{
+//		KnowledgePacket thingKnowledge = KnowledgeAccessor.getInstance().getNounKnowledge(word.toString());
+//		ThingNode newThing = new ThingNode(word, null, thingKnowledge.getCategories(), thingKnowledge.getAttributes(),
+//				thingKnowledge.getModels(), thingKnowledge.getPrimaryModelName(), thingKnowledge.getInstructionInterpreter(), thingKnowledge.getConfidence(),
+//				thingKnowledge.getElements());
+//		thingTrees.add(newThing);
+//		if(newThing.hasAttribute("Goals"))
+//		{
+//			String[] goals = newThing.getAttribute("Goals").split(",");
+//			for(String goal : goals)
+//			{
+//				this.goals.add(goal);
+//			}
+//		} else if(newThing.hasAttribute("goals"))
+//		{
+//			String[] goals = newThing.getAttribute("goals").split(",");
+//			for(String goal : goals)
+//			{
+//				this.goals.add(goal);
+//			}
+//		} else if(newThing.hasAttribute("Goal"))
+//		{
+//			String[] goals = newThing.getAttribute("Goal").split(",");
+//			for(String goal : goals)
+//			{
+//				this.goals.add(goal);
+//			}
+//		} else if(newThing.hasAttribute("goal"))
+//		{
+//			String[] goals = newThing.getAttribute("goal").split(",");
+//			for(String goal : goals)
+//			{
+//				this.goals.add(goal);
+//			}
+//		}
+//		return newThing;
+//	}
 	
 	private void addActionTree(Word word, ThingNode subject, ThingNode directObject, ThingNode indirectObject, List<Adverb> adverbs) throws UnknownActionException, UnreadableActionNodeException,
 	NotAnActionNodeException, FileNotFoundException, IOException

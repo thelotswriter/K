@@ -8,6 +8,7 @@ import java.util.Set;
 
 import instructions.Instruction;
 import instructions.InstructionType;
+import processTree.ProcessNode;
 import processTree.ThingNode;
 
 public class DiscreteSpatialModel extends SubModel 
@@ -171,14 +172,16 @@ public class DiscreteSpatialModel extends SubModel
 			worldTiles[i] = worldDimensions[i] / gridTileDimensions[i];
 		}
 		allowableSpaces = new AllowableSpaces(worldTiles);
-		for(ThingNode element : world.getElements())
+		for(ProcessNode pElement : world.getElements())
 		{
+			ThingNode element = (ThingNode) pElement;
 			if(element.getCategories().contains("obstacle"))
 			{
 				if(element.isPlural())
 				{
-					for(ThingNode subElement : element.getElements())
+					for(ProcessNode pSubElement : element.getElements())
 					{
+					    ThingNode subElement = (ThingNode) pSubElement;
 						blockStationaryObstacles(subElement);
 					}
 				} else

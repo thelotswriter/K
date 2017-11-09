@@ -1,5 +1,7 @@
 package processTree.subActionNodes;
 
+import actionNodes.Plan;
+import instructions.InstructionPacket;
 import kaiExceptions.NotAnActionNodeException;
 import kaiExceptions.UnknownActionException;
 import kaiExceptions.UnreadableActionNodeException;
@@ -15,7 +17,8 @@ import java.util.List;
 public abstract class PlannableActionNode extends ActionNode
 {
 
-    boolean planningNode;
+    private Plan plan;
+    private boolean planningNode;
     private final double MAX_URGENCY = 100;
 
     public PlannableActionNode(CommandNode root, ActionNode parent, ThingNode subject, ThingNode directObject, ThingNode indirectObject,
@@ -23,8 +26,38 @@ public abstract class PlannableActionNode extends ActionNode
             throws NotAnActionNodeException, UnknownActionException, IOException, UnreadableActionNodeException
     {
         super(root, parent, subject, directObject, indirectObject, adverbs, elements, confidence, priority, urgency);
+        plan = new Plan(root, parent, subject, directObject, indirectObject, adverbs, elements, confidence, priority, urgency);
         planningNode = false;
     }
+
+    public void initialize() throws NotAnActionNodeException, UnknownActionException, IOException, UnreadableActionNodeException
+    {
+        if(!planningNode)
+        {
+            plan.initialize();
+        }
+    }
+
+    /**
+     * When using the original (non-planning) node, runs plan. When using the future versions, returns the results of planningRun
+     * @return A list of potential instructions to perform
+     */
+    public List<InstructionPacket> run()
+    {
+        if(!planningNode)
+        {
+            return plan.run();
+        } else
+        {
+            return planningRun();
+        }
+    }
+
+    /**
+     * Runs the code when in planning mode. This is what is run by plan
+     * @return A list of instructions that the Plan node will use to choose the best instruction
+     */
+    public abstract List<InstructionPacket> planningRun();
 
     public void makePlanningNode()
     {

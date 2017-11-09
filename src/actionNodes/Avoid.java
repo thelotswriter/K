@@ -9,6 +9,7 @@ import kaiExceptions.UnreadableActionNodeException;
 import knowledgeAccess.ActionElement;
 import processTree.ActionNode;
 import processTree.CommandNode;
+import processTree.ProcessNode;
 import processTree.ThingNode;
 import processTree.subActionNodes.PlannableActionNode;
 import processTree.toolNodes.Model;
@@ -38,28 +39,28 @@ public class Avoid extends PlannableActionNode
     }
 
     @Override
-    public void initialize()
-    {
+    public void initialize() throws NotAnActionNodeException, UnknownActionException, UnreadableActionNodeException, IOException {
+        super.initialize();
         // Determine which sort of model should be used to avoid. Currently we only have one model to use, so we'll use that.
         // In the future, this may be expanded to use a search tree or some other method to select the best model
         models = new ArrayList<>();
         if(getDirectObject().isPlural())
         {
-            for(ThingNode singleObject : getDirectObject().getElements())
+            for(ProcessNode singleObject : getDirectObject().getElements())
             {
-                models.add(ModelPicker.getInstance().getModel(getDirectObject().getParent(), getSubject(), singleObject, getIndirectObject()));
+                models.add(ModelPicker.getInstance().getModel((ThingNode) getDirectObject().getParent(), getSubject(), (ThingNode) singleObject, getIndirectObject()));
             }
         } else
         {
-            models.add(ModelPicker.getInstance().getModel(getDirectObject().getParent(), getSubject(), getDirectObject(), getIndirectObject()));
+            models.add(ModelPicker.getInstance().getModel((ThingNode) getDirectObject().getParent(), getSubject(), getDirectObject(), getIndirectObject()));
         }
     }
 
     @Override
-    public List<InstructionPacket> run()
+    public List<InstructionPacket> planningRun()
     {
         List<InstructionPacket> instructionPackets = new ArrayList<>();
-        double[] vector = new double[getDirectObject().getParent().getAttribute("dimensions").split(",").length];
+        double[] vector = new double[((ThingNode) getDirectObject().getParent()).getAttribute("dimensions").split(",").length];
         for(double oneDVector : vector)
         {
             oneDVector = 0;

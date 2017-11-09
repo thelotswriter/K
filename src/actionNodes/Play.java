@@ -9,6 +9,7 @@ import kaiExceptions.UnreadableActionNodeException;
 import knowledgeAccess.ActionElement;
 import processTree.ActionNode;
 import processTree.CommandNode;
+import processTree.ProcessNode;
 import processTree.ThingNode;
 import thingNodes.CategoryNodes.GameNode;
 import words.Adverb;
@@ -35,8 +36,9 @@ public class Play extends ActionNode
         {
             GameNode game = (GameNode) directObject;
             convertGoalsToNodes(game);
-            for(ActionNode element : getElements())
+            for(ProcessNode pElement : getElements())
             {
+                ActionNode element = (ActionNode) pElement;
                 element.initialize();
             }
             game.startGame();
@@ -66,9 +68,10 @@ public class Play extends ActionNode
     public List<InstructionPacket> run()
     {
         List<InstructionPacket> instructionPackets = new ArrayList<>();
-        List<ActionNode> elements = getElements();
-        for(ActionNode element : elements)
+        List<ProcessNode> elements = getElements();
+        for(ProcessNode pElement : elements)
         {
+            ActionNode element = (ActionNode) pElement;
             List<InstructionPacket> elementPackets = element.run();
             if(elementPackets != null)
             {

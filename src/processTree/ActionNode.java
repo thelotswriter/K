@@ -57,6 +57,7 @@ public abstract class ActionNode extends ProcessNode
 	public ActionNode(CommandNode root, ActionNode parent, ThingNode subject, ThingNode directObject, ThingNode indirectObject, List<Adverb> adverbs, List<ActionElement> elements,
 			double confidence, double priority, double urgency) throws UnknownActionException, UnreadableActionNodeException, NotAnActionNodeException, FileNotFoundException, IOException
 	{
+	    super(parent, null, confidence);
 		this.root = root;
 		this.parent = parent;
 		this.subject = subject;
@@ -73,7 +74,7 @@ public abstract class ActionNode extends ProcessNode
 			elementInfo.addAll(elements);
 		}
 		setConfidence(confidence);
-		setScore(0);
+//		setScore(0);
 		this.priority = priority;
 		this.urgency = urgency;
 		usage = 0;
@@ -115,9 +116,12 @@ public abstract class ActionNode extends ProcessNode
 		if(elements != null)
 		{
 			elementInfo.addAll(elements);
+		} else
+		{
+			this.elements = new ArrayList<>();
 		}
 		setConfidence(confidence);
-		setScore(0);
+//		setScore(0);
 		this.priority = priority;
 		this.urgency = urgency;
 		usage = 0;
@@ -250,7 +254,7 @@ public abstract class ActionNode extends ProcessNode
 	 * Gets the elements used by the action node
 	 * @return The elements used by the action node
 	 */
-	public List<ActionNode> getElements()
+	public List<ActionNode> getActionElements()
 	{
 		return elements;
 	}

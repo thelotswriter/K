@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import instructions.Instruction;
+import instructions.InstructionType;
+import processTree.ProcessNode;
 import processTree.ThingNode;
 import processTree.toolNodes.Model;
 import structures.ID2DDFS;
@@ -109,14 +111,16 @@ public class Discrete2DSpatialModel extends Model
      */
     private void setUnallowedSpaces()
     {
-        for(ThingNode node : getWorld().getElements())
+        for(ProcessNode pNode : getWorld().getElements())
         {
+            ThingNode node = (ThingNode) pNode;
             if(node.getCategories().contains("obstacle"))
             {
                 if(node.isPlural())
                 {
-                    for(ThingNode singleNode : node.getElements())
+                    for(ProcessNode singlePNode : node.getElements())
                     {
+                        ThingNode singleNode = (ThingNode) singlePNode;
                         blockObstacle(singleNode);
                     }
                 } else
@@ -390,13 +394,220 @@ public class Discrete2DSpatialModel extends Model
     @Override
     public List<ThingNode> getFutureWorldStates(Instruction action)
     {
+        // First, get the player's new location based on the given instruction--be sure to check how far the player moves
+        // Move the thing based on the thing's distance traveled times the object's speed divided by the thing's speed
+        // At every junction, split the object into multiple copies (one for each allowed movement)
+        double[] moveAction = new double[N_DIMENSIONS];
+        moveAction[0] = Double.parseDouble(action.getParameters().get(0));
+        moveAction[1] = Double.parseDouble(action.getParameters().get(1));
+        int[] newObjectLocation = new int[N_DIMENSIONS];
+        newObjectLocation[0] = objectLocation[0];
+        newObjectLocation[1] = objectLocation[1];
+        if(moveAction[0] != 0 && moveAction[1] != 0)
+        {
+            if(Math.abs(moveAction[0]) > Math.abs(moveAction[1]))
+            {
+                moveAction[1] = 0;
+            } else
+            {
+                moveAction[0] = 0;
+            }
+        }
+        int playerDist = 0;
+        if(objectLocation[0] % tileDimensions[0] != 0 || objectLocation[1] % tileDimensions[1] != 0)
+        {
+            if(object.hasAttribute("direction"))
+            {
+                if(objectLocation[0] % tileDimensions[0] != 0)
+                {
+                    if(Double.parseDouble(object.getAttribute("direction").split(",")[0]) > 0)
+                    {
+                        if(moveAction[0] < 0)
+                        {
+                            playerDist = newObjectLocation[0] - (newObjectLocation[0] / tileDimensions[0]) * tileDimensions[0];
+                            newObjectLocation[0] -= playerDist;
+                        } else
+                        {
+                            playerDist = ((newObjectLocation[0] / tileDimensions[0]) + 1) * tileDimensions[0] - newObjectLocation[0];
+                            newObjectLocation[0] += playerDist;
+                        }
+                    } else
+                    {
+                        if(moveAction[0] > 0)
+                        {
+                            playerDist = ((newObjectLocation[0] / tileDimensions[0]) + 1) * tileDimensions[0] - newObjectLocation[0];
+                            newObjectLocation[0] += playerDist;
+                        } else
+                        {
+                            playerDist = newObjectLocation[0] - (newObjectLocation[0] / tileDimensions[0]) * tileDimensions[0];
+                            newObjectLocation[0] -= playerDist;
+                        }
+                    }
+                } else
+                {
+                    if(Double.parseDouble(object.getAttribute("direction").split(",")[1]) > 0)
+                    {
+                        if(moveAction[1] < 0)
+                        {
+                            playerDist = newObjectLocation[0] - (newObjectLocation[1] / tileDimensions[1]) * tileDimensions[1];
+                            newObjectLocation[1] -= playerDist;
+                        } else
+                        {
+                            playerDist = ((newObjectLocation[1] / tileDimensions[1]) + 1) * tileDimensions[1] - newObjectLocation[1];
+                            newObjectLocation[1] += playerDist;
+                        }
+                    } else
+                    {
+                        if(moveAction[1] > 0)
+                        {
+                            playerDist = ((newObjectLocation[1] / tileDimensions[1]) + 1) * tileDimensions[1] - newObjectLocation[1];
+                            newObjectLocation[1] += playerDist;
+                        } else
+                        {
+                            playerDist = newObjectLocation[1] - (newObjectLocation[1] / tileDimensions[1]) * tileDimensions[1];
+                            newObjectLocation[1] -= playerDist;
+                        }
+                    }
+                }
+            } else
+            {
+                if(objectLocation[0] % tileDimensions[0] != 0 && moveAction[0] != 0)
+                {
+                    if(moveAction[0] > 0)
+                    {
+                        playerDist = ((newObjectLocation[0] / tileDimensions[0]) + 1) * tileDimensions[0] - newObjectLocation[0];
+                        newObjectLocation[0] += playerDist;
+                    } else
+                    {
+                        playerDist = newObjectLocation[0] - (newObjectLocation[0] / tileDimensions[0]) * tileDimensions[0];
+                        newObjectLocation[0] -= playerDist;
+                    }
+                } else if(objectLocation[1] % tileDimensions[1] != 0 && moveAction[1] != 0)
+                {
+                    if(moveAction[1] > 0)
+                    {
+                        playerDist = ((newObjectLocation[1] / tileDimensions[1]) + 1) * tileDimensions[1] - newObjectLocation[1];
+                        newObjectLocation[1] += playerDist;
+                    } else
+                    {
+                        playerDist = newObjectLocation[1] - (newObjectLocation[1] / tileDimensions[1]) * tileDimensions[1];
+                        newObjectLocation[1] -= playerDist;
+                    }
+                } else
+                {
+                    if(objectLocation[0] % tileDimensions[0] != 0)
+                    {
+                        int positiveDist = ((newObjectLocation[0] / tileDimensions[0]) + 1) * tileDimensions[0] - newObjectLocation[0];
+                        int negativeDist = newObjectLocation[0] - (newObjectLocation[0] / tileDimensions[0]) * tileDimensions[0];
+                        int[] newObjectLocation2 = new int[N_DIMENSIONS];
+                        newObjectLocation2[0] = newObjectLocation[0] - negativeDist;
+                        newObjectLocation2[1] = newObjectLocation[1];
+                        objectLocation[0] += positiveDist;
+                        return twoPlayerPositionFutureWorld(newObjectLocation, newObjectLocation2, positiveDist, negativeDist);
+                    } else
+                    {
+                        int positiveDist = ((newObjectLocation[1] / tileDimensions[1]) + 1) * tileDimensions[1] - newObjectLocation[1];
+                        int negativeDist = newObjectLocation[1] - (newObjectLocation[1] / tileDimensions[1]) * tileDimensions[1];
+                        int[] newObjectLocation2 = new int[N_DIMENSIONS];
+                        newObjectLocation2[0] = newObjectLocation[0];
+                        newObjectLocation2[1] = newObjectLocation[1] - negativeDist;
+                        objectLocation[1] += positiveDist;
+                        return twoPlayerPositionFutureWorld(newObjectLocation, newObjectLocation2, positiveDist, negativeDist);
+                    }
+                }
+            }
+        } else
+        {
+            double[] moveDirections = new double[N_DIMENSIONS];
+            for(int i = 0; i < moveDirections.length; i++)
+            {
+                moveDirections[i] = Double.parseDouble(action.getParameters().get(i));
+            }
+            if(isAllowableMovement(objectLocation, moveDirections))
+            {
+                int[] newLocation = new int[N_DIMENSIONS];
+                if(Math.abs(moveDirections[0]) > Math.abs(moveDirections[1]))
+                {
+                    newLocation[1] = objectLocation[1];
+                    if(moveDirections[0] > 0)
+                    {
+                        newLocation[0] = objectLocation[0] + tileDimensions[0];
+                    } else
+                    {
+                        newLocation[0] = objectLocation[0] - tileDimensions[0];
+                    }
+                    playerDist = tileDimensions[0];
+                } else
+                {
+                    newLocation[0] = objectLocation[0];
+                    if(moveDirections[1] > 0)
+                    {
+                        newLocation[1] = objectLocation[1] + tileDimensions[1];
+                    } else
+                    {
+                        newLocation[1] = objectLocation[1] - tileDimensions[1];
+                    }
+                    playerDist = tileDimensions[1];
+                }
+            }
+        }
+        int thingDist = 0;
+        if(getThing().hasAttribute("speed") && object.hasAttribute("speed"))
+        {
+            thingDist = playerDist * ((int) (Double.parseDouble(getThing().getAttribute("speed"))
+                    / Double.parseDouble(object.getAttribute("speed"))));
+        } else
+        {
+            thingDist = playerDist;
+        }
+
+        return null;
+    }
+
+    private List<ThingNode> twoPlayerPositionFutureWorld(int[] playerLoc1, int[] playerLoc2, int playerDist1, int playerDist2)
+    {
+        return null;
+    }
+
+    private List<ThingNode> possibleThingLocations(int distanceTraveled)
+    {
         return null;
     }
 
     @Override
     public List<Instruction> getPossibleActions()
     {
-        return null;
+        List<Instruction> possibleActions = new ArrayList<>();
+        String[] possibleMoves = object.getAttribute("move").split(",");
+        if(possibleMoves[0] == "both" || possibleMoves[0] == "forward")
+        {
+            List<String> params = new ArrayList<>();
+            params.add("1");
+            params.add("0");
+            possibleActions.add(new Instruction(InstructionType.MOVE, params));
+        }
+        if(possibleMoves[0] == "both" || possibleMoves[0] == "backward")
+        {
+            List<String> params = new ArrayList<>();
+            params.add("-1");
+            params.add("0");
+            possibleActions.add(new Instruction(InstructionType.MOVE, params));
+        }
+        if(possibleMoves[1] == "both" || possibleMoves[1] == "forward")
+        {
+            List<String> params = new ArrayList<>();
+            params.add("0");
+            params.add("1");
+            possibleActions.add(new Instruction(InstructionType.MOVE, params));
+        }
+        if(possibleMoves[1] == "both" || possibleMoves[1] == "backward")
+        {
+            List<String> params = new ArrayList<>();
+            params.add("0");
+            params.add("-1");
+            possibleActions.add(new Instruction(InstructionType.MOVE, params));
+        }
+        return possibleActions;
     }
 
 }
