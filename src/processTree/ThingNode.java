@@ -218,6 +218,7 @@ public class ThingNode extends ProcessNode
 	 */
 	public void addElement(ThingNode element)
 	{
+		super.addElement(element);
 		elements.add(element);
 	}
 
@@ -263,6 +264,7 @@ public class ThingNode extends ProcessNode
 	 */
 	public void removeElement(ThingNode element)
 	{
+		super.removeElement(element);
 		elements.remove(element);
 	}
 	

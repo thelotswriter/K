@@ -1,7 +1,8 @@
 package subModel;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 import instructions.Instruction;
 import instructions.InstructionType;
@@ -31,6 +32,10 @@ public class Discrete2DSpatialModel extends Model
     private double[][] finalMap;
     private int steps;
 
+    private Constructor worldConstructor;
+    private Constructor thingConstructor;
+    private Constructor objectConstructor;
+
     /**
      * Creates a model made for a two-dimensional, discrete world
      * @param thing The thing being modeled
@@ -40,6 +45,14 @@ public class Discrete2DSpatialModel extends Model
     {
         super(thing, world);
         object = null;
+        try
+        {
+            worldConstructor = world.getClass().getDeclaredConstructor(ProcessNode.class, List.class, List.class,
+                    Map.class, double.class);
+            thingConstructor = thing.getClass().getDeclaredConstructor(ProcessNode.class, List.class, List.class,
+                    Map.class, double.class);
+        } catch (NoSuchMethodException e) {}
+        objectConstructor = null;
         String[] goal = thing.getAttribute("goal").split(" ");
         if(goal.length > 1)
         {
@@ -54,6 +67,14 @@ public class Discrete2DSpatialModel extends Model
                 {
                     object = world.getThing(goal[2]);
                 }
+            }
+            if(object != null)
+            {
+                try
+                {
+                    objectConstructor = object.getClass().getDeclaredConstructor(ProcessNode.class, List.class, List.class,
+                            Map.class, double.class);
+                } catch (NoSuchMethodException e) {}
             }
         }
         initializeMaps();
@@ -400,9 +421,9 @@ public class Discrete2DSpatialModel extends Model
         double[] moveAction = new double[N_DIMENSIONS];
         moveAction[0] = Double.parseDouble(action.getParameters().get(0));
         moveAction[1] = Double.parseDouble(action.getParameters().get(1));
-        int[] newObjectLocation = new int[N_DIMENSIONS];
-        newObjectLocation[0] = objectLocation[0];
-        newObjectLocation[1] = objectLocation[1];
+        int[] newPlayerLocation = new int[N_DIMENSIONS];
+        newPlayerLocation[0] = objectLocation[0];
+        newPlayerLocation[1] = objectLocation[1];
         if(moveAction[0] != 0 && moveAction[1] != 0)
         {
             if(Math.abs(moveAction[0]) > Math.abs(moveAction[1]))
@@ -424,23 +445,23 @@ public class Discrete2DSpatialModel extends Model
                     {
                         if(moveAction[0] < 0)
                         {
-                            playerDist = newObjectLocation[0] - (newObjectLocation[0] / tileDimensions[0]) * tileDimensions[0];
-                            newObjectLocation[0] -= playerDist;
+                            playerDist = newPlayerLocation[0] - (newPlayerLocation[0] / tileDimensions[0]) * tileDimensions[0];
+                            newPlayerLocation[0] -= playerDist;
                         } else
                         {
-                            playerDist = ((newObjectLocation[0] / tileDimensions[0]) + 1) * tileDimensions[0] - newObjectLocation[0];
-                            newObjectLocation[0] += playerDist;
+                            playerDist = ((newPlayerLocation[0] / tileDimensions[0]) + 1) * tileDimensions[0] - newPlayerLocation[0];
+                            newPlayerLocation[0] += playerDist;
                         }
                     } else
                     {
                         if(moveAction[0] > 0)
                         {
-                            playerDist = ((newObjectLocation[0] / tileDimensions[0]) + 1) * tileDimensions[0] - newObjectLocation[0];
-                            newObjectLocation[0] += playerDist;
+                            playerDist = ((newPlayerLocation[0] / tileDimensions[0]) + 1) * tileDimensions[0] - newPlayerLocation[0];
+                            newPlayerLocation[0] += playerDist;
                         } else
                         {
-                            playerDist = newObjectLocation[0] - (newObjectLocation[0] / tileDimensions[0]) * tileDimensions[0];
-                            newObjectLocation[0] -= playerDist;
+                            playerDist = newPlayerLocation[0] - (newPlayerLocation[0] / tileDimensions[0]) * tileDimensions[0];
+                            newPlayerLocation[0] -= playerDist;
                         }
                     }
                 } else
@@ -449,23 +470,23 @@ public class Discrete2DSpatialModel extends Model
                     {
                         if(moveAction[1] < 0)
                         {
-                            playerDist = newObjectLocation[0] - (newObjectLocation[1] / tileDimensions[1]) * tileDimensions[1];
-                            newObjectLocation[1] -= playerDist;
+                            playerDist = newPlayerLocation[0] - (newPlayerLocation[1] / tileDimensions[1]) * tileDimensions[1];
+                            newPlayerLocation[1] -= playerDist;
                         } else
                         {
-                            playerDist = ((newObjectLocation[1] / tileDimensions[1]) + 1) * tileDimensions[1] - newObjectLocation[1];
-                            newObjectLocation[1] += playerDist;
+                            playerDist = ((newPlayerLocation[1] / tileDimensions[1]) + 1) * tileDimensions[1] - newPlayerLocation[1];
+                            newPlayerLocation[1] += playerDist;
                         }
                     } else
                     {
                         if(moveAction[1] > 0)
                         {
-                            playerDist = ((newObjectLocation[1] / tileDimensions[1]) + 1) * tileDimensions[1] - newObjectLocation[1];
-                            newObjectLocation[1] += playerDist;
+                            playerDist = ((newPlayerLocation[1] / tileDimensions[1]) + 1) * tileDimensions[1] - newPlayerLocation[1];
+                            newPlayerLocation[1] += playerDist;
                         } else
                         {
-                            playerDist = newObjectLocation[1] - (newObjectLocation[1] / tileDimensions[1]) * tileDimensions[1];
-                            newObjectLocation[1] -= playerDist;
+                            playerDist = newPlayerLocation[1] - (newPlayerLocation[1] / tileDimensions[1]) * tileDimensions[1];
+                            newPlayerLocation[1] -= playerDist;
                         }
                     }
                 }
@@ -475,44 +496,44 @@ public class Discrete2DSpatialModel extends Model
                 {
                     if(moveAction[0] > 0)
                     {
-                        playerDist = ((newObjectLocation[0] / tileDimensions[0]) + 1) * tileDimensions[0] - newObjectLocation[0];
-                        newObjectLocation[0] += playerDist;
+                        playerDist = ((newPlayerLocation[0] / tileDimensions[0]) + 1) * tileDimensions[0] - newPlayerLocation[0];
+                        newPlayerLocation[0] += playerDist;
                     } else
                     {
-                        playerDist = newObjectLocation[0] - (newObjectLocation[0] / tileDimensions[0]) * tileDimensions[0];
-                        newObjectLocation[0] -= playerDist;
+                        playerDist = newPlayerLocation[0] - (newPlayerLocation[0] / tileDimensions[0]) * tileDimensions[0];
+                        newPlayerLocation[0] -= playerDist;
                     }
                 } else if(objectLocation[1] % tileDimensions[1] != 0 && moveAction[1] != 0)
                 {
                     if(moveAction[1] > 0)
                     {
-                        playerDist = ((newObjectLocation[1] / tileDimensions[1]) + 1) * tileDimensions[1] - newObjectLocation[1];
-                        newObjectLocation[1] += playerDist;
+                        playerDist = ((newPlayerLocation[1] / tileDimensions[1]) + 1) * tileDimensions[1] - newPlayerLocation[1];
+                        newPlayerLocation[1] += playerDist;
                     } else
                     {
-                        playerDist = newObjectLocation[1] - (newObjectLocation[1] / tileDimensions[1]) * tileDimensions[1];
-                        newObjectLocation[1] -= playerDist;
+                        playerDist = newPlayerLocation[1] - (newPlayerLocation[1] / tileDimensions[1]) * tileDimensions[1];
+                        newPlayerLocation[1] -= playerDist;
                     }
                 } else
                 {
                     if(objectLocation[0] % tileDimensions[0] != 0)
                     {
-                        int positiveDist = ((newObjectLocation[0] / tileDimensions[0]) + 1) * tileDimensions[0] - newObjectLocation[0];
-                        int negativeDist = newObjectLocation[0] - (newObjectLocation[0] / tileDimensions[0]) * tileDimensions[0];
-                        int[] newObjectLocation2 = new int[N_DIMENSIONS];
-                        newObjectLocation2[0] = newObjectLocation[0] - negativeDist;
-                        newObjectLocation2[1] = newObjectLocation[1];
+                        int positiveDist = ((newPlayerLocation[0] / tileDimensions[0]) + 1) * tileDimensions[0] - newPlayerLocation[0];
+                        int negativeDist = newPlayerLocation[0] - (newPlayerLocation[0] / tileDimensions[0]) * tileDimensions[0];
+                        int[] newPlayerLocation2 = new int[N_DIMENSIONS];
+                        newPlayerLocation2[0] = newPlayerLocation[0] - negativeDist;
+                        newPlayerLocation2[1] = newPlayerLocation[1];
                         objectLocation[0] += positiveDist;
-                        return twoPlayerPositionFutureWorld(newObjectLocation, newObjectLocation2, positiveDist, negativeDist);
+                        return twoPlayerPositionFutureWorld(newPlayerLocation, newPlayerLocation2, positiveDist, negativeDist);
                     } else
                     {
-                        int positiveDist = ((newObjectLocation[1] / tileDimensions[1]) + 1) * tileDimensions[1] - newObjectLocation[1];
-                        int negativeDist = newObjectLocation[1] - (newObjectLocation[1] / tileDimensions[1]) * tileDimensions[1];
-                        int[] newObjectLocation2 = new int[N_DIMENSIONS];
-                        newObjectLocation2[0] = newObjectLocation[0];
-                        newObjectLocation2[1] = newObjectLocation[1] - negativeDist;
+                        int positiveDist = ((newPlayerLocation[1] / tileDimensions[1]) + 1) * tileDimensions[1] - newPlayerLocation[1];
+                        int negativeDist = newPlayerLocation[1] - (newPlayerLocation[1] / tileDimensions[1]) * tileDimensions[1];
+                        int[] newPlayerLocation2 = new int[N_DIMENSIONS];
+                        newPlayerLocation2[0] = newPlayerLocation[0];
+                        newPlayerLocation2[1] = newPlayerLocation[1] - negativeDist;
                         objectLocation[1] += positiveDist;
-                        return twoPlayerPositionFutureWorld(newObjectLocation, newObjectLocation2, positiveDist, negativeDist);
+                        return twoPlayerPositionFutureWorld(newPlayerLocation, newPlayerLocation2, positiveDist, negativeDist);
                     }
                 }
             }
@@ -525,27 +546,27 @@ public class Discrete2DSpatialModel extends Model
             }
             if(isAllowableMovement(objectLocation, moveDirections))
             {
-                int[] newLocation = new int[N_DIMENSIONS];
+//                int[] newLocation = new int[N_DIMENSIONS];
                 if(Math.abs(moveDirections[0]) > Math.abs(moveDirections[1]))
                 {
-                    newLocation[1] = objectLocation[1];
+                    newPlayerLocation[1] = objectLocation[1];
                     if(moveDirections[0] > 0)
                     {
-                        newLocation[0] = objectLocation[0] + tileDimensions[0];
+                        newPlayerLocation[0] = objectLocation[0] + tileDimensions[0];
                     } else
                     {
-                        newLocation[0] = objectLocation[0] - tileDimensions[0];
+                        newPlayerLocation[0] = objectLocation[0] - tileDimensions[0];
                     }
                     playerDist = tileDimensions[0];
                 } else
                 {
-                    newLocation[0] = objectLocation[0];
+                    newPlayerLocation[0] = objectLocation[0];
                     if(moveDirections[1] > 0)
                     {
-                        newLocation[1] = objectLocation[1] + tileDimensions[1];
+                        newPlayerLocation[1] = objectLocation[1] + tileDimensions[1];
                     } else
                     {
-                        newLocation[1] = objectLocation[1] - tileDimensions[1];
+                        newPlayerLocation[1] = objectLocation[1] - tileDimensions[1];
                     }
                     playerDist = tileDimensions[1];
                 }
@@ -560,18 +581,439 @@ public class Discrete2DSpatialModel extends Model
         {
             thingDist = playerDist;
         }
-
-        return null;
+        List<ThingNode> futureThings = calculatePossibleFutures(thingDist, getThing());
+        List<ThingNode> futureWorlds = new ArrayList<>();
+        try
+        {
+            StringBuilder pLocationBuilder = new StringBuilder();
+            pLocationBuilder.append(newPlayerLocation[0]);
+            pLocationBuilder.append(",");
+            pLocationBuilder.append(newPlayerLocation[1]);
+            int[] playerDirection = new int[N_DIMENSIONS];
+            if(objectLocation[0] - newPlayerLocation[0] == 0)
+            {
+                playerDirection[0] = 0;
+                if(objectLocation[1] - newPlayerLocation[1] > 0)
+                {
+                    playerDirection[1] = 1;
+                } else
+                {
+                    playerDirection[1] = -1;
+                }
+            } else
+            {
+                if(objectLocation[0] - newPlayerLocation[0] > 0)
+                {
+                    playerDirection[0] = 1;
+                } else
+                {
+                    playerDirection[0] = -1;
+                }
+                playerDirection[1] = 0;
+            }
+            StringBuilder pDirectionBuilder = new StringBuilder();
+            pDirectionBuilder.append(playerDirection[0]);
+            pDirectionBuilder.append(",");
+            pDirectionBuilder.append(playerDirection[1]);
+            for(ThingNode futureThing : futureThings)
+            {
+                ThingNode futureWorld = (ThingNode) worldConstructor.newInstance(null, null, getWorld().getCategories(),
+                        getWorld().getAttributes(), getWorld().getConfidence());
+                futureWorld.setName(getWorld().getName());
+                ThingNode futurePlayer = (ThingNode) objectConstructor.newInstance(futureWorld, null, object.getCategories(),
+                        object.getAttributes(), object.getConfidence());
+                futurePlayer.setName(object.getName());
+                futureThing.setParent(futureWorld);
+                futurePlayer.setAttribute("location", pLocationBuilder.toString());
+                futurePlayer.setAttribute("direction", pDirectionBuilder.toString());
+                futureWorld.addElement(futurePlayer);
+                futureWorld.addElement(futureThing);
+                futureWorlds.add(futureWorld);
+            }
+        } catch (InstantiationException e) {}
+        catch (IllegalAccessException e) {}
+        catch (InvocationTargetException e) {}
+        return futureWorlds;
     }
 
     private List<ThingNode> twoPlayerPositionFutureWorld(int[] playerLoc1, int[] playerLoc2, int playerDist1, int playerDist2)
     {
-        return null;
+        int thingDist1 = 0;
+        int thingDist2 = 0;
+        if(getThing().hasAttribute("speed") && object.hasAttribute("speed"))
+        {
+            thingDist1 = playerDist1 * ((int) (Double.parseDouble(getThing().getAttribute("speed"))
+                    / Double.parseDouble(object.getAttribute("speed"))));
+            thingDist2 = playerDist2 * ((int) (Double.parseDouble(getThing().getAttribute("speed"))
+                    / Double.parseDouble(object.getAttribute("speed"))));
+        } else
+        {
+            thingDist1 = playerDist1;
+            thingDist2 = playerDist2;
+        }
+        List<ThingNode> futureThings1 = calculatePossibleFutures(thingDist1, getThing());
+        List<ThingNode> futureThings2 = calculatePossibleFutures(thingDist2, getThing());
+        StringBuilder p1LocationBuilder = new StringBuilder();
+        p1LocationBuilder.append(playerLoc1[0]);
+        p1LocationBuilder.append(",");
+        p1LocationBuilder.append(playerLoc1[1]);
+        List<ThingNode> possibleFutureWorlds = new ArrayList<>();
+        try
+        {
+            int[] player1Direction = new int[N_DIMENSIONS];
+            if(objectLocation[0] - playerLoc1[0] == 0)
+            {
+                player1Direction[0] = 0;
+                if(objectLocation[1] - playerLoc1[1] > 0)
+                {
+                    player1Direction[1] = 1;
+                } else
+                {
+                    player1Direction[1] = -1;
+                }
+            } else
+            {
+                if(objectLocation[0] - playerLoc1[0] > 0)
+                {
+                    player1Direction[0] = 1;
+                } else
+                {
+                    player1Direction[0] = -1;
+                }
+                player1Direction[1] = 0;
+            }
+            StringBuilder p1DirectionBuilder = new StringBuilder();
+            p1DirectionBuilder.append(player1Direction[0]);
+            p1DirectionBuilder.append(",");
+            p1DirectionBuilder.append(player1Direction[1]);
+            for(ThingNode futureThing : futureThings1)
+            {
+                ThingNode futureWorld = (ThingNode) worldConstructor.newInstance(null, null, getWorld().getCategories(),
+                        getWorld().getAttributes(), getWorld().getConfidence());
+                futureWorld.setName(getWorld().getName());
+                ThingNode futurePlayer = (ThingNode) objectConstructor.newInstance(futureWorld, null, object.getCategories(),
+                        object.getAttributes(), object.getConfidence());
+                futurePlayer.setName(object.getName());
+                futureThing.setParent(futureWorld);
+                futurePlayer.setAttribute("location", p1LocationBuilder.toString());
+                futureWorld.addElement(futurePlayer);
+                futureWorld.addElement(futureThing);
+                possibleFutureWorlds.add(futureWorld);
+            }
+            StringBuilder p2LocationBuilder = new StringBuilder();
+            p2LocationBuilder.append(playerLoc2[0]);
+            p2LocationBuilder.append(",");
+            p2LocationBuilder.append(playerLoc2[1]);
+            int[] player2Direction = new int[N_DIMENSIONS];
+            if(objectLocation[0] - playerLoc2[0] == 0)
+            {
+                player2Direction[0] = 0;
+                if(objectLocation[1] - playerLoc2[1] > 0)
+                {
+                    player2Direction[1] = 1;
+                } else
+                {
+                    player2Direction[1] = -1;
+                }
+            } else
+            {
+                if(objectLocation[0] - playerLoc2[0] > 0)
+                {
+                    player2Direction[0] = 1;
+                } else
+                {
+                    player2Direction[0] = -1;
+                }
+                player2Direction[1] = 0;
+            }
+            StringBuilder p2DirectionBuilder = new StringBuilder();
+            p2DirectionBuilder.append(player2Direction[0]);
+            p2DirectionBuilder.append(",");
+            p2DirectionBuilder.append(player2Direction[1]);
+            for(ThingNode futureThing : futureThings2)
+            {
+                ThingNode futureWorld = (ThingNode) worldConstructor.newInstance(null, null, getWorld().getCategories(),
+                        getWorld().getAttributes(), getWorld().getConfidence());
+                ThingNode futurePlayer = (ThingNode) objectConstructor.newInstance(futureWorld, null, object.getCategories(),
+                        object.getAttributes(), object.getConfidence());
+                futureThing.setParent(futureWorld);
+                futurePlayer.setAttribute("location", p2LocationBuilder.toString());
+                futureWorld.addElement(futurePlayer);
+                futureWorld.addElement(futureThing);
+                possibleFutureWorlds.add(futureWorld);
+            }
+        } catch (IllegalAccessException e) {}
+        catch (InstantiationException e) {}
+        catch (InvocationTargetException e) {}
+//        for(ThingNode futureThing : futureThings2)
+//        {
+//
+//        }
+        return possibleFutureWorlds;
     }
 
-    private List<ThingNode> possibleThingLocations(int distanceTraveled)
+    /**
+     * Calculates possible future states given the distance traveled
+     * @param distance The distance the given thing will travel
+     * @param thingToFuture Thing to predict its future
+     * @return A list of future things
+     */
+    private List<ThingNode> calculatePossibleFutures(int distance, ThingNode thingToFuture)
     {
-        return null;
+        List<ThingNode> futureThings = new ArrayList<>();
+        try
+        {
+            Constructor futureConstructor = thingToFuture.getClass().getDeclaredConstructor(ProcessNode.class, List.class,
+                    List.class, Map.class, double.class);
+            int[] originalLocation = new int[N_DIMENSIONS];
+            originalLocation[0] = Integer.parseInt(thingToFuture.getAttribute("location").split(",")[0]);
+            originalLocation[1] = Integer.parseInt(thingToFuture.getAttribute("location").split(",")[1]);
+            Queue<int[]> newLocations = new LinkedList<>();
+            Queue<Integer> distancesToTravel = new LinkedList<>();
+            newLocations.add(originalLocation);
+            distancesToTravel.add(distance);
+            while(!newLocations.isEmpty())
+            {
+                int[] currentLocation = newLocations.remove();
+                int currentDistance = distancesToTravel.remove();
+                if(currentLocation[0] % tileDimensions[0] != 0) // Between tiles
+                {
+                    int distLeft = currentLocation[0] - (currentLocation[0] / tileDimensions[0]) * tileDimensions[0];
+                    int distRight = ((currentLocation[0] / tileDimensions[0]) + 1) * tileDimensions[0] - currentLocation[0];
+                    if(distLeft >= currentDistance)
+                    {
+                        int[] newLocation = new int[N_DIMENSIONS];
+                        newLocation[0] = currentLocation[0] - currentDistance;
+                        newLocation[1] = currentLocation[1];
+                        try {
+                            ThingNode futureState = (ThingNode) futureConstructor.newInstance(null, null, thingToFuture.getCategories(),
+                                    thingToFuture.getAttributes(), thingToFuture.getConfidence());
+                            futureState.setName(thingToFuture.getName());
+                            StringBuilder locationBuilder = new StringBuilder();
+                            locationBuilder.append(newLocation[0]);
+                            locationBuilder.append(",");
+                            locationBuilder.append(newLocation[1]);
+                            futureState.setAttribute("location", locationBuilder.toString());
+                            futureState.setAttribute("direction", "-1,0");
+                            futureThings.add(futureState);
+                        } catch (InstantiationException e) {}
+                        catch (IllegalAccessException e) {}
+                        catch (InvocationTargetException e) {}
+                    } else
+                    {
+                        int[] newLocation = new int[N_DIMENSIONS];
+                        newLocation[0] = currentLocation[0] - distLeft;
+                        newLocation[1] = currentLocation[1];
+                        newLocations.add(newLocation);
+                        distancesToTravel.add(currentDistance - distLeft);
+                    }
+                    if(distRight >= currentDistance)
+                    {
+                        int[] newLocation = new int[N_DIMENSIONS];
+                        newLocation[0] = currentLocation[0] + currentDistance;
+                        newLocation[1] = currentLocation[1];
+                        try {
+                            ThingNode futureState = (ThingNode) futureConstructor.newInstance(null, null, thingToFuture.getCategories(),
+                                    thingToFuture.getAttributes(), thingToFuture.getConfidence());
+                            futureState.setName(thingToFuture.getName());
+                            StringBuilder locationBuilder = new StringBuilder();
+                            locationBuilder.append(newLocation[0]);
+                            locationBuilder.append(",");
+                            locationBuilder.append(newLocation[1]);
+                            futureState.setAttribute("location", locationBuilder.toString());
+                            futureState.setAttribute("direction", "1,0");
+                            futureThings.add(futureState);
+                        } catch (InstantiationException e) {}
+                        catch (IllegalAccessException e) {}
+                        catch (InvocationTargetException e) {}
+                    } else
+                    {
+                        int[] newLocation = new int[N_DIMENSIONS];
+                        newLocation[0] = currentLocation[0] + distRight;
+                        newLocation[1] = currentLocation[1];
+                        newLocations.add(newLocation);
+                        distancesToTravel.add(currentDistance - distRight);
+                    }
+                } else if(currentLocation[1] % tileDimensions[1] != 0) // Between tiles
+                {
+                    int distUp = currentLocation[1] - (currentLocation[1] / tileDimensions[1]) * tileDimensions[1];
+                    int distDown = ((currentLocation[1] / tileDimensions[1]) + 1) * tileDimensions[1] - currentLocation[1];
+                    if(distUp >= currentDistance)
+                    {
+                        int[] newLocation = new int[N_DIMENSIONS];
+                        newLocation[0] = currentLocation[0];
+                        newLocation[1] = currentLocation[1] - currentDistance;
+                        try {
+                            ThingNode futureState = (ThingNode) futureConstructor.newInstance(null, null, thingToFuture.getCategories(),
+                                    thingToFuture.getAttributes(), thingToFuture.getConfidence());
+                            futureState.setName(thingToFuture.getName());
+                            StringBuilder locationBuilder = new StringBuilder();
+                            locationBuilder.append(newLocation[0]);
+                            locationBuilder.append(",");
+                            locationBuilder.append(newLocation[1]);
+                            futureState.setAttribute("location", locationBuilder.toString());
+                            futureState.setAttribute("direction", "0,-1");
+                            futureThings.add(futureState);
+                        } catch (InstantiationException e) {}
+                        catch (IllegalAccessException e) {}
+                        catch (InvocationTargetException e) {}
+                    } else
+                    {
+                        int[] newLocation = new int[N_DIMENSIONS];
+                        newLocation[0] = currentLocation[0];
+                        newLocation[1] = currentLocation[1] - distUp;
+                        newLocations.add(newLocation);
+                        distancesToTravel.add(currentDistance - distUp);
+                    }
+                    if(distDown >= currentDistance)
+                    {
+                        int[] newLocation = new int[N_DIMENSIONS];
+                        newLocation[0] = currentLocation[0];
+                        newLocation[1] = currentLocation[1] + currentDistance;
+                        try {
+                            ThingNode futureState = (ThingNode) futureConstructor.newInstance(null, null, thingToFuture.getCategories(),
+                                    thingToFuture.getAttributes(), thingToFuture.getConfidence());
+                            futureState.setName(thingToFuture.getName());
+                            StringBuilder locationBuilder = new StringBuilder();
+                            locationBuilder.append(newLocation[0]);
+                            locationBuilder.append(",");
+                            locationBuilder.append(newLocation[1]);
+                            futureState.setAttribute("location", locationBuilder.toString());
+                            futureThings.add(futureState);
+                            futureState.setAttribute("direction", "0,1");
+                        } catch (InstantiationException e) {}
+                        catch (IllegalAccessException e) {}
+                        catch (InvocationTargetException e) {}
+                    } else
+                    {
+                        int[] newLocation = new int[N_DIMENSIONS];
+                        newLocation[0] = currentLocation[0];
+                        newLocation[1] = currentLocation[1] + distDown;
+                        newLocations.add(newLocation);
+                        distancesToTravel.add(currentDistance - distDown);
+                    }
+                } else // Intersection
+                {
+                    double[] up = {0, -1};
+                    double[] down = {0, 1};
+                    double[] left = {-1, 0};
+                    double[] right = {1, 0};
+                    if(isAllowableMovement(currentLocation, up))
+                    {
+                        int[] newLocation = new int[N_DIMENSIONS];
+                        newLocation[0] = currentLocation[0];
+                        if(currentDistance <= tileDimensions[1])
+                        {
+                            newLocation[1] = currentLocation[1] - currentDistance;
+                            try {
+                                ThingNode futureState = (ThingNode) futureConstructor.newInstance(null, null, thingToFuture.getCategories(),
+                                        thingToFuture.getAttributes(), thingToFuture.getConfidence());
+                                futureState.setName(thingToFuture.getName());
+                                StringBuilder locationBuilder = new StringBuilder();
+                                locationBuilder.append(newLocation[0]);
+                                locationBuilder.append(",");
+                                locationBuilder.append(newLocation[1]);
+                                futureState.setAttribute("location", locationBuilder.toString());
+                                futureState.setAttribute("direction", "0,-1");
+                                futureThings.add(futureState);
+                            } catch (InstantiationException e) {}
+                            catch (IllegalAccessException e) {}
+                            catch (InvocationTargetException e) {}
+                        } else
+                        {
+                            newLocation[1] = currentLocation[1] - tileDimensions[1];
+                            newLocations.add(newLocation);
+                            distancesToTravel.add(currentDistance - tileDimensions[1]);
+                        }
+                    }
+                    if(isAllowableMovement(currentLocation, down))
+                    {
+                        int[] newLocation = new int[N_DIMENSIONS];
+                        newLocation[0] = currentLocation[0];
+                        if(currentDistance <= tileDimensions[1])
+                        {
+                            newLocation[1] = currentLocation[1] + currentDistance;
+                            try {
+                                ThingNode futureState = (ThingNode) futureConstructor.newInstance(null, null, thingToFuture.getCategories(),
+                                        thingToFuture.getAttributes(), thingToFuture.getConfidence());
+                                futureState.setName(thingToFuture.getName());
+                                StringBuilder locationBuilder = new StringBuilder();
+                                locationBuilder.append(newLocation[0]);
+                                locationBuilder.append(",");
+                                locationBuilder.append(newLocation[1]);
+                                futureState.setAttribute("location", locationBuilder.toString());
+                                futureState.setAttribute("direction", "0,1");
+                                futureThings.add(futureState);
+                            } catch (InstantiationException e) {}
+                            catch (IllegalAccessException e) {}
+                            catch (InvocationTargetException e) {}
+                        } else
+                        {
+                            newLocation[1] = currentLocation[1] + tileDimensions[1];
+                            newLocations.add(newLocation);
+                            distancesToTravel.add(currentDistance - tileDimensions[1]);
+                        }
+                    }
+                    if(isAllowableMovement(currentLocation, left))
+                    {
+                        int[] newLocation = new int[N_DIMENSIONS];
+                        newLocation[1] = currentLocation[1];
+                        if(currentDistance <= tileDimensions[0])
+                        {
+                            newLocation[0] = currentLocation[0] - currentDistance;
+                            try {
+                                ThingNode futureState = (ThingNode) futureConstructor.newInstance(null, null, thingToFuture.getCategories(),
+                                        thingToFuture.getAttributes(), thingToFuture.getConfidence());
+                                futureState.setName(thingToFuture.getName());
+                                StringBuilder locationBuilder = new StringBuilder();
+                                locationBuilder.append(newLocation[0]);
+                                locationBuilder.append(",");
+                                locationBuilder.append(newLocation[1]);
+                                futureState.setAttribute("location", locationBuilder.toString());
+                                futureState.setAttribute("direction", "-1,0");
+                                futureThings.add(futureState);
+                            } catch (InstantiationException e) {}
+                            catch (IllegalAccessException e) {}
+                            catch (InvocationTargetException e) {}
+                        } else
+                        {
+                            newLocation[0] = currentLocation[0] - tileDimensions[0];
+                            newLocations.add(newLocation);
+                            distancesToTravel.add(currentDistance - tileDimensions[0]);
+                        }
+                    }
+                    if(isAllowableMovement(currentLocation, right))
+                    {
+                        int[] newLocation = new int[N_DIMENSIONS];
+                        newLocation[1] = currentLocation[1];
+                        if(currentDistance <= tileDimensions[0])
+                        {
+                            newLocation[0] = currentLocation[0] + currentDistance;
+                            try {
+                                ThingNode futureState = (ThingNode) futureConstructor.newInstance(null, null, thingToFuture.getCategories(),
+                                        thingToFuture.getAttributes(), thingToFuture.getConfidence());
+                                futureState.setName(thingToFuture.getName());
+                                StringBuilder locationBuilder = new StringBuilder();
+                                locationBuilder.append(newLocation[0]);
+                                locationBuilder.append(",");
+                                locationBuilder.append(newLocation[1]);
+                                futureState.setAttribute("location", locationBuilder.toString());
+                                futureState.setAttribute("direction", "1,0");
+                                futureThings.add(futureState);
+                            } catch (InstantiationException e) {}
+                            catch (IllegalAccessException e) {}
+                            catch (InvocationTargetException e) {}
+                        } else
+                        {
+                            newLocation[1] = currentLocation[0] + tileDimensions[0];
+                            newLocations.add(newLocation);
+                            distancesToTravel.add(currentDistance - tileDimensions[0]);
+                        }
+                    }
+                }
+            }
+        } catch (NoSuchMethodException e) {}
+        return futureThings;
     }
 
     @Override
@@ -579,28 +1021,28 @@ public class Discrete2DSpatialModel extends Model
     {
         List<Instruction> possibleActions = new ArrayList<>();
         String[] possibleMoves = object.getAttribute("move").split(",");
-        if(possibleMoves[0] == "both" || possibleMoves[0] == "forward")
+        if(possibleMoves[0].equalsIgnoreCase("both") || possibleMoves[0].equalsIgnoreCase("forward"))
         {
             List<String> params = new ArrayList<>();
             params.add("1");
             params.add("0");
             possibleActions.add(new Instruction(InstructionType.MOVE, params));
         }
-        if(possibleMoves[0] == "both" || possibleMoves[0] == "backward")
+        if(possibleMoves[0].equalsIgnoreCase("both") || possibleMoves[0].equalsIgnoreCase("backward"))
         {
             List<String> params = new ArrayList<>();
             params.add("-1");
             params.add("0");
             possibleActions.add(new Instruction(InstructionType.MOVE, params));
         }
-        if(possibleMoves[1] == "both" || possibleMoves[1] == "forward")
+        if(possibleMoves[1].equalsIgnoreCase("both") || possibleMoves[1].equalsIgnoreCase("forward"))
         {
             List<String> params = new ArrayList<>();
             params.add("0");
             params.add("1");
             possibleActions.add(new Instruction(InstructionType.MOVE, params));
         }
-        if(possibleMoves[1] == "both" || possibleMoves[1] == "backward")
+        if(possibleMoves[1].equalsIgnoreCase("both") || possibleMoves[1].equalsIgnoreCase("backward"))
         {
             List<String> params = new ArrayList<>();
             params.add("0");
@@ -608,6 +1050,294 @@ public class Discrete2DSpatialModel extends Model
             possibleActions.add(new Instruction(InstructionType.MOVE, params));
         }
         return possibleActions;
+    }
+
+    public List<ThingNode> generateFutureWorlds(Instruction action)
+    {
+        double[] moveAction = new double[N_DIMENSIONS];
+        moveAction[0] = Double.parseDouble(action.getParameters().get(0));
+        moveAction[1] = Double.parseDouble(action.getParameters().get(1));
+        ThingNode player = getWorld().getThing("Player");
+        String[] playerLocationStrings = player.getAttribute("location").split(",");
+        int[] newPlayerLocation = new int[N_DIMENSIONS];
+        newPlayerLocation[0] = Integer.parseInt(playerLocationStrings[0]);
+        newPlayerLocation[1] = Integer.parseInt(playerLocationStrings[1]);
+        List<ThingNode> futurePlayers = new ArrayList<>();
+        List<Integer> playerDistance = new ArrayList<>();
+        if(newPlayerLocation[0] % tileDimensions[0] != 0 || newPlayerLocation[1] % tileDimensions[1] != 0)
+        {
+            if(moveAction[0] != 0 && newPlayerLocation[0] % tileDimensions[0] != 0)
+            {
+                ThingNode futurePlayer = new ThingNode(null, null, player.getCategories(), null, player.getConfidence());
+                futurePlayer.setName(player.getName());
+                for(String attributeName : player.getAttributes().keySet())
+                {
+                    futurePlayer.setAttribute(attributeName, player.getAttribute(attributeName));
+                }
+                if(moveAction[0] > 0)
+                {
+                    int dist = (((newPlayerLocation[0] / tileDimensions[0]) + 1) * tileDimensions[0]) - newPlayerLocation[0];
+                    playerDistance.add(dist);
+                    newPlayerLocation[0] += dist;
+                    StringBuilder locationBuilder = new StringBuilder();
+                    locationBuilder.append(newPlayerLocation[0]);
+                    locationBuilder.append(",");
+                    locationBuilder.append(newPlayerLocation[1]);
+                    futurePlayer.setAttribute("location", locationBuilder.toString());
+                    futurePlayer.setAttribute("direction", "1,0");
+                    futurePlayers.add(futurePlayer);
+                } else
+                {
+                    int dist = newPlayerLocation[0] - ((newPlayerLocation[0] / tileDimensions[0]) * tileDimensions[0]);
+                    playerDistance.add(dist);
+                    newPlayerLocation[0] -= dist;
+                    StringBuilder locationBuilder = new StringBuilder();
+                    locationBuilder.append(newPlayerLocation[0]);
+                    locationBuilder.append(",");
+                    locationBuilder.append(newPlayerLocation[1]);
+                    futurePlayer.setAttribute("location", locationBuilder.toString());
+                    futurePlayer.setAttribute("direction", "-1,0");
+                    futurePlayers.add(futurePlayer);
+                }
+            } else if(moveAction[1] != 0 && newPlayerLocation[1] % tileDimensions[0] != 0)
+            {
+                ThingNode futurePlayer = new ThingNode(null, null, player.getCategories(), null, player.getConfidence());
+                futurePlayer.setName(player.getName());
+                for(String attributeName : player.getAttributes().keySet())
+                {
+                    futurePlayer.setAttribute(attributeName, player.getAttribute(attributeName));
+                }
+                if(moveAction[1] > 0)
+                {
+                    int dist = (((newPlayerLocation[1] / tileDimensions[1]) + 1) * tileDimensions[1]) - newPlayerLocation[1];
+                    playerDistance.add(dist);
+                    newPlayerLocation[1] += dist;
+                    StringBuilder locationBuilder = new StringBuilder();
+                    locationBuilder.append(newPlayerLocation[0]);
+                    locationBuilder.append(",");
+                    locationBuilder.append(newPlayerLocation[1]);
+                    futurePlayer.setAttribute("location", locationBuilder.toString());
+                    futurePlayer.setAttribute("direction", "0,1");
+                    futurePlayers.add(futurePlayer);
+                } else
+                {
+                    int dist = newPlayerLocation[1] - ((newPlayerLocation[1] / tileDimensions[1]) * tileDimensions[1]);
+                    playerDistance.add(dist);
+                    newPlayerLocation[1] -= dist;
+                    StringBuilder locationBuilder = new StringBuilder();
+                    locationBuilder.append(newPlayerLocation[0]);
+                    locationBuilder.append(",");
+                    locationBuilder.append(newPlayerLocation[1]);
+                    futurePlayer.setAttribute("location", locationBuilder.toString());
+                    futurePlayer.setAttribute("direction", "0,-1");
+                    futurePlayers.add(futurePlayer);
+                }
+            } else if(player.hasAttribute("direction"))
+            {
+                ThingNode futurePlayer = new ThingNode(null, null, player.getCategories(), null, player.getConfidence());
+                futurePlayer.setName(player.getName());
+                for(String attributeName : player.getAttributes().keySet())
+                {
+                    futurePlayer.setAttribute(attributeName, player.getAttribute(attributeName));
+                }
+                String[] directionStrings = player.getAttribute("direction").split(",");
+                if(moveAction[0] % tileDimensions[0] != 0)
+                {
+                    if(Integer.parseInt(directionStrings[0]) > 0)
+                    {
+                        int dist = (((newPlayerLocation[0] / tileDimensions[0]) + 1) * tileDimensions[0]) - newPlayerLocation[0];
+                        playerDistance.add(dist);
+                        newPlayerLocation[0] += dist;
+                        StringBuilder locationBuilder = new StringBuilder();
+                        locationBuilder.append(newPlayerLocation[0]);
+                        locationBuilder.append(",");
+                        locationBuilder.append(newPlayerLocation[1]);
+                        futurePlayer.setAttribute("location", locationBuilder.toString());
+                        futurePlayer.setAttribute("direction", "1,0");
+                        futurePlayers.add(futurePlayer);
+                    } else
+                    {
+                        int dist = newPlayerLocation[0] - ((newPlayerLocation[0] / tileDimensions[0]) * tileDimensions[0]);
+                        playerDistance.add(dist);
+                        newPlayerLocation[0] -= dist;
+                        StringBuilder locationBuilder = new StringBuilder();
+                        locationBuilder.append(newPlayerLocation[0]);
+                        locationBuilder.append(",");
+                        locationBuilder.append(newPlayerLocation[1]);
+                        futurePlayer.setAttribute("location", locationBuilder.toString());
+                        futurePlayer.setAttribute("direction", "-1,0");
+                        futurePlayers.add(futurePlayer);
+                    }
+                } else
+                {
+                    if(Integer.parseInt(directionStrings[1]) > 0)
+                    {
+                        int dist = (((newPlayerLocation[1] / tileDimensions[1]) + 1) * tileDimensions[1]) - newPlayerLocation[1];
+                        playerDistance.add(dist);
+                        newPlayerLocation[1] += dist;
+                        StringBuilder locationBuilder = new StringBuilder();
+                        locationBuilder.append(newPlayerLocation[0]);
+                        locationBuilder.append(",");
+                        locationBuilder.append(newPlayerLocation[1]);
+                        futurePlayer.setAttribute("location", locationBuilder.toString());
+                        futurePlayer.setAttribute("direction", "0,1");
+                        futurePlayers.add(futurePlayer);
+                    } else
+                    {
+                        int dist = newPlayerLocation[1] - ((newPlayerLocation[1] / tileDimensions[1]) * tileDimensions[1]);
+                        playerDistance.add(dist);
+                        newPlayerLocation[1] -= dist;
+                        StringBuilder locationBuilder = new StringBuilder();
+                        locationBuilder.append(newPlayerLocation[0]);
+                        locationBuilder.append(",");
+                        locationBuilder.append(newPlayerLocation[1]);
+                        futurePlayer.setAttribute("location", locationBuilder.toString());
+                        futurePlayer.setAttribute("direction", "0,-1");
+                        futurePlayers.add(futurePlayer);
+                    }
+                }
+            } else if(moveAction[0] % tileDimensions[0] != 0)
+            {
+                int lDist = newPlayerLocation[0] - (newPlayerLocation[0] / tileDimensions[0]) * tileDimensions[0];
+                int rDist = (((newPlayerLocation[0] / tileDimensions[0]) + 1) * tileDimensions[0]) - newPlayerLocation[0];
+                int[] otherNewPlayerLocation = new int[N_DIMENSIONS];
+                otherNewPlayerLocation[0] = newPlayerLocation[0];
+                otherNewPlayerLocation[1] = newPlayerLocation[1];
+                playerDistance.add(lDist);
+                playerDistance.add(rDist);
+                newPlayerLocation[0] -= lDist;
+                otherNewPlayerLocation[0] += rDist;
+                StringBuilder location1Builder = new StringBuilder();
+                location1Builder.append(newPlayerLocation[0]);
+                location1Builder.append(",");
+                location1Builder.append(newPlayerLocation[1]);
+                StringBuilder location2Builder = new StringBuilder();
+                location2Builder.append(otherNewPlayerLocation[0]);
+                location2Builder.append(",");
+                location2Builder.append(otherNewPlayerLocation[1]);
+                ThingNode futurePlayer1 = new ThingNode(null, null, player.getCategories(), null, player.getConfidence());
+                ThingNode futurePlayer2 = new ThingNode(null, null, player.getCategories(), null, player.getConfidence());
+                futurePlayer1.setName(player.getName());
+                futurePlayer2.setName(player.getName());
+                for(String attributeName : player.getAttributes().keySet())
+                {
+                    futurePlayer1.setAttribute(attributeName, player.getAttribute(attributeName));
+                    futurePlayer2.setAttribute(attributeName, player.getAttribute(attributeName));
+                }
+                futurePlayer1.setAttribute("location", location1Builder.toString());
+                futurePlayer1.setAttribute("direction", "-1,0");
+                futurePlayer2.setAttribute("location", location2Builder.toString());
+                futurePlayer2.setAttribute("direction", "1,0");
+                futurePlayers.add(futurePlayer1);
+                futurePlayers.add(futurePlayer2);
+            } else
+            {
+                int uDist = newPlayerLocation[1] - (newPlayerLocation[1] / tileDimensions[1]) * tileDimensions[1];
+                int dDist = (((newPlayerLocation[1] / tileDimensions[1]) + 1) * tileDimensions[1]) - newPlayerLocation[1];
+                int[] otherNewPlayerLocation = new int[N_DIMENSIONS];
+                otherNewPlayerLocation[0] = newPlayerLocation[0];
+                otherNewPlayerLocation[1] = newPlayerLocation[1];
+                playerDistance.add(uDist);
+                playerDistance.add(dDist);
+                newPlayerLocation[1] -= uDist;
+                otherNewPlayerLocation[1] += dDist;
+                StringBuilder location1Builder = new StringBuilder();
+                location1Builder.append(newPlayerLocation[0]);
+                location1Builder.append(",");
+                location1Builder.append(newPlayerLocation[1]);
+                StringBuilder location2Builder = new StringBuilder();
+                location2Builder.append(otherNewPlayerLocation[0]);
+                location2Builder.append(",");
+                location2Builder.append(otherNewPlayerLocation[1]);
+                ThingNode futurePlayer1 = new ThingNode(null, null, player.getCategories(), null, player.getConfidence());
+                ThingNode futurePlayer2 = new ThingNode(null, null, player.getCategories(), null, player.getConfidence());
+                futurePlayer1.setName(player.getName());
+                futurePlayer2.setName(player.getName());
+                for(String attributeName : player.getAttributes().keySet())
+                {
+                    futurePlayer1.setAttribute(attributeName, player.getAttribute(attributeName));
+                    futurePlayer2.setAttribute(attributeName, player.getAttribute(attributeName));
+                }
+                futurePlayer1.setAttribute("location", location1Builder.toString());
+                futurePlayer1.setAttribute("direction", "-1,0");
+                futurePlayer2.setAttribute("location", location2Builder.toString());
+                futurePlayer2.setAttribute("direction", "1,0");
+                futurePlayers.add(futurePlayer1);
+                futurePlayers.add(futurePlayer2);
+            }
+        } else // Player is at an intersection
+        {
+            ThingNode futurePlayer = new ThingNode(null, null, player.getCategories(), null, player.getConfidence());
+            futurePlayer.setName(player.getName());
+            for(String attributeName : player.getAttributes().keySet())
+            {
+                futurePlayer.setAttribute(attributeName, player.getAttribute(attributeName));
+            }
+            if(isAllowableMovement(newPlayerLocation, moveAction))
+            {
+                int dist = 0;
+                if(Math.abs(moveAction[0]) > Math.abs(moveAction[1]))
+                {
+                    dist = tileDimensions[0];
+                    if(moveAction[0] > 0)
+                    {
+                        newPlayerLocation[0] += dist;
+                        futurePlayer.setAttribute("direction", "1,0");
+                    } else
+                    {
+                        newPlayerLocation[0] -= dist;
+                        futurePlayer.setAttribute("direction", "-1,0");
+                    }
+                } else
+                {
+                    dist = tileDimensions[1];
+                    if(moveAction[1] > 0)
+                    {
+                        newPlayerLocation[1] += dist;
+                        futurePlayer.setAttribute("direction", "0,1");
+                    } else
+                    {
+                        newPlayerLocation[1] -= dist;
+                        futurePlayer.setAttribute("direction", "0,-1");
+                    }
+                }
+                StringBuilder locationBuilder = new StringBuilder();
+                locationBuilder.append(newPlayerLocation[0]);
+                locationBuilder.append(",");
+                locationBuilder.append(newPlayerLocation[1]);
+                futurePlayer.setAttribute("location", locationBuilder.toString());
+                playerDistance.add(dist);
+            }
+            futurePlayers.add(futurePlayer);
+        }
+        int playerSpeed = Integer.parseInt(player.getAttribute("speed"));
+        List<ThingNode> futureWorlds = new ArrayList<>();
+        for(int i = 0; i < futurePlayers.size(); i++)
+        {
+            List<List<ThingNode>> selectedPlayerFutureWorldElements = new ArrayList<>();
+            List<ThingNode> playerList = new ArrayList<>();
+            playerList.add(futurePlayers.get(i));
+            selectedPlayerFutureWorldElements.add(playerList);
+            for(ThingNode element : getWorld().getThingElements())
+            {
+                if(!element.hasAttribute("Player"))
+                {
+                    selectedPlayerFutureWorldElements.add(generateFutureStates(element, playerSpeed, playerDistance.get(i)));
+                }
+            }
+            futureWorlds.addAll(generateFutureWorlds(selectedPlayerFutureWorldElements));
+        }
+        return futureWorlds;
+    }
+
+    private List<ThingNode> generateFutureStates(ThingNode currentState, int playerSpeed, int playerDist)
+    {
+        return null;
+    }
+
+    private List<ThingNode> generateFutureWorlds(List<List<ThingNode>> possibleStates)
+    {
+        return null;
     }
 
 }

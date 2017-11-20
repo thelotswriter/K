@@ -296,6 +296,7 @@ public abstract class ActionNode extends ProcessNode
 
 	public void addElement(ActionNode element)
 	{
+		super.addElement(element);
 	    if(elements == null)
         {
             elements = new ArrayList<>();

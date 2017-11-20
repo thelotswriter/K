@@ -26,7 +26,7 @@ public abstract class PlannableActionNode extends ActionNode
             throws NotAnActionNodeException, UnknownActionException, IOException, UnreadableActionNodeException
     {
         super(root, parent, subject, directObject, indirectObject, adverbs, elements, confidence, priority, urgency);
-        plan = new Plan(root, parent, subject, directObject, indirectObject, adverbs, elements, confidence, priority, urgency);
+        plan = new Plan(root, this, subject, directObject, indirectObject, adverbs, elements, confidence, priority, urgency);
         planningNode = false;
     }
 

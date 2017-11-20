@@ -35,13 +35,13 @@ public class Play extends ActionNode
         if(directObject instanceof GameNode)
         {
             GameNode game = (GameNode) directObject;
+            game.startGame();
             convertGoalsToNodes(game);
             for(ProcessNode pElement : getElements())
             {
                 ActionNode element = (ActionNode) pElement;
                 element.initialize();
             }
-            game.startGame();
         }
     }
 

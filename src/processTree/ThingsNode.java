@@ -29,6 +29,7 @@ public class ThingsNode extends ThingNode
             for(int i = 0; i < Math.min(values.length, getThingElements().size()); i++)
             {
                 getThingElements().get(i).setAttribute(key, values[i]);
+				((ThingNode) getElements().get(i)).setAttribute(key, values[i]);
             }
         }
     }

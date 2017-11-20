@@ -57,6 +57,11 @@ public abstract class ProcessNode implements Serializable
         return elements;
     }
 
+    public void removeElement(ProcessNode node)
+	{
+		elements.remove(node);
+	}
+
 	/**
 	 * Gives the name identifying the node
 	 * @return The string identifying the node
@@ -83,6 +88,11 @@ public abstract class ProcessNode implements Serializable
 	{
 		return confidence;
 	}
+
+	public void setParent(ProcessNode newParent)
+    {
+        this.parent = newParent;
+    }
 	
 	/**
 	 * Sets the name of the process node

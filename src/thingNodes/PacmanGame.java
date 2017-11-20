@@ -41,25 +41,25 @@ public class PacmanGame extends GameNode
     {
         super(parent, elements, categories, attributes, confidence);
         setName("PacmanGame");
-        pMan = new Pacman();
+        pMan = null;
         setAttributes();
-        addElements();
     }
 
 	public void startGame()
     {
+        if(pMan == null)
+        {
+            pMan = new Pacman();
+        }
         pMan.play();
+        addElements();
     }
 	
 	private void setAttributes()
 	{
 		setAttribute("goal", "avoid ghosts");
 		setAttribute("dimensions", "360,360");
-		StringBuilder tileBuilder = new StringBuilder();
-		tileBuilder.append(pMan.getTileSize());
-		tileBuilder.append(',');
-		tileBuilder.append(pMan.getTileSize());
-		setAttribute("grid", tileBuilder.toString());
+		setAttribute("grid", "24,24");
 	}
 	
 	private void addElements()
@@ -109,11 +109,7 @@ public class PacmanGame extends GameNode
         }
 //		player.updateLocation(pMan.getPacmanX(), pMan.getPacmanY());
 //		player.updateSpeed(pMan.getPacmanSpeed());
-        Map<String, String[]> gAttributes = getGhostAttributes();
-        for(String key : gAttributes.keySet())
-        {
-            ghosts.setAttribute(key, pAttributes.get(key));
-        }
+        ghosts.setAttributes(getGhostAttributes());
 //		ghosts.updateLocations(pMan.getGhostXs(), pMan.getGhostYs());
 //		ghosts.updateSpeeds(pMan.getGhostSpeeds());
 	}
