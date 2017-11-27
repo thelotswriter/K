@@ -90,6 +90,7 @@ public class PacmanGame extends GameNode
 		addElement(walls);
 		ghosts = new PacmanGhosts(this, null, null, null, 1);
         int[] ghostXs = pMan.getGhostXs();
+        ghosts.setAttribute("dimensions", dimensionsBuilder.toString());
 		for(int i = 0; i < ghostXs.length; i++)
         {
             PacmanGhost ghost = new PacmanGhost(ghosts, null, null, null, 1);

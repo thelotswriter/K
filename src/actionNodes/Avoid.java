@@ -48,7 +48,8 @@ public class Avoid extends PlannableActionNode
         {
             for(ProcessNode singleObject : getDirectObject().getElements())
             {
-                models.add(ModelPicker.getInstance().getModel((ThingNode) getDirectObject().getParent(), getSubject(), (ThingNode) singleObject, getIndirectObject()));
+                models.add(ModelPicker.getInstance().getModel((ThingNode) getDirectObject().getParent(), getSubject(),
+                        (ThingNode) singleObject, getIndirectObject()));
             }
         } else
         {

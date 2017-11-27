@@ -16,6 +16,7 @@ public class PacmanGhosts extends ThingsNode
         setName("ghosts");
         addCategory("enemy");
         addCategory("monster");
+        setAttribute("goal", "approach Player");
     }
 
 //    public void updateLocations(int[] ghostXs, int[] ghostYs)
