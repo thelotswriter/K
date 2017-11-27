@@ -42,6 +42,7 @@ public class PlayPacman implements MiniMain
                 double[] probabilityVector = generateProbabilityVector(game.getAttribute("dimensions").split(",").length,
                         instructionPackets);
                 double rand = Math.random();
+                System.out.println("Just ran");
                 if(rand < probabilityVector[0])
                 {
                     robot.keyPress(KeyEvent.VK_RIGHT);

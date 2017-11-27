@@ -21,7 +21,7 @@ import java.util.*;
 public class Plan extends ActionNode
 {
 
-    private final int MAX_MODELS = 10000;
+    private final int MAX_MODELS = 100;
 
     private Constructor parentConstructor;
     private Constructor pluralConstructor;
@@ -339,6 +339,7 @@ public class Plan extends ActionNode
                             nextAction.makePlanningNode();
                             nextAction.makePlanningNode();
                             nextAction.initialize();
+//                            System.out.println("Initialized");
                             nextAction.run();
                             if(nextAction.getUrgency() <= nextAction.getMaxUrgency())
                             {
@@ -347,6 +348,7 @@ public class Plan extends ActionNode
                         }
                     }
                 }
+                System.out.println("Out of the for loop!");
                 if(newLeaves.isEmpty())
                 {
                     break;
@@ -354,6 +356,8 @@ public class Plan extends ActionNode
                 {
                     leafNodes.clear();
                     leafNodes.addAll(newLeaves);
+                    nodeCounter += newLeaves.size();
+                    System.out.println("Current count: " + nodeCounter);
                 }
             }
             double lowestUrgency = Double.MAX_VALUE;

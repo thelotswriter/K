@@ -1330,8 +1330,8 @@ public class Discrete2DSpatialModel extends Model
                 locationBuilder.append(newPlayerLocation[1]);
                 futurePlayer.setAttribute("location", locationBuilder.toString());
                 playerDistance.add(dist);
+                futurePlayers.add(futurePlayer);
             }
-            futurePlayers.add(futurePlayer);
         }
         int playerSpeed = Integer.parseInt(player.getAttribute("speed"));
         List<ThingNode> futureWorlds = new ArrayList<>();
@@ -1871,7 +1871,7 @@ public class Discrete2DSpatialModel extends Model
             List<ThingNode> possibleCombination = generateCombination(possibleStates, 0, i);
             for(ThingNode state : possibleCombination)
             {
-                state.setParent(state);
+                state.setParent(possibleWorld);
                 possibleWorld.addElement(state);
             }
             worlds.add(possibleWorld);
