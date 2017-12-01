@@ -348,7 +348,7 @@ public class Plan extends ActionNode
                         }
                     }
                 }
-                System.out.println("Out of the for loop!");
+//                System.out.println("Out of the for loop!");
                 if(newLeaves.isEmpty())
                 {
                     break;
@@ -357,7 +357,7 @@ public class Plan extends ActionNode
                     leafNodes.clear();
                     leafNodes.addAll(newLeaves);
                     nodeCounter += newLeaves.size();
-                    System.out.println("Current count: " + nodeCounter);
+//                    System.out.println("Current count: " + nodeCounter);
                 }
             }
             double lowestUrgency = Double.MAX_VALUE;
@@ -374,12 +374,19 @@ public class Plan extends ActionNode
             if(bestNode != null)
             {
                 PlanningNode bestParent = bestNode.getParent();
-                while(bestParent != null)
+                if(bestParent != null)
                 {
-                    bestNode = bestParent;
-                    bestParent = bestNode.getParent();
+                    while(bestParent != root)
+                    {
+                        bestNode = bestParent;
+                        bestParent = bestNode.getParent();
+                    }
+                    getParent().setUrgencey(bestNode.getActionNode().getUrgency());
+                    instructions.add(new InstructionPacket(bestNode.getActionToState(), getParent()));
+                } else
+                {
+                    System.out.println("Best was root?");
                 }
-                instructions.add(new InstructionPacket(bestNode.getActionToState(), getParent()));
             }
         } catch (InstantiationException e) {
         } catch (IllegalAccessException e) {

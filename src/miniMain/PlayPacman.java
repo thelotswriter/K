@@ -42,7 +42,7 @@ public class PlayPacman implements MiniMain
                 double[] probabilityVector = generateProbabilityVector(game.getAttribute("dimensions").split(",").length,
                         instructionPackets);
                 double rand = Math.random();
-                System.out.println("Just ran");
+//                System.out.println("Just ran");
                 if(rand < probabilityVector[0])
                 {
                     robot.keyPress(KeyEvent.VK_RIGHT);
@@ -87,35 +87,38 @@ public class PlayPacman implements MiniMain
         for(InstructionPacket packet : instructionPackets)
         {
             List<String> params = packet.getInstruction().getParameters();
-            double[] paramDoubles = new double[params.size()];
-            int indexOfLargest = 0;
-            double largestVal = 0;
-            for(int i = 0; i < params.size(); i++)
+            if(params != null)
             {
-                paramDoubles[i] = Double.parseDouble(params.get(i));
-                if(Math.abs(paramDoubles[i]) > Math.abs(largestVal))
+                double[] paramDoubles = new double[params.size()];
+                int indexOfLargest = 0;
+                double largestVal = 0;
+                for(int i = 0; i < params.size(); i++)
                 {
-                    indexOfLargest = i;
-                    largestVal = paramDoubles[i];
-                }
-            }
-            for(int i = 0; i < paramDoubles.length; i++)
-            {
-                if(i != indexOfLargest)
-                {
-                    paramDoubles[i] = 0;
-                } else if(largestVal != 0)
-                {
-                    if(largestVal > 0)
+                    paramDoubles[i] = Double.parseDouble(params.get(i));
+                    if(Math.abs(paramDoubles[i]) > Math.abs(largestVal))
                     {
-                        probVector[2 * i] += largestVal;
-                    } else
-                    {
-                        probVector[2 * i + 1] -= largestVal;
+                        indexOfLargest = i;
+                        largestVal = paramDoubles[i];
                     }
                 }
+                for(int i = 0; i < paramDoubles.length; i++)
+                {
+                    if(i != indexOfLargest)
+                    {
+                        paramDoubles[i] = 0;
+                    } else if(largestVal != 0)
+                    {
+                        if(largestVal > 0)
+                        {
+                            probVector[2 * i] += largestVal;
+                        } else
+                        {
+                            probVector[2 * i + 1] -= largestVal;
+                        }
+                    }
+                }
+                System.out.print("Urgency: " + packet.getOriginNode().getUrgency() + " | ");
             }
-            System.out.print("Urgency: " + packet.getOriginNode().getUrgency() + " | ");
         }
         double vectorLength = 0;
         for(int i = 0; i < probVector.length; i++)

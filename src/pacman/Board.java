@@ -60,7 +60,7 @@ public class Board extends JPanel implements ActionListener {
     private Image pacman3up, pacman3down, pacman3left, pacman3right;
     private Image pacman4up, pacman4down, pacman4left, pacman4right;
 
-    private int[] pacStart = {12,0};
+    private int[] pacStart = {0,0};
     private int[] ghostStart = {10,0};
 
     private int pacman_x, pacman_y, pacmand_x, pacmand_y;

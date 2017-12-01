@@ -81,9 +81,9 @@ public class PacmanGame extends GameNode
 			PacmanWall wall = new PacmanWall(walls, null, null, null, 1);
 			wall.setAttribute("dimensions", dimensionsBuilder.toString());
 			StringBuilder wLocationBuilder = new StringBuilder();
-			wLocationBuilder.append(wallX[i]);
+			wLocationBuilder.append(wallX[i] * pMan.getTileSize());
 			wLocationBuilder.append(",");
-			wLocationBuilder.append(wallY[i]);
+			wLocationBuilder.append(wallY[i] * pMan.getTileSize());
 			wall.setAttribute("location", wLocationBuilder.toString());
 			walls.addElement(wall);
 		}

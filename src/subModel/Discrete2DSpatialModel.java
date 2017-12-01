@@ -16,7 +16,7 @@ import structures.MoveType2D;
 public class Discrete2DSpatialModel extends Model
 {
     private final int N_DIMENSIONS = 2;
-    private final int MAX_SEARCH = 10;
+    private final int MAX_SEARCH = 4;
     private final double STEP_COEFFICIENT = 10;
 
     private ThingNode object;
