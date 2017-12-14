@@ -163,5 +163,10 @@ public class Pacman extends JFrame
 //        tileTimer.setRepeats(false);
 //        tileTimer.start();
     }
+
+    public void directionGiven(int key)
+    {
+        board.directionGiven(key);
+    }
     
 }

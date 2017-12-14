@@ -33,8 +33,9 @@ public class PlayPacman implements MiniMain
             Play playNode = new Play(null, null, null, game, null, null, null, 1, 1, 1);
             playNode.initialize();
             Instruction instruction = new Instruction(InstructionType.START, null);
-            Robot robot = new Robot();
+//            Robot robot = new Robot();
             int count = 0;
+            Pacman pMan = game.getGame();
             while(instruction.getType() != InstructionType.FINISH)
             {
                 game.update();
@@ -45,19 +46,23 @@ public class PlayPacman implements MiniMain
 //                System.out.println("Just ran");
                 if(rand < probabilityVector[0])
                 {
-                    robot.keyPress(KeyEvent.VK_RIGHT);
+                    pMan.directionGiven(KeyEvent.VK_RIGHT);
+//                    robot.keyPress(KeyEvent.VK_RIGHT);
                     System.out.println("Right");
                 } else if(rand < probabilityVector[0] + probabilityVector[1])
                 {
-                    robot.keyPress(KeyEvent.VK_LEFT);
+                    pMan.directionGiven(KeyEvent.VK_LEFT);
+//                    robot.keyPress(KeyEvent.VK_LEFT);
                     System.out.println("Left");
                 } else if(rand < probabilityVector[0] + probabilityVector[1] + probabilityVector[2])
                 {
-                    robot.keyPress(KeyEvent.VK_DOWN);
+                    pMan.directionGiven(KeyEvent.VK_DOWN);
+//                    robot.keyPress(KeyEvent.VK_DOWN);
                     System.out.println("Down");
                 } else
                 {
-                    robot.keyPress(KeyEvent.VK_UP);
+                    pMan.directionGiven(KeyEvent.VK_UP);
+//                    robot.keyPress(KeyEvent.VK_UP);
                     System.out.println("Up");
                 }
             }

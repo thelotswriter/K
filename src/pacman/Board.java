@@ -15,8 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -28,6 +27,8 @@ import miniMain.MiniMain;
 
 @SuppressWarnings("serial")
 public class Board extends JPanel implements ActionListener {
+
+    private final int MODE = 1;
 
     private Dimension d;
     private final Font smallFont = new Font("Helvetica", Font.BOLD, 14);
@@ -66,23 +67,7 @@ public class Board extends JPanel implements ActionListener {
     private int pacman_x, pacman_y, pacmand_x, pacmand_y;
     private int req_dx, req_dy, view_dx, view_dy;
 
-    private final short levelData[] = {
-        19, 26, 26, 26, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22,
-        21, 0, 0, 0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,
-        21, 0, 0, 0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,
-        21, 0, 0, 0, 17, 16, 16, 24, 16, 16, 16, 16, 16, 16, 20,
-        17, 18, 18, 18, 16, 16, 20, 0, 17, 16, 16, 16, 16, 16, 20,
-        17, 16, 16, 16, 16, 16, 20, 0, 17, 16, 16, 16, 16, 24, 20,
-        25, 16, 16, 16, 24, 24, 28, 0, 25, 24, 24, 16, 20, 0, 21,
-        1, 17, 16, 20, 0, 0, 0, 0, 0, 0, 0, 17, 20, 0, 21,
-        1, 17, 16, 16, 18, 18, 22, 0, 19, 18, 18, 16, 20, 0, 21,
-        1, 17, 16, 16, 16, 16, 20, 0, 17, 16, 16, 16, 20, 0, 21,
-        1, 17, 16, 16, 16, 16, 20, 0, 17, 16, 16, 16, 20, 0, 21,
-        1, 17, 16, 16, 16, 16, 16, 18, 16, 16, 16, 16, 20, 0, 21,
-        1, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20, 0, 21,
-        1, 25, 24, 24, 24, 24, 24, 24, 24, 24, 16, 16, 16, 18, 20,
-        9, 8, 8, 8, 8, 8, 8, 8, 8, 8, 25, 24, 24, 24, 28
-    };
+    private short levelData[];
 
     private final int validSpeeds[] = {1, 2, 3, 4, 6, 8};
     private final int maxSpeed = 3;
@@ -90,12 +75,24 @@ public class Board extends JPanel implements ActionListener {
     private int currentSpeed = 3;
     private short[] screenData;
     private ArrayList<Point> pellets; // Tracks the pellets left on the board
-    private int[] wallX = {1, 2, 3, 1, 2, 3, 1, 2, 3, 7, 7, 7, 13, 0, 4, 5, 6, 7, 8,  // The x coordinates (in terms of tiles) of the blocks which are inaccessible 
-    		9, 10, 13, 0, 7, 13, 0, 7, 13, 0, 7, 13, 0, 13, 0, 13, 0, 0, 1, 2, 3, 4, 
-    		5, 6, 7, 8, 9};
-    private int[] wallY = {1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 5, 6, 6, 7, 7, 7, 7, 7, 7,  // The y coordinates (in terms of tiles) of the blocks which are inaccessible
-    		7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 10, 11, 11, 12, 12, 13, 14, 14, 14, 14, 14, 
-    		14, 14, 14, 14, 14};
+    private final boolean[][] wallMap = {
+            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+            {false, true,  true,  true,  false, false, false, false, false, false, false, false, false, false, false},
+            {false, true,  true,  true,  false, false, false, false, false, false, false, false, false, false, false},
+            {false, true,  true,  true,  false, false, false, false, false, false, false, false, false, false, false},
+            {false, false, false, false, false, false, false, true,  false, false, false, false, false, false, false},
+            {false, false, false, false, false, false, false, true,  false, false, false, false, false, false, false},
+            {false, false, false, false, false, false, false, true,  false, false, false, false, false, true,  false},
+            {true,  false, false, false, true,  true,  true,  true,  true,  true,  true,  false, false, true,  false},
+            {true,  false, false, false, false, false, false, true,  false, false, false, false, false, true,  false},
+            {true,  false, false, false, false, false, false, true,  false, false, false, false, false, true,  false},
+            {true,  false, false, false, false, false, false, true,  false, false, false, false, false, true,  false},
+            {true,  false, false, false, false, false, false, false, false, false, false, false, false, true,  false},
+            {true,  false, false, false, false, false, false, false, false, false, false, false, false, true,  false},
+            {true,  false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+            {true,  true,  true,  true,  true,  true,  true,  true,  true,  true, false, false, false, false, false}};
+    private int[] wallX;
+    private int[] wallY;
     private Timer timer;
     private MiniMain miniMain;
     private Graphics graphics;
@@ -145,7 +142,65 @@ public class Board extends JPanel implements ActionListener {
         dy = new int[4];
         
         pellets = new ArrayList<>();
-        
+
+        levelData = new short[wallMap.length * wallMap[0].length];
+
+        List<Point> wallLocations = new ArrayList<>();
+        for(int i = 0; i < wallMap.length; i++)
+        {
+            for(int j = 0; j < wallMap[i].length; j++)
+            {
+                if(wallMap[i][j])
+                {
+                    levelData[i * wallMap[0].length + j] = 0;
+                    wallLocations.add(new Point(j,i));
+                    if(j == 0)
+                    {
+                        levelData[i * wallMap[0].length + j] += 1;
+                    }
+                    if(i == 0)
+                    {
+                        levelData[i * wallMap[0].length + j] += 2;
+                    }
+                    if(j == wallMap[i].length - 1)
+                    {
+                        levelData[i * wallMap[0].length + j] += 4;
+                    }
+                    if(i == wallMap.length - 1)
+                    {
+                        levelData[i * wallMap[0].length + j] += 8;
+                    }
+                } else
+                {
+                    levelData[i * wallMap[0].length + j] = 16;
+                    if(j == 0 || wallMap[i][j - 1])
+                    {
+                        levelData[i * wallMap[0].length + j] += 1;
+                    }
+                    if(i == 0 || wallMap[i - 1][j])
+                    {
+                        levelData[i * wallMap[0].length + j] += 2;
+                    }
+                    if(j == wallMap[i].length - 1 || wallMap[i][j + 1])
+                    {
+                        levelData[i * wallMap[0].length + j] += 4;
+                    }
+                    if(i == wallMap.length - 1 || wallMap[i + 1][j])
+                    {
+                        levelData[i * wallMap[0].length + j] += 8;
+                    }
+                }
+            }
+        }
+
+        wallX = new int[wallLocations.size()];
+        wallY = new int[wallLocations.size()];
+        for(int i = 0; i < wallLocations.size(); i++)
+        {
+            wallX[i] = wallLocations.get(i).x;
+            wallY[i] = wallLocations.get(i).y;
+        }
+
         timer = new Timer(40, this);
         timer.start();
     }
@@ -262,65 +317,15 @@ public class Board extends JPanel implements ActionListener {
     private void moveGhosts(Graphics2D g2d) {
 
         short i;
-        int pos;
-        int count;
 
         for (i = 0; i < N_GHOSTS; i++) {
-            if (ghost_x[i] % BLOCK_SIZE == 0 && ghost_y[i] % BLOCK_SIZE == 0) {
-                pos = ghost_x[i] / BLOCK_SIZE + N_BLOCKS * (int) (ghost_y[i] / BLOCK_SIZE);
-
-                count = 0;
-
-                if ((screenData[pos] & 1) == 0 && ghost_dx[i] != 1) {
-                    dx[count] = -1;
-                    dy[count] = 0;
-                    count++;
-                }
-
-                if ((screenData[pos] & 2) == 0 && ghost_dy[i] != 1) {
-                    dx[count] = 0;
-                    dy[count] = -1;
-                    count++;
-                }
-
-                if ((screenData[pos] & 4) == 0 && ghost_dx[i] != -1) {
-                    dx[count] = 1;
-                    dy[count] = 0;
-                    count++;
-                }
-
-                if ((screenData[pos] & 8) == 0 && ghost_dy[i] != -1) {
-                    dx[count] = 0;
-                    dy[count] = 1;
-                    count++;
-                }
-
-                if (count == 0) {
-
-                    if ((screenData[pos] & 15) == 15) {
-                        ghost_dx[i] = 0;
-                        ghost_dy[i] = 0;
-                    } else {
-                        ghost_dx[i] = -ghost_dx[i];
-                        ghost_dy[i] = -ghost_dy[i];
-                    }
-
-                } else {
-
-                    count = (int) (Math.random() * count);
-
-                    if (count > 3) {
-                        count = 3;
-                    }
-
-                    ghost_dx[i] = dx[count];
-                    ghost_dy[i] = dy[count];
-                }
-
+            if (ghost_x[i] % BLOCK_SIZE == 0 && ghost_y[i] % BLOCK_SIZE == 0)
+            {
+                moveGhost(i);
             }
 
-            ghost_x[i] = ghost_x[i] + (ghost_dx[i] * ghostSpeed[i]);
-            ghost_y[i] = ghost_y[i] + (ghost_dy[i] * ghostSpeed[i]);
+            ghost_x[i] += (ghost_dx[i] * ghostSpeed[i]);
+            ghost_y[i] += (ghost_dy[i] * ghostSpeed[i]);
             drawGhost(g2d, ghost_x[i] + 1, ghost_y[i] + 1);
 
             if (pacman_x > (ghost_x[i] - 12) && pacman_x < (ghost_x[i] + 12)
@@ -329,6 +334,197 @@ public class Board extends JPanel implements ActionListener {
 
                 dying = true;
             }
+        }
+    }
+
+    private void moveGhost(short ghostNumber)
+    {
+        switch(MODE)
+        {
+            case 0:
+            {
+                moveGhostRandom(ghostNumber);
+                break;
+            }case 1:
+            {
+                moveGhostAStar(ghostNumber);
+                break;
+            }
+        }
+    }
+
+    private void moveGhostRandom(int i)
+    {
+        int pos;
+        int count;
+
+        pos = ghost_x[i] / BLOCK_SIZE + N_BLOCKS * (int) (ghost_y[i] / BLOCK_SIZE);
+
+        count = 0;
+
+        if ((screenData[pos] & 1) == 0 && ghost_dx[i] != 1) {
+            dx[count] = -1;
+            dy[count] = 0;
+            count++;
+        }
+
+        if ((screenData[pos] & 2) == 0 && ghost_dy[i] != 1) {
+            dx[count] = 0;
+            dy[count] = -1;
+            count++;
+        }
+
+        if ((screenData[pos] & 4) == 0 && ghost_dx[i] != -1) {
+            dx[count] = 1;
+            dy[count] = 0;
+            count++;
+        }
+
+        if ((screenData[pos] & 8) == 0 && ghost_dy[i] != -1) {
+            dx[count] = 0;
+            dy[count] = 1;
+            count++;
+        }
+
+        if (count == 0) {
+
+            if ((screenData[pos] & 15) == 15) {
+                ghost_dx[i] = 0;
+                ghost_dy[i] = 0;
+            } else {
+                ghost_dx[i] = -ghost_dx[i];
+                ghost_dy[i] = -ghost_dy[i];
+            }
+
+        } else {
+
+            count = (int) (Math.random() * count);
+
+            if (count > 3) {
+                count = 3;
+            }
+
+            ghost_dx[i] = dx[count];
+            ghost_dy[i] = dy[count];
+        }
+    }
+
+    private void moveGhostAStar(int ghostNumber)
+    {
+        LocationNode[][] nodeMatrix = new LocationNode[wallMap[0].length][wallMap.length];
+        for(int i = 0; i < nodeMatrix.length; i++)
+        {
+            for(int j = 0; j < nodeMatrix[i].length; j++)
+            {
+                if(!wallMap[j][i])
+                {
+                    nodeMatrix[i][j] = new LocationNode(i, j);
+                }
+            }
+        }
+        int playerX = pacman_x / BLOCK_SIZE;
+        int playerY = pacman_y / BLOCK_SIZE;
+        int ghostX = ghost_x[ghostNumber] / BLOCK_SIZE;
+        int ghostY = ghost_y[ghostNumber] / BLOCK_SIZE;
+        LocationNode root = nodeMatrix[ghostX][ghostY];
+        root.setWeight(calculateManhattanDistance(ghostX, ghostY, playerX, playerY));
+        PriorityQueue<LocationNode> nodesToExplore = new PriorityQueue<>();
+        nodesToExplore.add(root);
+        Set<LocationNode> exploredNodes = new HashSet<>();
+        exploredNodes.add(root);
+        while(!nodesToExplore.isEmpty())
+        {
+            LocationNode currentNode = nodesToExplore.poll();
+            int currentX = currentNode.x;
+            int currentY = currentNode.y;
+            if(currentX > 0)
+            {
+                int nextX = currentX - 1;
+                if(nodeMatrix[nextX][currentY] != null)
+                {
+                    LocationNode nextNode = nodeMatrix[nextX][currentY];
+                    if(exploredNodes.add(nextNode))
+                    {
+                        nextNode.setParent(currentNode);
+                        nextNode.setWeight(nextNode.dist + calculateManhattanDistance(nextNode.x, nextNode.y, ghostX, ghostY));
+                        if(nextX == playerX && currentY == playerY)
+                        {
+                            break;
+                        }
+                        nodesToExplore.add(nextNode);
+                    }
+                }
+            }
+            if(currentX < nodeMatrix.length - 1)
+            {
+                int nextX = currentX + 1;
+                if(nodeMatrix[nextX][currentY] != null)
+                {
+                    LocationNode nextNode = nodeMatrix[nextX][currentY];
+                    if(exploredNodes.add(nextNode))
+                    {
+                        nextNode.setParent(currentNode);
+                        nextNode.setWeight(nextNode.dist + calculateManhattanDistance(nextNode.x, nextNode.y, ghostX, ghostY));
+                        if(nextX == playerX && currentY == playerY)
+                        {
+                            break;
+                        }
+                        nodesToExplore.add(nextNode);
+                    }
+                }
+            }
+            if(currentY > 0)
+            {
+                int nextY = currentY - 1;
+                if(nodeMatrix[currentX][nextY] != null)
+                {
+                    LocationNode nextNode = nodeMatrix[currentX][nextY];
+                    if(exploredNodes.add(nextNode))
+                    {
+                        nextNode.setParent(currentNode);
+                        nextNode.setWeight(nextNode.dist + calculateManhattanDistance(nextNode.x, nextNode.y, ghostX, ghostY));
+                        if(currentX == playerX && nextY == playerY)
+                        {
+                            break;
+                        }
+                        nodesToExplore.add(nextNode);
+                    }
+                }
+            }
+            if(currentY < nodeMatrix[currentX].length - 1)
+            {
+                int nextY = currentY + 1;
+                if(nodeMatrix[currentX][nextY] != null)
+                {
+                    LocationNode nextNode = nodeMatrix[currentX][nextY];
+                    if(exploredNodes.add(nextNode))
+                    {
+                        nextNode.setParent(currentNode);
+                        nextNode.setWeight(nextNode.dist + calculateManhattanDistance(nextNode.x, nextNode.y, ghostX, ghostY));
+                        if(currentX == playerX && nextY == playerY)
+                        {
+                            break;
+                        }
+                        nodesToExplore.add(nextNode);
+                    }
+                }
+            }
+        }
+        LocationNode destinationNode = nodeMatrix[playerX][playerY];
+        if(destinationNode != null && destinationNode.getParent() != null)
+        {
+            LocationNode parent = destinationNode.getParent();
+            while(parent != root)
+            {
+                destinationNode = parent;
+                parent = parent.getParent();
+            }
+            ghost_dx[ghostNumber] = destinationNode.x - root.x;
+            ghost_dy[ghostNumber] = destinationNode.y - root.y;
+        } else
+        {
+            ghost_dx[ghostNumber] = 0;
+            ghost_dy[ghostNumber] = 0;
         }
     }
 
@@ -637,6 +833,41 @@ public class Board extends JPanel implements ActionListener {
         g2d.dispose();
     }
 
+    public void directionGiven(int key)
+    {
+        if (inGame) {
+            if (key == KeyEvent.VK_LEFT) {
+                req_dx = -1;
+                req_dy = 0;
+            } else if (key == KeyEvent.VK_RIGHT) {
+                req_dx = 1;
+                req_dy = 0;
+            } else if (key == KeyEvent.VK_UP) {
+                req_dx = 0;
+                req_dy = -1;
+            } else if (key == KeyEvent.VK_DOWN) {
+                req_dx = 0;
+                req_dy = 1;
+            } else if (key == KeyEvent.VK_ESCAPE && timer.isRunning()) {
+                inGame = false;
+            } else if (key == KeyEvent.VK_P) {
+                if (timer.isRunning()) {
+                    timer.stop();
+                    if(miniMain != null)
+                    {
+                        miniMain.paused();
+                    }
+                } else {
+                    timer.start();
+                }
+            }
+        } else {
+            if (key == 's' || key == 'S') {
+                initGame();
+            }
+        }
+    }
+
     class TAdapter extends KeyAdapter {
 
         @Override
@@ -826,6 +1057,64 @@ public class Board extends JPanel implements ActionListener {
             speeds[i] = ghostSpeed[i];
         }
         return speeds;
+    }
+
+    private int calculateManhattanDistance(int x1, int y1, int x2, int y2)
+    {
+        int dist = 0;
+        dist += Math.abs(x1 - x2);
+        dist += Math.abs(y1 - y2);
+        return dist;
+    }
+
+    private class LocationNode implements Comparable
+    {
+
+        private LocationNode parent;
+        public int x;
+        public int y;
+        public int weight;
+        public int dist;
+
+        public LocationNode(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+            this.weight = Integer.MAX_VALUE;
+            this.dist = 0;
+        }
+
+        public void setParent(LocationNode parent)
+        {
+            this.parent = parent;
+            this.dist = parent.dist + 1;
+        }
+
+        public void setWeight(int newWeight)
+        {
+            this.weight = newWeight;
+        }
+
+        public LocationNode getParent()
+        {
+            return parent;
+        }
+
+        @Override
+        public int compareTo(Object otherNode)
+        {
+            if(otherNode == null)
+            {
+                return 0;
+            } else if(otherNode instanceof LocationNode)
+            {
+                int otherWeight = ((LocationNode) otherNode).weight;
+                return Integer.compare(weight, otherWeight);
+            } else
+            {
+                return 0;
+            }
+        }
     }
 
 }
