@@ -97,78 +97,155 @@ public class Plan extends ActionNode
             currentAction.initialize();
             currentAction.run();
             PlanningNode root = new PlanningNode(null, currentAction, new Instruction(InstructionType.START, null));
-            List<PlanningNode> leafNodes = new ArrayList<>();
-            leafNodes.add(root);
-            int nodeCounter = 0;
-            while(nodeCounter < MAX_MODELS)
+
+            int maxDepth = 5;
+            Stack<PlanningNode> nodesToExplore = new Stack<>();
+            PriorityQueue<PlanningNode> leaves = new PriorityQueue<>();
+            nodesToExplore.push(root);
+            System.out.println("----------------Start planning--------------------");
+            while(!nodesToExplore.empty())
             {
-                List<PlanningNode> newLeaves = new ArrayList<>();
-                for(PlanningNode oldLeaf : leafNodes)
+                PlanningNode exploringNode = nodesToExplore.pop();
+                PlannableActionNode exploringNodesAction = exploringNode.getActionNode();
+                Model predictiveModel = ModelPicker.getInstance().getModel((ThingNode) exploringNodesAction.getSubject().getParent(),
+                        exploringNodesAction.getSubject(), exploringNodesAction.getDirectObject(), exploringNodesAction.getIndirectObject());
+                for(Instruction possibleAction : possibleActions)
                 {
-                    PlannableActionNode leafsAction = oldLeaf.getActionNode();
-                    Model predictiveModel = ModelPicker.getInstance().getModel((ThingNode) leafsAction.getSubject().getParent(),
-                            leafsAction.getSubject(), leafsAction.getDirectObject(), leafsAction.getIndirectObject());
-                    for(Instruction possibleAction : possibleActions)
+                    List<ThingNode> futureWorlds = predictiveModel.getFutureWorldStates(possibleAction);
+                    PlannableActionNode highestUrgencyNode = null;
+//                    System.out.println("In the loop");
+                    for(ThingNode futureWorld : futureWorlds)
                     {
-                        List<ThingNode> futureWorlds = predictiveModel.getFutureWorldStates(possibleAction);
-                        for(ThingNode futureWorld : futureWorlds)
+//                        System.out.println("Check");
+                        PlannableActionNode nextAction = (PlannableActionNode) parentConstructor.newInstance(getRoot(),
+                                exploringNodesAction, futureWorld.getThing(subjectName), futureWorld.getThing(directObjectName),
+                                futureWorld.getThing(indirectObjectName), getAdverbs(), null, getParent().getConfidence(),
+                                getParent().getPriority(), getParent().getUrgency());
+                        nextAction.makePlanningNode();
+                        nextAction.initialize();
+                        nextAction.run();
+                        if(highestUrgencyNode == null)
                         {
-                            PlannableActionNode nextAction = (PlannableActionNode) parentConstructor.newInstance(getRoot(),
-                                    leafsAction, futureWorld.getThing(subjectName), futureWorld.getThing(directObjectName),
-                                    futureWorld.getThing(indirectObjectName), getAdverbs(), null, getParent().getConfidence(),
-                                    getParent().getPriority(), getParent().getUrgency());
-                            nextAction.makePlanningNode();
-                            nextAction.makePlanningNode();
-                            nextAction.initialize();
-//                            System.out.println("Initialized");
-                            nextAction.run();
-                            if(nextAction.getUrgency() <= nextAction.getMaxUrgency())
-                            {
-                                newLeaves.add(new PlanningNode(oldLeaf, nextAction, possibleAction));
-                            }
+//                            System.out.println("Was null...");
+                            highestUrgencyNode = nextAction;
+                        } else if(highestUrgencyNode.getUrgency() < nextAction.getUrgency())
+                        {
+//                            System.out.println("Boop");
+                            highestUrgencyNode = nextAction;
+                        }
+                        if(highestUrgencyNode.getUrgency() >= highestUrgencyNode.getMaxUrgency())
+                        {
+//                            System.out.println("Can't take the pressure!");
+                            break;
                         }
                     }
-                }
-//                System.out.println("Out of the for loop!");
-                if(newLeaves.isEmpty())
-                {
-                    break;
-                } else
-                {
-                    leafNodes.clear();
-                    leafNodes.addAll(newLeaves);
-                    nodeCounter += newLeaves.size();
-//                    System.out.println("Current count: " + nodeCounter);
-                }
-            }
-            double lowestUrgency = Double.MAX_VALUE;
-            PlanningNode bestNode = null;
-            for(PlanningNode leafNode : leafNodes)
-            {
-                double urg = leafNode.getActionNode().getUrgency();
-                if(urg < lowestUrgency)
-                {
-                    lowestUrgency = urg;
-                    bestNode = leafNode;
-                }
-            }
-            if(bestNode != null)
-            {
-                PlanningNode bestParent = bestNode.getParent();
-                if(bestParent != null)
-                {
-                    while(bestParent != root)
+//                    System.out.println("Out of the loop");
+                    PlanningNode nextNode = new PlanningNode(exploringNode, highestUrgencyNode, possibleAction);
+                    if(highestUrgencyNode == null)
                     {
-                        bestNode = bestParent;
-                        bestParent = bestNode.getParent();
+//                        System.out.println("Null somehow");
+                    } else if((highestUrgencyNode.getUrgency() < highestUrgencyNode.getMaxUrgency()) && (nextNode.getDepth() < maxDepth))
+                    {
+                        nodesToExplore.push(nextNode);
+                    } else
+                    {
+                        leaves.add(nextNode);
                     }
-                    getParent().setUrgencey(bestNode.getActionNode().getUrgency());
-                    instructions.add(new InstructionPacket(bestNode.getActionToState(), getParent()));
-                } else
-                {
-                    System.out.println("Best was root?");
                 }
             }
+            PlanningNode nodeToReach = leaves.poll();
+            if(nodeToReach == null || nodeToReach.getParent() == null)
+            {
+//                System.out.print("NULLIFIED!");
+            } else
+            {
+                while(nodeToReach.getParent() != null)
+                {
+                    PlanningNode parent = nodeToReach.getParent();
+                    if(parent.getParent() == null)
+                    {
+                        break;
+                    } else
+                    {
+                        nodeToReach = parent;
+                    }
+                }
+                instructions.add(new InstructionPacket(nodeToReach.getActionToState(), getParent()));
+            }
+            System.out.println("-----------------End planning---------------------");
+
+//            List<PlanningNode> leafNodes = new ArrayList<>();
+//            leafNodes.add(root);
+//            int nodeCounter = 0;
+//            while(nodeCounter < MAX_MODELS)
+//            {
+//                List<PlanningNode> newLeaves = new ArrayList<>();
+//                for(PlanningNode oldLeaf : leafNodes)
+//                {
+//                    PlannableActionNode leafsAction = oldLeaf.getActionNode();
+//                    Model predictiveModel = ModelPicker.getInstance().getModel((ThingNode) leafsAction.getSubject().getParent(),
+//                            leafsAction.getSubject(), leafsAction.getDirectObject(), leafsAction.getIndirectObject());
+//                    for(Instruction possibleAction : possibleActions)
+//                    {
+//                        List<ThingNode> futureWorlds = predictiveModel.getFutureWorldStates(possibleAction);
+//                        for(ThingNode futureWorld : futureWorlds)
+//                        {
+//                            PlannableActionNode nextAction = (PlannableActionNode) parentConstructor.newInstance(getRoot(),
+//                                    leafsAction, futureWorld.getThing(subjectName), futureWorld.getThing(directObjectName),
+//                                    futureWorld.getThing(indirectObjectName), getAdverbs(), null, getParent().getConfidence(),
+//                                    getParent().getPriority(), getParent().getUrgency());
+////                            nextAction.makePlanningNode();
+//                            nextAction.makePlanningNode();
+//                            nextAction.initialize();
+////                            System.out.println("Initialized");
+//                            nextAction.run();
+//                            if(nextAction.getUrgency() <= nextAction.getMaxUrgency())
+//                            {
+//                                newLeaves.add(new PlanningNode(oldLeaf, nextAction, possibleAction));
+//                            }
+//                        }
+//                    }
+//                }
+////                System.out.println("Out of the for loop!");
+//                if(newLeaves.isEmpty())
+//                {
+//                    break;
+//                } else
+//                {
+//                    leafNodes.clear();
+//                    leafNodes.addAll(newLeaves);
+//                    nodeCounter += newLeaves.size();
+////                    System.out.println("Current count: " + nodeCounter);
+//                }
+//            }
+//            double lowestUrgency = Double.MAX_VALUE;
+//            PlanningNode bestNode = null;
+//            for(PlanningNode leafNode : leafNodes)
+//            {
+//                double urg = leafNode.getActionNode().getUrgency();
+//                if(urg < lowestUrgency)
+//                {
+//                    lowestUrgency = urg;
+//                    bestNode = leafNode;
+//                }
+//            }
+//            if(bestNode != null)
+//            {
+//                PlanningNode bestParent = bestNode.getParent();
+//                if(bestParent != null)
+//                {
+//                    while(bestParent != root)
+//                    {
+//                        bestNode = bestParent;
+//                        bestParent = bestNode.getParent();
+//                    }
+//                    getParent().setUrgencey(bestNode.getActionNode().getUrgency());
+//                    instructions.add(new InstructionPacket(bestNode.getActionToState(), getParent()));
+//                } else
+//                {
+//                    System.out.println("Best was root?");
+//                }
+//            }
         } catch (InstantiationException e) {
         } catch (IllegalAccessException e) {
         } catch (InvocationTargetException e) {
@@ -199,13 +276,14 @@ public class Plan extends ActionNode
         }
     }
 
-    private class PlanningNode
+    private class PlanningNode implements Comparable
     {
 
         private PlanningNode parent;
         private List<PlanningNode> children;
         private PlannableActionNode plannableActionNode;
         private Instruction actionToState;
+        private int depth;
 
         public PlanningNode(PlanningNode parent, PlannableActionNode actionNode, Instruction actionToState)
         {
@@ -213,6 +291,13 @@ public class Plan extends ActionNode
             this.children = new ArrayList<>();
             this.plannableActionNode = actionNode;
             this.actionToState = actionToState;
+            if(parent != null)
+            {
+                this.depth = parent.depth + 1;
+            } else
+            {
+                this.depth = 0;
+            }
         }
 
         public void addNode(PlanningNode node)
@@ -238,6 +323,27 @@ public class Plan extends ActionNode
         public Instruction getActionToState()
         {
             return actionToState;
+        }
+
+        public int getDepth()
+        {
+            return this.depth;
+        }
+
+        @Override
+        public int compareTo(Object o)
+        {
+            if(o == null)
+            {
+                return 0;
+            } else if(o instanceof PlanningNode)
+            {
+                PlanningNode other = (PlanningNode) o;
+                return Double.compare(this.getActionNode().getUrgency(), other.getActionNode().getUrgency());
+            } else
+            {
+                return 0;
+            }
         }
     }
 

@@ -61,94 +61,113 @@ public class Avoid extends PlannableActionNode
     public List<InstructionPacket> planningRun()
     {
         List<InstructionPacket> instructionPackets = new ArrayList<>();
-        double[] vector = new double[((ThingNode) getDirectObject().getParent()).getAttribute("dimensions").split(",").length];
-        for(double oneDVector : vector)
-        {
-            oneDVector = 0;
-        }
-        double urgency = 0;
+//        double[] vector = new double[((ThingNode) getDirectObject().getParent()).getAttribute("dimensions").split(",").length];
+//        for(double oneDVector : vector)
+//        {
+//            oneDVector = 0;
+//        }
+//        double urgency = 0;
+//        String[] subjectLocationStrings = getSubject().getAttribute("location").split(",");
+//        int[] subjectLocation = new int[subjectLocationStrings.length];
+//        for(int i = 0; i < subjectLocation.length; i++)
+//        {
+//            subjectLocation[i] = Integer.parseInt(subjectLocationStrings[i]);
+//        }
+//        for(Model model : models)
+//        {
+//            model.updateLocations();
+//            double[] currentVector = model.getVector(subjectLocation);
+//            for(int i = 0; i < vector.length; i++)
+//            {
+//                vector[i] += currentVector[i];
+//                urgency += Math.abs(currentVector[i]);
+//            }
+//        }
+//        setUrgencey(urgency);
+//        List<double[]> sideVectors = new ArrayList<>();
+//        double[] sideVector1 = new double[vector.length];
+//        double[] sideVector2 = new double[vector.length];
+//        int varsIndex = -1;
+//        double sideVectorLength = 0;
+//        double vectorLength = 0;
+//        for(int i = 0; i < vector.length; i++)
+//        {
+//            if(vector[i] != 0 && varsIndex < 0) // Mark the variable with a -1. We don't want it multiplied by zero
+//            {
+//                sideVector1[i] = -1;
+//                varsIndex = i;
+//            } else
+//            {
+//                sideVector1[i] = 1;
+//                sideVectorLength++;
+//            }
+//            vectorLength += vector[i] * vector[i];
+//        }
+//        // If the vector is a zero vector, return an empty list
+//        if(varsIndex < 0)
+//        {
+//            return instructionPackets;
+//        }
+//        vectorLength = Math.sqrt(vectorLength);
+//        double unknownDimension = 0;
+//        for(int i = 0; i < vector.length; i++)
+//        {
+//            if(sideVector1[i] == 1)
+//            {
+//                unknownDimension -= vector[i];
+//            }
+//        }
+//        unknownDimension /= vector[varsIndex];
+//        sideVector1[varsIndex] = unknownDimension;
+//        sideVectorLength += unknownDimension * unknownDimension;
+//        sideVectorLength = Math.sqrt(sideVectorLength);
+//        for(int i = 0; i < sideVector1.length; i++)
+//        {
+//            sideVector1[i] *= vectorLength / sideVectorLength;
+//            sideVector2[i] = -1 * sideVector1[i];
+//        }
+//        sideVectors.add(sideVector1);
+//        sideVectors.add(sideVector2);
+//        for(double[] sideVector : sideVectors)
+//        {
+//            if(models.get(0).isAllowableMovement(subjectLocation, sideVector))
+//            {
+//                List<String> params = new ArrayList<>();
+//                for(int i = 0; i < sideVector.length; i++)
+//                {
+//                    params.add(Double.toString(sideVector[i] * sideWeight));
+//                }
+//                instructionPackets.add(new InstructionPacket(new Instruction(InstructionType.MOVE, params), this));
+//            }
+//        }
+//        if(models.get(0).isAllowableMovement(subjectLocation, vector))
+//        {
+//            List<String> params = new ArrayList<>();
+//            for(int i = 0; i < vector.length; i++)
+//            {
+//                params.add(Double.toString(vector[i]));
+//            }
+//            instructionPackets.add(new InstructionPacket(new Instruction(InstructionType.MOVE, params), this));
+//        }
         String[] subjectLocationStrings = getSubject().getAttribute("location").split(",");
         int[] subjectLocation = new int[subjectLocationStrings.length];
         for(int i = 0; i < subjectLocation.length; i++)
         {
             subjectLocation[i] = Integer.parseInt(subjectLocationStrings[i]);
         }
+        double urgencyTotal = 0;
         for(Model model : models)
         {
-            model.updateLocations();
-            double[] currentVector = model.getVector(subjectLocation);
-            for(int i = 0; i < vector.length; i++)
+            double cUrcency = model.getDistance(subjectLocation);
+            if(cUrcency == 0)
             {
-                vector[i] += currentVector[i];
-                urgency += Math.abs(currentVector[i]);
-            }
-        }
-        setUrgencey(urgency);
-        List<double[]> sideVectors = new ArrayList<>();
-        double[] sideVector1 = new double[vector.length];
-        double[] sideVector2 = new double[vector.length];
-        int varsIndex = -1;
-        double sideVectorLength = 0;
-        double vectorLength = 0;
-        for(int i = 0; i < vector.length; i++)
-        {
-            if(vector[i] != 0 && varsIndex < 0) // Mark the variable with a -1. We don't want it multiplied by zero
-            {
-                sideVector1[i] = -1;
-                varsIndex = i;
+                urgencyTotal = Double.MAX_VALUE;
             } else
             {
-                sideVector1[i] = 1;
-                sideVectorLength++;
-            }
-            vectorLength += vector[i] * vector[i];
-        }
-        // If the vector is a zero vector, return an empty list
-        if(varsIndex < 0)
-        {
-            return instructionPackets;
-        }
-        vectorLength = Math.sqrt(vectorLength);
-        double unknownDimension = 0;
-        for(int i = 0; i < vector.length; i++)
-        {
-            if(sideVector1[i] == 1)
-            {
-                unknownDimension -= vector[i];
+                urgencyTotal += 1 / cUrcency;
             }
         }
-        unknownDimension /= vector[varsIndex];
-        sideVector1[varsIndex] = unknownDimension;
-        sideVectorLength += unknownDimension * unknownDimension;
-        sideVectorLength = Math.sqrt(sideVectorLength);
-        for(int i = 0; i < sideVector1.length; i++)
-        {
-            sideVector1[i] *= vectorLength / sideVectorLength;
-            sideVector2[i] = -1 * sideVector1[i];
-        }
-        sideVectors.add(sideVector1);
-        sideVectors.add(sideVector2);
-        for(double[] sideVector : sideVectors)
-        {
-            if(models.get(0).isAllowableMovement(subjectLocation, sideVector))
-            {
-                List<String> params = new ArrayList<>();
-                for(int i = 0; i < sideVector.length; i++)
-                {
-                    params.add(Double.toString(sideVector[i] * sideWeight));
-                }
-                instructionPackets.add(new InstructionPacket(new Instruction(InstructionType.MOVE, params), this));
-            }
-        }
-        if(models.get(0).isAllowableMovement(subjectLocation, vector))
-        {
-            List<String> params = new ArrayList<>();
-            for(int i = 0; i < vector.length; i++)
-            {
-                params.add(Double.toString(vector[i]));
-            }
-            instructionPackets.add(new InstructionPacket(new Instruction(InstructionType.MOVE, params), this));
-        }
+        setUrgencey(urgencyTotal);
         return instructionPackets;
     }
 

@@ -10,6 +10,7 @@ import processTree.ProcessNode;
 import processTree.ThingNode;
 import processTree.ThingsNode;
 import processTree.toolNodes.Model;
+import structures.AStar2D;
 import structures.ID2DDFS;
 import structures.MoveType2D;
 
@@ -353,6 +354,21 @@ public class Discrete2DSpatialModel extends Model
             }
         }
         return vector;
+    }
+
+    public double getDistance(int[] end)
+    {
+        String[] thingLocStrings = getThing().getAttribute("location").split(",");
+        int[] start = new int[N_DIMENSIONS];
+        for(int i = 0; i < N_DIMENSIONS; i++)
+        {
+            double startDouble = Double.parseDouble(thingLocStrings[i]) / ((double) tileDimensions[i]);
+            double endDouble = ((double) end[i]) / ((double) tileDimensions[i]);
+            start[i] = (int) Math.round(startDouble);
+            end[i] = (int) Math.round(endDouble);
+        }
+        AStar2D searcher = new AStar2D(allowedSpaces, moveCapabilities);
+        return (double) searcher.calculateDistance(start, end);
     }
 
     public boolean isAllowableMovement(int[] location, double[] direction)
@@ -1350,7 +1366,40 @@ public class Discrete2DSpatialModel extends Model
             }
             futureWorlds.addAll(generateFutureWorlds(selectedPlayerFutureWorldElements));
         }
+        System.out.println("**********Start One World List********************");
+        recursivelyCheckLocations(futureWorlds);
+        System.out.println("***********End One World List*********************");
         return futureWorlds;
+    }
+
+    private void recursivelyCheckLocations(List<ThingNode> things)
+    {
+        for(ThingNode thing : things)
+        {
+            if(thing.hasAttribute("location"))
+            {
+                String[] locationStrings = thing.getAttribute("location").split(",");
+                int[] location = new int[N_DIMENSIONS];
+                location[0] = Integer.parseInt(locationStrings[0]);
+                location[1] = Integer.parseInt(locationStrings[1]);
+                if(location[0] < 0 || location[1] < 0)
+                {
+                    int x = 0;
+                    int y = x + 2;
+                    System.err.println("Problem!");
+                    System.err.println(thing.getName() + ": " + location[0] / 24 + ", " + location[1] / 24);
+                    System.err.println(thing.getName() + ": " + location[0] + ", " + location[1]);
+                } else if(!thing.getName().equalsIgnoreCase("wall"))
+                {
+                    System.out.println(thing.getName() + ": " + location[0] / 24 + ", " + location[1] / 24);
+                }
+            }
+            List<ThingNode> children = thing.getThingElements();
+            if(children != null)
+            {
+                recursivelyCheckLocations(children);
+            }
+        }
     }
 
     private List<ThingNode> generateFutureStates(ThingNode currentState, int playerSpeed, int playerDist)

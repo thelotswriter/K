@@ -35,6 +35,13 @@ public abstract class Model
     public abstract double[] getVector(int[] location);
 
     /**
+     * Gets the shortest distance between two points, accounting for obstacles in between
+     * @param end The ending location
+     * @return The distance of the shortest path between the object and the given end
+     */
+    public abstract double getDistance(int[] end);
+
+    /**
      * Gets the thing being modeled
      * @return The thing being modeled
      */

@@ -446,7 +446,7 @@ public class Board extends JPanel implements ActionListener {
                     if(exploredNodes.add(nextNode))
                     {
                         nextNode.setParent(currentNode);
-                        nextNode.setWeight(nextNode.dist + calculateManhattanDistance(nextNode.x, nextNode.y, ghostX, ghostY));
+                        nextNode.setWeight(nextNode.dist + calculateManhattanDistance(nextNode.x, nextNode.y, playerX, playerY));
                         if(nextX == playerX && currentY == playerY)
                         {
                             break;
@@ -464,7 +464,7 @@ public class Board extends JPanel implements ActionListener {
                     if(exploredNodes.add(nextNode))
                     {
                         nextNode.setParent(currentNode);
-                        nextNode.setWeight(nextNode.dist + calculateManhattanDistance(nextNode.x, nextNode.y, ghostX, ghostY));
+                        nextNode.setWeight(nextNode.dist + calculateManhattanDistance(nextNode.x, nextNode.y, playerX, playerY));
                         if(nextX == playerX && currentY == playerY)
                         {
                             break;
@@ -482,7 +482,7 @@ public class Board extends JPanel implements ActionListener {
                     if(exploredNodes.add(nextNode))
                     {
                         nextNode.setParent(currentNode);
-                        nextNode.setWeight(nextNode.dist + calculateManhattanDistance(nextNode.x, nextNode.y, ghostX, ghostY));
+                        nextNode.setWeight(nextNode.dist + calculateManhattanDistance(nextNode.x, nextNode.y, playerX, playerY));
                         if(currentX == playerX && nextY == playerY)
                         {
                             break;
