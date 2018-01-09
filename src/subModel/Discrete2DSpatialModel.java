@@ -1454,6 +1454,10 @@ public class Discrete2DSpatialModel extends Model
                 int[] currentLocationState = new int[N_DIMENSIONS];
                 currentLocationState[0] = Integer.parseInt(locString[0]);
                 currentLocationState[1] = Integer.parseInt(locString[1]);
+                if(currentLocationState[0] < 0 || currentLocationState[1] < 0)
+                {
+                    System.out.println("GAAAHHHH!!!!");
+                }
                 if(currentLocationState[0] % tileDimensions[0] != 0 || currentLocationState[1] % tileDimensions[1] != 0)
                 {
                     ThingNode futureThing = new ThingNode(null, null, currentState.getCategories(),
@@ -1484,6 +1488,10 @@ public class Discrete2DSpatialModel extends Model
                                     futureThing.setAttribute("location", locationBuilder.toString());
                                     List<ThingNode> singleThing = new ArrayList<>();
                                     singleThing.add(futureThing);
+                                    if(currentLocationState[0] < 0 || currentLocationState[1] < 0)
+                                    {
+                                        System.out.println("GAAAHHHH!!!!");
+                                    }
                                     return singleThing;
                                 } else
                                 {
@@ -1493,6 +1501,10 @@ public class Discrete2DSpatialModel extends Model
                                     locationBuilder.append(",");
                                     locationBuilder.append(currentLocationState[1]);
                                     futureThing.setAttribute("location", locationBuilder.toString());
+                                    if(currentLocationState[0] < 0 || currentLocationState[1] < 0)
+                                    {
+                                        System.out.println("GAAAHHHH!!!!");
+                                    }
                                     return generateFutureIndividualStates(futureThing, dist - distRight);
                                 }
                             } else
@@ -1508,6 +1520,10 @@ public class Discrete2DSpatialModel extends Model
                                     futureThing.setAttribute("location", locationBuilder.toString());
                                     List<ThingNode> singleThing = new ArrayList<>();
                                     singleThing.add(futureThing);
+                                    if(currentLocationState[0] < 0 || currentLocationState[1] < 0)
+                                    {
+                                        System.out.println("GAAAHHHH!!!!");
+                                    }
                                     return singleThing;
                                 } else
                                 {
@@ -1517,6 +1533,10 @@ public class Discrete2DSpatialModel extends Model
                                     locationBuilder.append(",");
                                     locationBuilder.append(currentLocationState[1]);
                                     futureThing.setAttribute("location", locationBuilder.toString());
+                                    if(currentLocationState[0] < 0 || currentLocationState[1] < 0)
+                                    {
+                                        System.out.println("GAAAHHHH!!!!");
+                                    }
                                     return generateFutureIndividualStates(futureThing, dist - distLeft);
                                 }
                             }
@@ -1535,6 +1555,10 @@ public class Discrete2DSpatialModel extends Model
                                     futureThing.setAttribute("location", locationBuilder.toString());
                                     List<ThingNode> singleThing = new ArrayList<>();
                                     singleThing.add(futureThing);
+                                    if(currentLocationState[0] < 0 || currentLocationState[1] < 0)
+                                    {
+                                        System.out.println("GAAAHHHH!!!!");
+                                    }
                                     return singleThing;
                                 } else
                                 {
@@ -1544,11 +1568,15 @@ public class Discrete2DSpatialModel extends Model
                                     locationBuilder.append(",");
                                     locationBuilder.append(currentLocationState[1]);
                                     futureThing.setAttribute("location", locationBuilder.toString());
+                                    if(currentLocationState[0] < 0 || currentLocationState[1] < 0)
+                                    {
+                                        System.out.println("GAAAHHHH!!!!");
+                                    }
                                     return generateFutureIndividualStates(futureThing, dist - distDown);
                                 }
                             } else
                             {
-                                int distUp = currentLocationState[0] - (currentLocationState[0] / tileDimensions[0]) * tileDimensions[0];
+                                int distUp = currentLocationState[1] - (currentLocationState[1] / tileDimensions[1]) * tileDimensions[1];
                                 if(distUp > dist)
                                 {
                                     currentLocationState[1] -= dist;
@@ -1559,6 +1587,10 @@ public class Discrete2DSpatialModel extends Model
                                     futureThing.setAttribute("location", locationBuilder.toString());
                                     List<ThingNode> singleThing = new ArrayList<>();
                                     singleThing.add(futureThing);
+                                    if(currentLocationState[0] < 0 || currentLocationState[1] < 0)
+                                    {
+                                        System.out.println("GAAAHHHH!!!!");
+                                    }
                                     return singleThing;
                                 } else
                                 {
@@ -1568,6 +1600,10 @@ public class Discrete2DSpatialModel extends Model
                                     locationBuilder.append(",");
                                     locationBuilder.append(currentLocationState[1]);
                                     futureThing.setAttribute("location", locationBuilder.toString());
+                                    if(currentLocationState[0] < 0 || currentLocationState[1] < 0)
+                                    {
+                                        System.out.println("GAAAHHHH!!!!");
+                                    }
                                     return generateFutureIndividualStates(futureThing, dist - distUp);
                                 }
                             }
