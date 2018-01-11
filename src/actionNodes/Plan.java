@@ -88,6 +88,7 @@ public class Plan extends ActionNode
 
     public List<InstructionPacket> run()
     {
+        int x = 0;
         List<InstructionPacket> instructions = new ArrayList<>();
         try {
             PlannableActionNode currentAction = (PlannableActionNode) parentConstructor.newInstance(getRoot(),
