@@ -83,6 +83,9 @@ public class Discrete2DSpatialModel extends Model
         checkMovementCapabilities();
         setTilesToSearch();
         updateLocations();
+        recursivelyCheckLocations(world.getThingElements());
+        int x = 0;
+        int y = x + 2;
     }
 
     /**
@@ -1349,6 +1352,7 @@ public class Discrete2DSpatialModel extends Model
                 futurePlayers.add(futurePlayer);
             }
         }
+//        recursivelyCheckLocations(getWorld().getThingElements());
         int playerSpeed = Integer.parseInt(player.getAttribute("speed"));
         List<ThingNode> futureWorlds = new ArrayList<>();
         for(int i = 0; i < futurePlayers.size(); i++)
@@ -1364,11 +1368,15 @@ public class Discrete2DSpatialModel extends Model
                     selectedPlayerFutureWorldElements.add(generateFutureStates(element, playerSpeed, playerDistance.get(i)));
                 }
             }
+//            for(List<ThingNode> list : selectedPlayerFutureWorldElements)
+//            {
+//                recursivelyCheckLocations(list);
+//            }
             futureWorlds.addAll(generateFutureWorlds(selectedPlayerFutureWorldElements));
         }
-        System.out.println("**********Start One World List********************");
-        recursivelyCheckLocations(futureWorlds);
-        System.out.println("***********End One World List*********************");
+//        System.out.println("**********Start One World List********************");
+//
+//        System.out.println("***********End One World List*********************");
         return futureWorlds;
     }
 
@@ -1389,10 +1397,10 @@ public class Discrete2DSpatialModel extends Model
                     System.err.println("Problem!");
                     System.err.println(thing.getName() + ": " + location[0] / 24 + ", " + location[1] / 24);
                     System.err.println(thing.getName() + ": " + location[0] + ", " + location[1]);
-                } else if(!thing.getName().equalsIgnoreCase("wall"))
-                {
-                    System.out.println(thing.getName() + ": " + location[0] / 24 + ", " + location[1] / 24);
-                }
+                } //else if(!thing.getName().equalsIgnoreCase("wall"))
+//                {
+//                    System.out.println(thing.getName() + ": " + location[0] / 24 + ", " + location[1] / 24);
+//                }
             }
             List<ThingNode> children = thing.getThingElements();
             if(children != null)
