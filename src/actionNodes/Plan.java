@@ -88,7 +88,6 @@ public class Plan extends ActionNode
 
     public List<InstructionPacket> run()
     {
-        int x = 0;
         List<InstructionPacket> instructions = new ArrayList<>();
         try {
             PlannableActionNode currentAction = (PlannableActionNode) parentConstructor.newInstance(getRoot(),
@@ -99,7 +98,7 @@ public class Plan extends ActionNode
             currentAction.run();
             PlanningNode root = new PlanningNode(null, currentAction, new Instruction(InstructionType.START, null));
 
-            int maxDepth = 5;
+            int maxDepth = 2;
             Stack<PlanningNode> nodesToExplore = new Stack<>();
             PriorityQueue<PlanningNode> leaves = new PriorityQueue<>();
             nodesToExplore.push(root);

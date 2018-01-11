@@ -38,6 +38,11 @@ public class PlayPacman implements MiniMain
             Pacman pMan = game.getGame();
             while(instruction.getType() != InstructionType.FINISH)
             {
+                count++;
+                if(count == 50)
+                {
+                    System.out.println("Time to debug!");
+                }
                 game.update();
                 List<InstructionPacket> instructionPackets = playNode.run();
                 double[] probabilityVector = generateProbabilityVector(game.getAttribute("dimensions").split(",").length,
