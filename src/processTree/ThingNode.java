@@ -128,6 +128,25 @@ public class ThingNode extends ProcessNode
             this.attributes = new HashMap<>();
         }
     }
+
+	public ThingNode(ThingNode thingToCopy)
+	{
+        super();
+        ThingNode copy = new ThingNode(null, null, thingToCopy.getCategories(), null, thingToCopy.getConfidence());
+		for(String key : thingToCopy.getAttributes().keySet())
+		{
+			copy.setAttribute(key, thingToCopy.getAttribute(key));
+		}
+		if(thingToCopy.getThingElements() != null)
+		{
+			for(ThingNode element : thingToCopy.getThingElements())
+			{
+				ThingNode copiedElement = new ThingNode(element);
+				copiedElement.setParent(copy);
+				copy.addElement(copiedElement);
+			}
+		}
+	}
 	
 //	/**
 //	 * Loads elements once the names have been loaded

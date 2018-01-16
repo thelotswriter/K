@@ -34,6 +34,8 @@ public abstract class ProcessNode implements Serializable
 //	 */
 //	public abstract ProcessNode get(String nodeName);
 
+    public ProcessNode() {}
+
 	public ProcessNode(ProcessNode parent, List<ProcessNode> elements, double confidence)
     {
         this.parent = parent;
