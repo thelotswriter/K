@@ -19,7 +19,15 @@ public abstract class Model
         this.thingModeled = thingToModel;
     }
 
-    public abstract int determineBestTime(List<Instruction> actions);
+    /**
+     * Determines an ideal time for the model (and associated models) to run
+     * @param actions The combination of actions the thing modeled plans to make
+     * @return An integer representing how long the thing modeled will run (and therefore how long other, related models should run
+     */
+    public int determineBestTime(List<Instruction> actions)
+    {
+        return 1;
+    }
 
     public abstract ThingNode generateFutureState(int time, List<Instruction> actions);
 

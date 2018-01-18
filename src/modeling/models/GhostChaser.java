@@ -6,12 +6,12 @@ import processTree.ThingNode;
 
 import java.util.List;
 
-public class Chaser extends Model
+public class GhostChaser extends Model
 {
 
-    public Chaser(ThingNode thingToModel)
+    public GhostChaser(ThingNode thingToBeModeled)
     {
-        super(thingToModel);
+        super(thingToBeModeled);
     }
 
     @Override
@@ -23,5 +23,4 @@ public class Chaser extends Model
     public ThingNode generateFutureState(int time) {
         return null;
     }
-
 }

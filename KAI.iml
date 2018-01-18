@@ -44,6 +44,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="jig-1.7.5" level="project" />
+    <orderEntry type="library" exported="" name="jig-1.7.5" level="project" />
   </component>
 </module>

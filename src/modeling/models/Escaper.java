@@ -6,12 +6,17 @@ import processTree.ThingNode;
 
 import java.util.List;
 
-public class Chaser extends Model
+public class Escaper extends Model
 {
 
-    public Chaser(ThingNode thingToModel)
+    public Escaper(ThingNode thingToBeModeled)
     {
-        super(thingToModel);
+        super(thingToBeModeled);
+    }
+
+    @Override
+    public int determineBestTime(List<Instruction> actions) {
+        return 0;
     }
 
     @Override
@@ -23,5 +28,4 @@ public class Chaser extends Model
     public ThingNode generateFutureState(int time) {
         return null;
     }
-
 }

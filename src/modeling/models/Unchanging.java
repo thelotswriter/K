@@ -17,14 +17,16 @@ public class Unchanging extends Model
     }
 
     @Override
-    public ThingNode generateFutureState(List<Instruction> actions)
+    public ThingNode generateFutureState(int time, List<Instruction> actions)
     {
         return new ThingNode(getThingBeingModeled());
     }
 
     @Override
-    public ThingNode generateFutureWorldState(List<ThingNode> changedThings) {
+    public ThingNode generateFutureState(int time)
+    {
         return new ThingNode(getThingBeingModeled());
     }
+
 
 }
