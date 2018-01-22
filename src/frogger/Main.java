@@ -91,6 +91,8 @@ public class Main extends StaticScreenGame {
     private boolean space_has_been_released = false;
 	private boolean keyPressed = false;
 	private boolean listenInput = true;
+
+	private FroggerHooks froggerHooks;
 	
     /**
 	 * Initialize game objects
@@ -126,6 +128,7 @@ public class Main extends StaticScreenGame {
 		particleLayer = new AbstractBodyLayer.IterativeUpdate<MovingEntity>();
 		
 		initializeLevel(1);
+		froggerHooks = new FroggerHooks(frog, frogCol, movingObjectsLayer, goalmanager, WORLD_WIDTH, WORLD_HEIGHT);
 	}
 	
 	
@@ -205,19 +208,33 @@ public class Main extends StaticScreenGame {
 		
 		/* River traffic updates */
 		riverLine1.update(deltaMs);
-	    if ((m = riverLine1.buildShortLogWithTurtles(40)) != null) movingObjectsLayer.add(m);
-		
+//	    if ((m = riverLine1.buildShortLogWithTurtles(40)) != null) movingObjectsLayer.add(m);
+//
+//		riverLine2.update(deltaMs);
+//	    if ((m = riverLine2.buildLongLogWithCrocodile(30)) != null) movingObjectsLayer.add(m);
+//
+//		riverLine3.update(deltaMs);
+//	    if ((m = riverLine3.buildShortLogWithTurtles(50)) != null) movingObjectsLayer.add(m);
+//
+//		riverLine4.update(deltaMs);
+//	    if ((m = riverLine4.buildLongLogWithCrocodile(20)) != null) movingObjectsLayer.add(m);
+//
+//		riverLine5.update(deltaMs);
+//	    if ((m = riverLine5.buildShortLogWithTurtles(10)) != null) movingObjectsLayer.add(m);
+
+		if ((m = riverLine1.buildShortLogWithTurtles(0)) != null) movingObjectsLayer.add(m);
+
 		riverLine2.update(deltaMs);
-	    if ((m = riverLine2.buildLongLogWithCrocodile(30)) != null) movingObjectsLayer.add(m);
-		
+		if ((m = riverLine2.buildLongLogWithCrocodile(0)) != null) movingObjectsLayer.add(m);
+
 		riverLine3.update(deltaMs);
-	    if ((m = riverLine3.buildShortLogWithTurtles(50)) != null) movingObjectsLayer.add(m);
-		
+		if ((m = riverLine3.buildShortLogWithTurtles(0)) != null) movingObjectsLayer.add(m);
+
 		riverLine4.update(deltaMs);
-	    if ((m = riverLine4.buildLongLogWithCrocodile(20)) != null) movingObjectsLayer.add(m);
+		if ((m = riverLine4.buildLongLogWithCrocodile(0)) != null) movingObjectsLayer.add(m);
 
 		riverLine5.update(deltaMs);
-	    if ((m = riverLine5.buildShortLogWithTurtles(10)) != null) movingObjectsLayer.add(m);
+		if ((m = riverLine5.buildShortLogWithTurtles(0)) != null) movingObjectsLayer.add(m);
 	    
 	    // Do Wind
 	    if ((m = wind.genParticles(GameLevel)) != null) particleLayer.add(m);
@@ -234,7 +251,7 @@ public class Main extends StaticScreenGame {
 	 */
 	public void froggerKeyboardHandler() {
  		keyboard.poll();
-		
+
  		boolean keyReleased = false;
         boolean downPressed = keyboard.isPressed(KeyEvent.VK_DOWN);
         boolean upPressed = keyboard.isPressed(KeyEvent.VK_UP);
@@ -360,7 +377,7 @@ public class Main extends StaticScreenGame {
 		switch(GameState) {
 		case GAME_PLAY:
 			froggerKeyboardHandler();
-			froggerVirtualInputHandler(FroggerAction.UP);
+			//froggerVirtualInputHandler(froggerHooks.getMove());
 			wind.update(deltaMs);
 			hwave.update(deltaMs);
 			frog.update(deltaMs);
