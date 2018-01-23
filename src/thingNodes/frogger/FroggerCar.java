@@ -14,6 +14,6 @@ public class FroggerCar extends ThingNode
         super(parent, elements, categories, attributes, confidence);
         setName("car");
         addCategory("enemy");
-        //setAttribute("move", "")
+        setAttribute("move", "both,neither");
     }
 }

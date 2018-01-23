@@ -13,6 +13,6 @@ public class FroggerLog extends ThingNode
         super(parent, elements, categories, attributes, confidence);
         setName("log");
         addCategory("platform");
-        //setAttribute("move", "")
+        setAttribute("move", "both,neither");
     }
 }
