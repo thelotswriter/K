@@ -7,10 +7,10 @@ import processTree.ThingNode;
 import java.util.List;
 import java.util.Map;
 
-public class FroggerCar extends ThingNode
+public class FroggerCopCar extends ThingNode
 {
 
-    public FroggerCar(ProcessNode parent, List<ThingNode> elements, List<String> categories, Map<String, String> attributes, double confidence)
+    public FroggerCopCar(ProcessNode parent, List<ThingNode> elements, List<String> categories, Map<String, String> attributes, double confidence)
     {
         super(parent, elements, categories, attributes, confidence);
         setName("car");

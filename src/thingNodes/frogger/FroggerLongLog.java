@@ -7,16 +7,15 @@ import processTree.ThingNode;
 import java.util.List;
 import java.util.Map;
 
-public class FroggerCar extends ThingNode
+public class FroggerLongLog extends ThingNode
 {
-
-    public FroggerCar(ProcessNode parent, List<ThingNode> elements, List<String> categories, Map<String, String> attributes, double confidence)
+    public FroggerLongLog(ProcessNode parent, List<ThingNode> elements, List<String> categories, Map<String, String> attributes, double confidence)
     {
         super(parent, elements, categories, attributes, confidence);
-        setName("car");
-        addCategory("enemy");
+        setName("log");
+        addCategory("platform");
         setAttribute("move", "both,neither");
         setAttribute("dimensions",
-                FroggerMain.BLOCK_SIZE + "," + FroggerMain.BLOCK_SIZE);
+                (FroggerMain.BLOCK_SIZE * 4) + "," + FroggerMain.BLOCK_SIZE);
     }
 }
