@@ -33,15 +33,15 @@ import java.util.List;
 
 public class FroggerUI implements ViewableLayer {
 	List<ImageResource> heart = ResourceFactory.getFactory().getFrames(
-			Main.SPRITE_SHEET + "#heart");
+			FroggerMain.SPRITE_SHEET + "#heart");
 	List<ImageResource> gameOver = ResourceFactory.getFactory().getFrames(
-			Main.SPRITE_SHEET + "#gameover");
+			FroggerMain.SPRITE_SHEET + "#gameover");
 	List<ImageResource> levelFinish = ResourceFactory.getFactory().getFrames(
-			Main.SPRITE_SHEET + "#level_finish");
+			FroggerMain.SPRITE_SHEET + "#level_finish");
 	List<ImageResource> introTitle = ResourceFactory.getFactory().getFrames(
-			Main.SPRITE_SHEET + "#splash");
+			FroggerMain.SPRITE_SHEET + "#splash");
 	List<ImageResource> instructions = ResourceFactory.getFactory().getFrames(
-			Main.SPRITE_SHEET + "#help");
+			FroggerMain.SPRITE_SHEET + "#help");
 	
 	FontResource font = ResourceFactory.getFactory().getFontResource(
 			new Font("Sans Serif", Font.BOLD, 14), Color.white, null );
@@ -49,9 +49,9 @@ public class FroggerUI implements ViewableLayer {
 	FontResource fontBlack = ResourceFactory.getFactory().getFontResource(
 			new Font("Sans Serif", Font.BOLD, 14), Color.black, null );
 	
-	Main game;
+	FroggerMain game;
 	
-	public FroggerUI(final Main g) {
+	public FroggerUI(final FroggerMain g) {
 		game = g;
 	}
 	
@@ -84,31 +84,31 @@ public class FroggerUI implements ViewableLayer {
 		font.render("L" + game.GameLevel, rc, 
 				AffineTransform.getTranslateInstance(270, 7));
 		
-		if (game.GameState == Main.GAME_INTRO) {
+		if (game.GameState == FroggerMain.GAME_INTRO) {
 			   introTitle.get(0).render(rc, 
 						AffineTransform.getTranslateInstance(
-								(Main.WORLD_WIDTH - introTitle.get(0).getWidth())/2, 150));
+								(FroggerMain.WORLD_WIDTH - introTitle.get(0).getWidth())/2, 150));
 			   return;
 		}
 		
-		if (game.GameState == Main.GAME_INSTRUCTIONS) {
+		if (game.GameState == FroggerMain.GAME_INSTRUCTIONS) {
 			   instructions.get(0).render(rc, 
 						AffineTransform.getTranslateInstance(
-								(Main.WORLD_WIDTH - instructions.get(0).getWidth())/2, 100));
+								(FroggerMain.WORLD_WIDTH - instructions.get(0).getWidth())/2, 100));
 			   return;			
 		}
 		
-		if (game.GameState == Main.GAME_OVER) {
+		if (game.GameState == FroggerMain.GAME_OVER) {
 		   gameOver.get(0).render(rc, 
 					AffineTransform.getTranslateInstance(
-							(Main.WORLD_WIDTH - gameOver.get(0).getWidth())/2, 150));
+							(FroggerMain.WORLD_WIDTH - gameOver.get(0).getWidth())/2, 150));
 		   return;
 		}
 		
-		if (game.GameState == Main.GAME_FINISH_LEVEL) {
+		if (game.GameState == FroggerMain.GAME_FINISH_LEVEL) {
 			 levelFinish.get(0).render(rc, 
 						AffineTransform.getTranslateInstance(
-								(Main.WORLD_WIDTH - levelFinish.get(0).getWidth())/2, 150));		 
+								(FroggerMain.WORLD_WIDTH - levelFinish.get(0).getWidth())/2, 150));
 		}
 	}
 

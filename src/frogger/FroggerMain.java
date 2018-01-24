@@ -37,9 +37,10 @@ import jig.engine.util.Vector2D;
 
 import java.awt.event.KeyEvent;
 
-public class Main extends StaticScreenGame {
-	public static final int WORLD_WIDTH = (13*32);
-	public static final int WORLD_HEIGHT = (14*32);
+public class FroggerMain extends StaticScreenGame {
+	public static final int BLOCK_SIZE = 32;
+	public static final int WORLD_WIDTH = 13 * BLOCK_SIZE;
+	public static final int WORLD_HEIGHT = 14 * BLOCK_SIZE;
 	public static final Vector2D FROGGER_START = new Vector2D(6*32,WORLD_HEIGHT-32);
 	
 	static final String RSC_PATH = "resources/";
@@ -97,7 +98,7 @@ public class Main extends StaticScreenGame {
     /**
 	 * Initialize game objects
 	 */
-	public Main () {
+	public FroggerMain() {
 		
 		super(WORLD_WIDTH, WORLD_HEIGHT, false);
 		
@@ -143,7 +144,7 @@ public class Main extends StaticScreenGame {
 		riverLine1 = new MovingEntityFactory(new Vector2D(-(32*3),2*32), 
 				new Vector2D(0.06*dV,0)); 
 		
-		riverLine2 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH,3*32),
+		riverLine2 = new MovingEntityFactory(new Vector2D(FroggerMain.WORLD_WIDTH,3*32),
 				new Vector2D(-0.04*dV,0)); 
 		
 		riverLine3 = new MovingEntityFactory(new Vector2D(-(32*3),4*32), 
@@ -152,23 +153,23 @@ public class Main extends StaticScreenGame {
 		riverLine4 = new MovingEntityFactory(new Vector2D(-(32*4),5*32),  
 				new Vector2D(0.045*dV,0));
 		
-		riverLine5 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH,6*32),
+		riverLine5 = new MovingEntityFactory(new Vector2D(FroggerMain.WORLD_WIDTH,6*32),
 				new Vector2D(-0.045*dV,0));
 		
 		/* Road Traffic */
-		roadLine1 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH, 8*32),
+		roadLine1 = new MovingEntityFactory(new Vector2D(FroggerMain.WORLD_WIDTH, 8*32),
 				new Vector2D(-0.1*dV, 0)); 
 		
 		roadLine2 = new MovingEntityFactory(new Vector2D(-(32*4), 9*32), 
 				new Vector2D(0.08*dV, 0)); 
 		
-		roadLine3 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH, 10*32),
+		roadLine3 = new MovingEntityFactory(new Vector2D(FroggerMain.WORLD_WIDTH, 10*32),
 			    new Vector2D(-0.12*dV, 0)); 
 		
 		roadLine4 = new MovingEntityFactory(new Vector2D(-(32*4), 11*32),
 				new Vector2D(0.075*dV, 0));
 		
-		roadLine5 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH, 12*32),
+		roadLine5 = new MovingEntityFactory(new Vector2D(FroggerMain.WORLD_WIDTH, 12*32),
 				new Vector2D(-0.05*dV, 0)); 
 		
 		goalmanager.init(level);
@@ -461,9 +462,13 @@ public class Main extends StaticScreenGame {
 			break;		
 		}
 	}
+
+	public FroggerHooks getFroggerHooks() {
+	    return froggerHooks;
+    }
 	
 	public static void main (String[] args) {
-		Main f = new Main();
+		FroggerMain f = new FroggerMain();
 		f.run();
 	}
 }

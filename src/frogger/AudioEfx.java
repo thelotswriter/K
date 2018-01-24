@@ -51,28 +51,28 @@ public class AudioEfx {
 	// Background music
 	private AudioStream gameMusic;
 	
-	public static final String A_FX_PATH = Main.RSC_PATH + "ambient_fx/";
+	public static final String A_FX_PATH = FroggerMain.RSC_PATH + "ambient_fx/";
 	
 	public static AudioClip frogJump = ResourceFactory.getFactory().getAudioClip(
-			Main.RSC_PATH + "jump.wav");
+			FroggerMain.RSC_PATH + "jump.wav");
 	
 	public static AudioClip frogDie = ResourceFactory.getFactory().getAudioClip(
-			Main.RSC_PATH + "frog_die.ogg");
+			FroggerMain.RSC_PATH + "frog_die.ogg");
 
 	public static AudioClip frogGoal = ResourceFactory.getFactory().getAudioClip(
-			Main.RSC_PATH + "goal.ogg");
+			FroggerMain.RSC_PATH + "goal.ogg");
 	
 	public static AudioClip levelGoal = ResourceFactory.getFactory().getAudioClip(
-			Main.RSC_PATH + "level_goal.ogg");
+			FroggerMain.RSC_PATH + "level_goal.ogg");
 
 	public static AudioClip wind = ResourceFactory.getFactory().getAudioClip(
-			Main.RSC_PATH + "wind.ogg");
+			FroggerMain.RSC_PATH + "wind.ogg");
 	
 	public static AudioClip heat = ResourceFactory.getFactory().getAudioClip(
-			Main.RSC_PATH + "match.ogg");
+			FroggerMain.RSC_PATH + "match.ogg");
 	
 	public static AudioClip bonus = ResourceFactory.getFactory().getAudioClip(
-			Main.RSC_PATH + "bonus.ogg");
+			FroggerMain.RSC_PATH + "bonus.ogg");
 	
 	public static AudioClip siren = ResourceFactory.getFactory().getAudioClip(
 			A_FX_PATH + "siren.ogg");
@@ -102,7 +102,7 @@ public class AudioEfx {
 	    water_effects.add(ResourceFactory.getFactory().getAudioClip(A_FX_PATH + "splash.ogg"));
 		water_effects.add(ResourceFactory.getFactory().getAudioClip(A_FX_PATH + "frog.ogg"));
 
-		gameMusic = new AudioStream(Main.RSC_PATH + "bg_music.ogg");
+		gameMusic = new AudioStream(FroggerMain.RSC_PATH + "bg_music.ogg");
 	}
 	
 	public void playGameMusic() {

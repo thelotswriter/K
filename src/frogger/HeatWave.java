@@ -103,7 +103,7 @@ public class HeatWave {
 		// Generate particles from center of the Frogger to all directions around
 		Vector2D v = new Vector2D((r.nextDouble()-0.5)*0.1,(r.nextDouble()-0.5)*0.1);
 		
-		return new Particle(Main.SPRITE_SHEET + "#smoke_cloud", pos,v,1000);
+		return new Particle(FroggerMain.SPRITE_SHEET + "#smoke_cloud", pos,v,1000);
 	}
 	
 	/**

@@ -33,7 +33,7 @@ public class LongLog extends MovingEntity
 	public static int LENGTH = 32*4;
 	
 	public LongLog (Vector2D pos, Vector2D v) {
-		super(Main.SPRITE_SHEET + "#longlog");
+		super(FroggerMain.SPRITE_SHEET + "#longlog");
 		position = pos;
 		Vector2D posSphere1 = position;
 		Vector2D posSphere2 = new Vector2D(position.getX()+32*1, position.getY());

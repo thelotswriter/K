@@ -137,7 +137,7 @@ public class MovingEntityFactory {
 			/* If the road line is clear, that is there are no cars or truck on it
 			 * then send in a high speed cop car
 			 */
-			if (Math.abs(velocity.getX()*copCarDelay) > Main.WORLD_WIDTH) {
+			if (Math.abs(velocity.getX()*copCarDelay) > FroggerMain.WORLD_WIDTH) {
 				copCarDelay = 0;
 				return new CopCar(position, velocity.scale(5));
 			}

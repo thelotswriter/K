@@ -87,7 +87,7 @@ public class PlayPacman implements MiniMain
         System.out.println("Reached the end!");
     }
 
-    private static double[] generateProbabilityVector(int nDimensions, List<InstructionPacket> instructionPackets)
+    public static double[] generateProbabilityVector(int nDimensions, List<InstructionPacket> instructionPackets)
     {
         double[] probVector = new double[nDimensions * 2];
         for(int i = 0; i < probVector.length; i++)
