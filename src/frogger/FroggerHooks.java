@@ -40,7 +40,6 @@ public class FroggerHooks
     }
 
     public AbstractBodyLayer<MovingEntity> getObjects() {
-        System.out.println("howdy");
         return movingObjectsLayer;
     }
 

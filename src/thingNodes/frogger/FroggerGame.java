@@ -16,6 +16,7 @@ public class FroggerGame extends GameNode
     FroggerMain frogger;
     FroggerPlayer player;
     FroggerCars cars;
+    FroggerRiver river;
     FroggerLogs logs;
     FroggerLilyPads lilyPads;
 
@@ -67,6 +68,12 @@ public class FroggerGame extends GameNode
         }
 
         addMovingEntities();
+
+        addElement(cars);
+        addElement(logs);
+        addElement(lilyPads);
+
+        addElement(river);
     }
 
     private Map<String, String> getPlayerAttributes()
