@@ -378,7 +378,7 @@ public class FroggerMain extends StaticScreenGame {
 		switch(GameState) {
 		case GAME_PLAY:
 			froggerKeyboardHandler();
-			froggerHooks.getCars();
+			froggerHooks.getObjects();
 			//froggerVirtualInputHandler(froggerHooks.getMove());
 			wind.update(deltaMs);
 			hwave.update(deltaMs);

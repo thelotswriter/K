@@ -1,7 +1,7 @@
 package thingNodes.frogger;
 
-import frogger.FroggerHooks;
-import frogger.FroggerMain;
+import frogger.*;
+import jig.engine.util.Vector2D;
 import processTree.ProcessNode;
 import processTree.ThingNode;
 import thingNodes.CategoryNodes.GameNode;
@@ -16,7 +16,8 @@ public class FroggerGame extends GameNode
     FroggerMain frogger;
     FroggerPlayer player;
     FroggerCars cars;
-    FroggerShortLog log;
+    FroggerLogs logs;
+    FroggerLilyPads lilyPads;
 
     FroggerHooks hooks;
 
@@ -54,9 +55,18 @@ public class FroggerGame extends GameNode
         player.setAttribute("dimensions", dimensions);
         addElement(player);
 
-        cars = new FroggerCars(this, null, null, null, 1);
+        addMovingEntities();
+    }
 
+    public void update()
+    {
+        Map<String, String> pAttributes = getPlayerAttributes();
+        for(String key : pAttributes.keySet())
+        {
+            player.setAttribute(key, pAttributes.get(key));
+        }
 
+        addMovingEntities();
     }
 
     private Map<String, String> getPlayerAttributes()
@@ -67,8 +77,47 @@ public class FroggerGame extends GameNode
         return attributes;
     }
 
-    private List<FroggerCar> getCars() {
-        return null;
+    private void addMovingEntities()
+    {
+        cars = new FroggerCars(this, null, null, null, 1);
+        logs = new FroggerLogs(this, null, null, null, 1);
+        lilyPads = new FroggerLilyPads(this, null, null, null, 1);
+        for (MovingEntity me : hooks.getObjects()) {
+            String speed = Double.toString(me.getVelocity().getX());
+            String location = Math.round(me.getPosition().getX()) +
+                    "," + Math.round(me.getPosition().getY());
+            ThingNode thingNode = null;
+
+            if (me instanceof CopCar) {
+                thingNode = new FroggerCopCar(cars, null, null, null, 1);
+                cars.addElement(thingNode);
+
+            } else if (me instanceof Car) {
+                thingNode = new FroggerCar(cars, null, null, null, 1);
+                cars.addElement(thingNode);
+
+            } else if (me instanceof Truck) {
+                thingNode = new FroggerTruck(cars, null, null, null, 1);
+                cars.addElement(thingNode);
+
+            } else if (me instanceof ShortLog) {
+                thingNode = new FroggerShortLog(logs, null, null, null, 1);
+                logs.addElement(thingNode);
+
+            } else if (me instanceof LongLog) {
+                thingNode = new FroggerLongLog(logs, null, null, null, 1);
+                logs.addElement(thingNode);
+
+            } else if (me instanceof Goal) {
+                thingNode = new FroggerLilyPad(lilyPads, null, null, null, 1);
+                lilyPads.addElement(thingNode);
+            }
+
+            if (thingNode != null) {
+                thingNode.setAttribute("speed", speed);
+                thingNode.setAttribute("location", location);
+            }
+        }
     }
 
     public FroggerMain getGame() {
