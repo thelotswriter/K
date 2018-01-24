@@ -39,7 +39,7 @@ public class Crocodile extends MovingEntity
 	protected CollisionObject head;
 	
 	public Crocodile (Vector2D pos, Vector2D v) {
-		super(Main.SPRITE_SHEET + "#crocodile");
+		super(FroggerMain.SPRITE_SHEET + "#crocodile");
 		position = pos;
 		Vector2D posSphere1 = position;
 		Vector2D posSphere2 = new Vector2D(position.getX()+32*1, position.getY());

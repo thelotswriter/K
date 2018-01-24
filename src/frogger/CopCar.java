@@ -31,7 +31,7 @@ public class CopCar extends MovingEntity
 {
 	
 	public CopCar (Vector2D pos, Vector2D v) {
-		super(Main.SPRITE_SHEET + "#copcar");
+		super(FroggerMain.SPRITE_SHEET + "#copcar");
 		position = pos;
 		collisionObjects.add(new CollisionObject(position));
 		velocity = v;

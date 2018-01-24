@@ -28,7 +28,7 @@ package frogger;
 import jig.engine.util.Vector2D;
 
 /**
- * Main sprite in the game that a player can control
+ * FroggerMain sprite in the game that a player can control
  * 
  * @author vitaliy
  *
@@ -65,13 +65,13 @@ public class Frogger extends MovingEntity
     
     public boolean hw_hasMoved = false;
     
-    private Main game;
+    private FroggerMain game;
     
     /**
      * Build frogger!
      */
-	public Frogger (Main g) {
-		super(Main.SPRITE_SHEET + "#frog");
+	public Frogger (FroggerMain g) {
+		super(FroggerMain.SPRITE_SHEET + "#frog");
 		game = g;
 		resetFrog();
 		collisionObjects.add(new CollisionObject(position));
@@ -85,12 +85,12 @@ public class Frogger extends MovingEntity
 		isAnimating = false;
 		currentFrame = 0;
 		followObject = null;
-		position = Main.FROGGER_START;
-		game.levelTimer = Main.DEFAULT_LEVEL_TIME;
+		position = FroggerMain.FROGGER_START;
+		game.levelTimer = FroggerMain.DEFAULT_LEVEL_TIME;
 	}
 	
 	/**
-	 * Moving methods, called from Main upon key strokes
+	 * Moving methods, called from FroggerMain upon key strokes
 	 */
 	public void moveLeft() {
 		if (getCenterPosition().getX()-16 > 0 && isAlive && !isAnimating) {
@@ -102,7 +102,7 @@ public class Frogger extends MovingEntity
 	
 	public void moveRight() {
 		
-		if (getCenterPosition().getX()+32 < Main.WORLD_WIDTH && isAlive && !isAnimating) {
+		if (getCenterPosition().getX()+32 < FroggerMain.WORLD_WIDTH && isAlive && !isAnimating) {
 			currentFrame = 2;
 		    move(new Vector2D(1,0));
 		    AudioEfx.frogJump.play(0.2);
@@ -118,7 +118,7 @@ public class Frogger extends MovingEntity
 	}
 	
 	public void moveDown() {
-		if (position.getY() < Main.WORLD_HEIGHT - MOVE_STEP && isAlive && !isAnimating) {
+		if (position.getY() < FroggerMain.WORLD_HEIGHT - MOVE_STEP && isAlive && !isAnimating) {
 			currentFrame = 1;
 		    move(new Vector2D(0,1));
 		    AudioEfx.frogJump.play(0.2);
@@ -271,7 +271,7 @@ public class Frogger extends MovingEntity
 		}
 		
 		timeOfDeath = getTime();
-		game.levelTimer = Main.DEFAULT_LEVEL_TIME;
+		game.levelTimer = FroggerMain.DEFAULT_LEVEL_TIME;
 	}
 	
 	/**

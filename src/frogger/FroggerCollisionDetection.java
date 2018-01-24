@@ -90,9 +90,9 @@ public class FroggerCollisionDetection  {
 	 */
 	public boolean isOutOfBounds() {
 		Vector2D frogPos = frogSphere.getCenterPosition();
-		if (frogPos.getY() < 32 || frogPos.getY() > Main.WORLD_HEIGHT)
+		if (frogPos.getY() < 32 || frogPos.getY() > FroggerMain.WORLD_HEIGHT)
 			return true;
-		if (frogPos.getX() < 0 || frogPos.getX() > Main.WORLD_WIDTH)
+		if (frogPos.getX() < 0 || frogPos.getX() > FroggerMain.WORLD_WIDTH)
 			return true;
 		return false;
 	}

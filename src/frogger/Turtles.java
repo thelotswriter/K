@@ -63,7 +63,7 @@ public class Turtles extends MovingEntity
 	 * @param v
 	 */
 	public Turtles (Vector2D pos, Vector2D v) {
-		super(Main.SPRITE_SHEET + "#turtles");
+		super(FroggerMain.SPRITE_SHEET + "#turtles");
 		init(pos,v);
 	}
 	
@@ -75,7 +75,7 @@ public class Turtles extends MovingEntity
 	 * @param water - 0 submerged; 1 - floating
 	 */
 	public Turtles (Vector2D pos, Vector2D v, int water) {
-		super(Main.SPRITE_SHEET + "#turtles");
+		super(FroggerMain.SPRITE_SHEET + "#turtles");
 		init(pos,v);
 		
 		

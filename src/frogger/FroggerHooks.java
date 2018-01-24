@@ -1,6 +1,7 @@
 package frogger;
 
 import jig.engine.physics.AbstractBodyLayer;
+import jig.engine.util.Vector2D;
 
 public class FroggerHooks
 {
@@ -28,6 +29,19 @@ public class FroggerHooks
         return FroggerAction.UP;
     }
 
+    public String getPlayerLocation() {
+        Vector2D position = frog.getPosition();
+        return Math.round(position.getX()) + "," + Math.round(position.getY());
+    }
+
+    public String getPlayerSpeed() {
+        Vector2D speed = frog.getVelocity();
+        return "0";
+    }
+
+    public AbstractBodyLayer<MovingEntity> getObjects() {
+        return movingObjectsLayer;
+    }
 
 
 }
