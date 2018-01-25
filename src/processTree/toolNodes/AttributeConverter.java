@@ -1,5 +1,7 @@
 package processTree.toolNodes;
 
+import structures.MoveType2D;
+
 public class AttributeConverter
 {
 
@@ -27,6 +29,17 @@ public class AttributeConverter
             intArray[i] = Integer.parseInt(attrString[i]);
         }
         return intArray;
+    }
+
+    public static MoveType2D[] convertToMoveType2DArray(String attribute)
+    {
+        String[] splitString = attribute.split(",");
+        MoveType2D[]  moveArray = new MoveType2D[splitString.length];
+        for(int i = 0; i < splitString.length; i++)
+        {
+            moveArray[i] = MoveType2D.stringToMoveType(splitString[i]);
+        }
+        return moveArray;
     }
 
     /**

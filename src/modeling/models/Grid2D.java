@@ -12,6 +12,7 @@ import java.util.List;
 public abstract class Grid2D extends Model
 {
 
+    private ThingNode world;
     private int[] location;
     private int[] momentum;
     private int[] tileDimensions;
@@ -26,11 +27,7 @@ public abstract class Grid2D extends Model
         time = -0;
         if(thingToModel.hasAttribute("location"))
         {
-            location = AttributeConverter.convertToIntArray(thingToModel.getAttribute("location"));
-            int[] dimensions = AttributeConverter.convertToIntArray(thingToModel.getAttribute("dimensions"));
-            // Set location to the center of the thing being modeled
-            location[0] += dimensions[0] / 2;
-            location[1] += dimensions[1] / 2;
+            location = getCenteredCoordinates(thingToModel);
             if(thingToModel.hasAttribute("momentum"))
             {
                 momentum = AttributeConverter.convertToIntArray(thingToModel.getAttribute("momentum"));
@@ -38,7 +35,7 @@ public abstract class Grid2D extends Model
             {
                 momentum = new int[location.length];
             }
-            ThingNode world = null;
+            world = null;
             if(thingToModel.getParent() != null && !((ThingNode) thingToModel.getParent()).isPlural())
             {
                 world = (ThingNode) thingToModel.getParent();
@@ -241,12 +238,40 @@ public abstract class Grid2D extends Model
     }
 
     /**
+     * Gets the world the thing being modeled exists in
+     * @return The world of the thing being modeled
+     */
+    public ThingNode getWorld()
+    {
+        return world;
+    }
+
+    /**
      * Gets the dimensions of the tiles the world has been divided into
      * @return The dimensions of the tiles the world has been divided into
      */
     public int[] getTileDimensions()
     {
         return tileDimensions;
+    }
+
+    /**
+     * Gets the location of the center of the thing being modeled
+     * @return The location of the center of the thing being modeled
+     */
+    public int[] getModifiedLocation()
+    {
+        return location;
+    }
+
+    public int[] getCenteredCoordinates(ThingNode thing)
+    {
+        int[] gridLocation = AttributeConverter.convertToIntArray(thing.getAttribute("location"));
+        int[] dimensions = AttributeConverter.convertToIntArray(thing.getAttribute("dimensions"));
+        // Set location to the center of the thing being modeled
+        gridLocation[0] += dimensions[0] / 2;
+        gridLocation[1] += dimensions[1] / 2;
+        return gridLocation;
     }
 
 }

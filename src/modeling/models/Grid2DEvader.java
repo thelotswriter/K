@@ -1,9 +1,5 @@
 package modeling.models;
 
-import instructions.Instruction;
-import instructions.InstructionType;
-import modeling.Model;
-import org.w3c.dom.Attr;
 import processTree.ThingNode;
 import processTree.toolNodes.AttributeConverter;
 import structures.AStar2D;
@@ -11,10 +7,10 @@ import structures.MoveType2D;
 
 import java.util.List;
 
-public class Grid2DChaser extends Grid2D
+public class Grid2DEvader extends Grid2D
 {
 
-    public Grid2DChaser(ThingNode thingToModel)
+    public Grid2DEvader(ThingNode thingToModel)
     {
         super(thingToModel);
     }
@@ -52,31 +48,13 @@ public class Grid2DChaser extends Grid2D
                 }
                 int distanceToGo = speed * time;
                 int[] predictedLocation = getModifiedLocation();
-                int moveIterator = 0;
-                int xDist = moveList.get(moveIterator)[0] * getTileDimensions()[0];
-                int yDist = moveList.get(moveIterator)[1] * getTileDimensions()[1];
-                int stepDistance = (int) Math.sqrt(xDist * xDist + yDist * yDist);
-                while(distanceToGo > stepDistance && moveIterator < moveList.size() - 1)
+                while(distanceToGo > 0)
                 {
-                    predictedLocation[0] += xDist;
-                    predictedLocation[1] += yDist;
-                    distanceToGo -= stepDistance;
-                    moveIterator++;
-                    xDist = moveList.get(moveIterator)[0] * getTileDimensions()[0];
-                    yDist = moveList.get(moveIterator)[1] * getTileDimensions()[1];
-                    stepDistance = (int) Math.sqrt(xDist * xDist + yDist * yDist);
-                }
-                if(distanceToGo > 0)
-                {
-                    distanceToGo = Math.min(distanceToGo, stepDistance);
-                    xDist = moveList.get(moveIterator)[0] * distanceToGo;
-                    yDist = moveList.get(moveIterator)[1] * distanceToGo;
-                    predictedLocation[0] += xDist;
-                    predictedLocation[1] += yDist;
+                    //TODO: Figure out where the evader will go
                 }
                 ThingNode modeledThing = new ThingNode(getThingBeingModeled());
                 modeledThing.setAttribute("location", AttributeConverter.convertToAttribute(predictedLocation));
-                modeledThing.setAttribute("momentum", AttributeConverter.convertToAttribute(moveList.get(moveIterator)));
+                // Set momentum
                 return modeledThing;
             }
         }
