@@ -16,13 +16,14 @@ public abstract class Grid2D extends Model
     private int[] momentum;
     private int[] tileDimensions;
     private boolean[][] allowedSpaces;
+    private int time;
 
     private List<ThingNode> platforms;
 
-    //TODO: Fix this! Make sure we're not looking at the thing in consideration when going through elements of the world!
     public Grid2D(ThingNode thingToModel)
     {
         super(thingToModel);
+        time = -0;
         if(thingToModel.hasAttribute("location"))
         {
             location = AttributeConverter.convertToIntArray(thingToModel.getAttribute("location"));
@@ -58,6 +59,12 @@ public abstract class Grid2D extends Model
                     }
                 }
                 platforms = new ArrayList<>();
+                ThingNode removedNode = thingToModel;
+                if(((ThingNode) thingToModel.getParent()).isPlural())
+                {
+                    removedNode = (ThingNode) thingToModel.getParent();
+                }
+                world.removeElement(removedNode);
                 for(ThingNode element : world.getThingElements())
                 {
                     checkSpaces(element);
@@ -66,6 +73,7 @@ public abstract class Grid2D extends Model
                 {
                     coverSpaces(platform);
                 }
+                world.addElement(removedNode);
             }
         }
     }
@@ -162,56 +170,10 @@ public abstract class Grid2D extends Model
     @Override
     public int determineBestTime(List<Instruction> actions)
     {
-//        if(getThingBeingModeled().hasAttribute("location") && getThingBeingModeled().getParent() != null
-//                && ((ThingNode) getThingBeingModeled().getParent()).hasAttribute("grid"))
-//        {
-//            for(Instruction action : actions)
-//            {
-//                if(action.getType() == InstructionType.MOVE)
-//                {
-//                    String[] strAttrG = ((ThingNode) getThingBeingModeled().getParent()).getAttribute("grid").split(",");
-//                    String[] strAttrL = ((ThingNode) getThingBeingModeled().getParent()).getAttribute("location").split(",");
-//                    List<String> strAttrM = action.getParameters();
-//                    int[] tileDims = new int[strAttrG.length];
-//                    int[] location = new int[strAttrL.length];
-//                    double[] move = new double[strAttrM.size()];
-//                    for(int i = 0; i < strAttrG.length; i++)
-//                    {
-//                        tileDims[i] = Integer.parseInt(strAttrG[i]);
-//                        location[i] = Integer.parseInt(strAttrL[i]);
-//                        move[i] = Double.parseDouble(strAttrM.get(i));
-//                    }
-//                    if(location[0] % tileDims[0] != 0)
-//                    {
-//                        if(move[0] > 0)
-//                        {
-//                            return ((location[0] / tileDims[0]) + 1) * tileDims[0] - (location[0] / tileDims[0]) * tileDims[0];
-//                        } else
-//                        {
-//                            return (location[0] / tileDims[0]) * tileDims[0];
-//                        }
-//                    } else if(location[1] % tileDims[1] != 0)
-//                    {
-//                        if(move[1] > 0)
-//                        {
-//                            return ((location[1] / tileDims[1]) + 1) * tileDims[1] - (location[1] / tileDims[1]) * tileDims[1];
-//                        } else
-//                        {
-//                            return (location[1] / tileDims[1]) * tileDims[1];
-//                        }
-//                    } else
-//                    {
-//                        if(Math.abs(move[0]) > Math.abs(move[1]))
-//                        {
-//                            return tileDims[0];
-//                        } else
-//                        {
-//                            return tileDims[1];
-//                        }
-//                    }
-//                }
-//            }
-//        }
+        if(time > 0)
+        {
+            return time;
+        }
         if(getThingBeingModeled().hasAttribute("speed"))
         {
             return AttributeConverter.convertToInt(getThingBeingModeled().getAttribute("speed"));
@@ -222,12 +184,6 @@ public abstract class Grid2D extends Model
     @Override
     public ThingNode generateFutureState(int time, List<Instruction> actions)
     {
-        int distance = time;
-        if(getThingBeingModeled().hasAttribute("speed"))
-        {
-            int speed = AttributeConverter.convertToInt(getThingBeingModeled().getAttribute("speed"));
-            distance = Math.max(1, distance / speed);
-        }
         for(Instruction action : actions)
         {
             if(action.getType() == InstructionType.MOVE)
@@ -237,20 +193,32 @@ public abstract class Grid2D extends Model
                     List<String> moveParams = action.getParameters();
                     if(Integer.parseInt(moveParams.get(0)) == 0 && Integer.parseInt(moveParams.get(1)) == 0)
                     {
+                        time = (tileDimensions[0] + tileDimensions[1]) / 2;
                         ThingNode futureThing = new ThingNode(getThingBeingModeled());
                         int[] futureLocation = AttributeConverter.convertToIntArray(futureThing.getAttribute("location"));
                         futureLocation[0] += momentum[0];
                         futureLocation[1] += momentum[1];
                         futureThing.setAttribute("location", AttributeConverter.convertToAttribute(futureLocation));
                         return futureThing;
-                    }
-                    else
+                    } else
                     {
+                        int moveX = Integer.parseInt(moveParams.get(0));
+                        int moveY = Integer.parseInt(moveParams.get(1));
+                        int distance = (int) Math.sqrt(moveX * moveX + moveY * moveY);
+                        int speed = 1;
+                        if(getThingBeingModeled().hasAttribute("speed"))
+                        {
+                            speed = AttributeConverter.convertToInt(getThingBeingModeled().getAttribute("speed"));
+                        }
+                        time = distance / speed;
                         ThingNode futureThing = new ThingNode(getThingBeingModeled());
                         int[] futureLocation = AttributeConverter.convertToIntArray(futureThing.getAttribute("location"));
                         futureLocation[0] += Integer.parseInt(moveParams.get(0)) * distance;
                         futureLocation[1] += Integer.parseInt(moveParams.get(1)) * distance;
-                        futureThing.setAttribute("location", AttributeConverter.convertToAttribute(futureLocation));
+                        if(allowedSpaces[futureLocation[0] / tileDimensions[0]][futureLocation[1] / tileDimensions[1]])
+                        {
+                            futureThing.setAttribute("location", AttributeConverter.convertToAttribute(futureLocation));
+                        }
                         futureThing.setAttribute("momentum","0,0");
                         return futureThing;
                     }
@@ -262,5 +230,23 @@ public abstract class Grid2D extends Model
 
     @Override
     public abstract ThingNode generateFutureState(int time);
+
+    /**
+     * Gets a 2D map representing where the thing being modeled can and cannot go
+     * @return A 2D map representing where the thing being modeled can and cannot go
+     */
+    public boolean[][] getAllowedSpaces()
+    {
+        return allowedSpaces;
+    }
+
+    /**
+     * Gets the dimensions of the tiles the world has been divided into
+     * @return The dimensions of the tiles the world has been divided into
+     */
+    public int[] getTileDimensions()
+    {
+        return tileDimensions;
+    }
 
 }
