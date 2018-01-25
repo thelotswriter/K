@@ -94,6 +94,7 @@ public class FroggerMain extends StaticScreenGame {
 	private boolean listenInput = true;
 
 	private FroggerHooks froggerHooks;
+	private FroggerAction pendingAction;
 	
     /**
 	 * Initialize game objects
@@ -130,6 +131,7 @@ public class FroggerMain extends StaticScreenGame {
 		
 		initializeLevel(1);
 		froggerHooks = new FroggerHooks(frog, frogCol, movingObjectsLayer, goalmanager, WORLD_WIDTH, WORLD_HEIGHT);
+		pendingAction = FroggerAction.STAY;
 	}
 	
 	
@@ -318,6 +320,10 @@ public class FroggerMain extends StaticScreenGame {
         }
     }
 
+    public void setPendingAction(FroggerAction action) {
+
+    }
+
     public int getGameState() {
 	    return GameState;
     }
@@ -380,6 +386,9 @@ public class FroggerMain extends StaticScreenGame {
 			froggerKeyboardHandler();
 			//froggerHooks.getObjects();
 			//froggerVirtualInputHandler(froggerHooks.getMove());
+            if (pendingAction != FroggerAction.STAY) {
+                froggerVirtualInputHandler(pendingAction);
+            }
 			wind.update(deltaMs);
 			hwave.update(deltaMs);
 			frog.update(deltaMs);

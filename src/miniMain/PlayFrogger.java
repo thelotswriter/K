@@ -43,21 +43,21 @@ public class PlayFrogger implements MiniMain
                 double rand = Math.random();
                 if(rand < probabilityVector[0])
                 {
-                    froggerMain.froggerVirtualInputHandler(FroggerAction.RIGHT);
+                    froggerMain.setPendingAction(FroggerAction.RIGHT);
                     System.out.println("Right");
                 } else if(rand < probabilityVector[0] + probabilityVector[1])
                 {
-                    froggerMain.froggerVirtualInputHandler(FroggerAction.LEFT);
+                    froggerMain.setPendingAction(FroggerAction.LEFT);
 //                    robot.keyPress(KeyEvent.VK_LEFT);
                     System.out.println("Left");
                 } else if(rand < probabilityVector[0] + probabilityVector[1] + probabilityVector[2])
                 {
-                    froggerMain.froggerVirtualInputHandler(FroggerAction.DOWN);
+                    froggerMain.setPendingAction(FroggerAction.DOWN);
 //                    robot.keyPress(KeyEvent.VK_DOWN);
                     System.out.println("Down");
                 } else
                 {
-                    froggerMain.froggerVirtualInputHandler(FroggerAction.UP);
+                    froggerMain.setPendingAction(FroggerAction.UP);
 //                    robot.keyPress(KeyEvent.VK_UP);
                     System.out.println("Up");
                 }
