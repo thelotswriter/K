@@ -21,14 +21,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import com.sun.prism.GraphicsPipeline;
 import miniMain.ColorCoordinate;
 import miniMain.MiniMain;
 
 @SuppressWarnings("serial")
 public class Board extends JPanel implements ActionListener {
 
-    private final int MODE = 1;
+    private final int MODE = 2;
 
     private Dimension d;
     private final Font smallFont = new Font("Helvetica", Font.BOLD, 14);
@@ -68,6 +67,7 @@ public class Board extends JPanel implements ActionListener {
     private int req_dx, req_dy, view_dx, view_dy;
 
     private short levelData[];
+    private short freeboard[];
 
     private final int validSpeeds[] = {1, 2, 3, 4, 6, 8};
     private final int maxSpeed = 3;
@@ -90,7 +90,8 @@ public class Board extends JPanel implements ActionListener {
             {true,  false, false, false, false, false, false, false, false, false, false, false, false, true,  false},
             {true,  false, false, false, false, false, false, false, false, false, false, false, false, true,  false},
             {true,  false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-            {true,  true,  true,  true,  true,  true,  true,  true,  true,  true, false, false, false, false, false}};
+            {true,  true,  true,  true,  true,  true,  true,  true,  true,  true, false, false, false, false, false}
+    };
     private int[] wallX;
     private int[] wallY;
     private Timer timer;
@@ -127,8 +128,7 @@ public class Board extends JPanel implements ActionListener {
         setDoubleBuffered(true);        
     }
 
-    private void initVariables() 
-    {
+    private void initVariables() {
 
         screenData = new short[N_BLOCKS * N_BLOCKS];
         mazeColor = new Color(5, 100, 5);
@@ -144,14 +144,15 @@ public class Board extends JPanel implements ActionListener {
         pellets = new ArrayList<>();
 
         levelData = new short[wallMap.length * wallMap[0].length];
+        freeboard = new short[wallMap.length * wallMap[0].length];
 
         List<Point> wallLocations = new ArrayList<>();
         for(int i = 0; i < wallMap.length; i++)
         {
             for(int j = 0; j < wallMap[i].length; j++)
             {
-                if(wallMap[i][j])
-                {
+
+                if(wallMap[i][j]) {
                     levelData[i * wallMap[0].length + j] = 0;
                     wallLocations.add(new Point(j,i));
                     if(j == 0)
@@ -170,8 +171,7 @@ public class Board extends JPanel implements ActionListener {
                     {
                         levelData[i * wallMap[0].length + j] += 8;
                     }
-                } else
-                {
+                } else {
                     levelData[i * wallMap[0].length + j] = 16;
                     if(j == 0 || wallMap[i][j - 1])
                     {
@@ -189,6 +189,23 @@ public class Board extends JPanel implements ActionListener {
                     {
                         levelData[i * wallMap[0].length + j] += 8;
                     }
+                }
+                freeboard[i * wallMap[0].length + j] = 16;
+                if(j == 0)
+                {
+                    freeboard[i * wallMap[0].length + j] += 1;
+                }
+                if(i == 0)
+                {
+                    freeboard[i * wallMap[0].length + j] += 2;
+                }
+                if(j == wallMap[i].length - 1)
+                {
+                    freeboard[i * wallMap[0].length + j] += 4;
+                }
+                if(i == wallMap.length - 1)
+                {
+                    freeboard[i * wallMap[0].length + j] += 8;
                 }
             }
         }
@@ -337,24 +354,22 @@ public class Board extends JPanel implements ActionListener {
         }
     }
 
-    private void moveGhost(short ghostNumber)
-    {
+    private void moveGhost(short ghostNumber) {
         switch(MODE)
         {
             case 0:
-            {
                 moveGhostRandom(ghostNumber);
                 break;
-            }case 1:
-            {
+            case 1:
                 moveGhostAStar(ghostNumber);
                 break;
-            }
+            case 2:
+                moveGhostNewRandom(ghostNumber);
+                break;
         }
     }
 
-    private void moveGhostRandom(int i)
-    {
+    private void moveGhostRandom(int i) {
         int pos;
         int count;
 
@@ -409,8 +424,7 @@ public class Board extends JPanel implements ActionListener {
         }
     }
 
-    private void moveGhostAStar(int ghostNumber)
-    {
+    private void moveGhostAStar(int ghostNumber) {
         LocationNode[][] nodeMatrix = new LocationNode[wallMap[0].length][wallMap.length];
         for(int i = 0; i < nodeMatrix.length; i++)
         {
@@ -525,6 +539,61 @@ public class Board extends JPanel implements ActionListener {
         {
             ghost_dx[ghostNumber] = 0;
             ghost_dy[ghostNumber] = 0;
+        }
+    }
+
+    private void moveGhostNewRandom(int i) { //todo: make not random
+        int pos;
+        int count;
+
+        pos = ghost_x[i] / BLOCK_SIZE + N_BLOCKS * (int) (ghost_y[i] / BLOCK_SIZE);
+
+        count = 0;
+
+        if ((freeboard[pos] & 1) == 0 && ghost_dx[i] != 1) {
+            dx[count] = -1;
+            dy[count] = 0;
+            count++;
+        }
+
+        if ((freeboard[pos] & 2) == 0 && ghost_dy[i] != 1) {
+            dx[count] = 0;
+            dy[count] = -1;
+            count++;
+        }
+
+        if ((freeboard[pos] & 4) == 0 && ghost_dx[i] != -1) {
+            dx[count] = 1;
+            dy[count] = 0;
+            count++;
+        }
+
+        if ((freeboard[pos] & 8) == 0 && ghost_dy[i] != -1) {
+            dx[count] = 0;
+            dy[count] = 1;
+            count++;
+        }
+
+        if (count == 0) {
+
+            if ((freeboard[pos] & 15) == 15) {
+                ghost_dx[i] = 0;
+                ghost_dy[i] = 0;
+            } else {
+                ghost_dx[i] = -ghost_dx[i];
+                ghost_dy[i] = -ghost_dy[i];
+            }
+
+        } else {
+
+            count = (int) (Math.random() * count);
+
+            if (count > 3) {
+                count = 3;
+            }
+
+            ghost_dx[i] = dx[count];
+            ghost_dy[i] = dy[count];
         }
     }
 
@@ -833,8 +902,7 @@ public class Board extends JPanel implements ActionListener {
         g2d.dispose();
     }
 
-    public void directionGiven(int key)
-    {
+    public void directionGiven(int key) {
         if (inGame) {
             if (key == KeyEvent.VK_LEFT) {
                 req_dx = -1;
@@ -922,8 +990,7 @@ public class Board extends JPanel implements ActionListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e)
-    {
+    public void actionPerformed(ActionEvent e) {
         if(inGame && miniMain != null)
         {
             miniMain.running();
@@ -950,14 +1017,12 @@ public class Board extends JPanel implements ActionListener {
     	return inGame;
     }
 
-    public void drawTiles(List<ColorCoordinate> coloredTiles)
-    {
+    public void drawTiles(List<ColorCoordinate> coloredTiles) {
         tilesToDraw = coloredTiles;
         drawTiles = true;
     }
 
-    public void drawTile(int xCoord, int yCoord, Color color)
-    {
+    public void drawTile(int xCoord, int yCoord, Color color) {
         int x = xCoord * BLOCK_SIZE;
         int y = yCoord * BLOCK_SIZE;
 //        graph2d.setColor(Color.white);
@@ -976,8 +1041,7 @@ public class Board extends JPanel implements ActionListener {
     	return pacman_y;
     }
     
-    public int[] getGhostXs()
-    {
+    public int[] getGhostXs() {
         int[] ghostXs = new int[N_GHOSTS];
         for(int i = 0; i < N_GHOSTS; i++)
         {
@@ -991,8 +1055,7 @@ public class Board extends JPanel implements ActionListener {
     	return ghost_x[index];
     }
     
-    public int[] getGhostYs()
-    {
+    public int[] getGhostYs() {
         int[] ghostYs = new int[N_GHOSTS];
         for(int i = 0; i < N_GHOSTS; i++)
         {
@@ -1041,34 +1104,29 @@ public class Board extends JPanel implements ActionListener {
         return PACMAN_SPEED;
     }
 
-    public int[] getPacmanDirection()
-    {
+    public int[] getPacmanDirection() {
         int[] direction = new int[2];
         direction[0] = pacmand_x;
         direction[1] = pacmand_y;
         return direction;
     }
 
-    public int[] getGhostSpeeds()
-    {
+    public int[] getGhostSpeeds() {
         int[] speeds = new int[N_GHOSTS];
-        for(int i = 0; i < N_GHOSTS; i++)
-        {
+        for(int i = 0; i < N_GHOSTS; i++) {
             speeds[i] = ghostSpeed[i];
         }
         return speeds;
     }
 
-    private int calculateManhattanDistance(int x1, int y1, int x2, int y2)
-    {
+    private int calculateManhattanDistance(int x1, int y1, int x2, int y2) {
         int dist = 0;
         dist += Math.abs(x1 - x2);
         dist += Math.abs(y1 - y2);
         return dist;
     }
 
-    private class LocationNode implements Comparable
-    {
+    private class LocationNode implements Comparable {
 
         private LocationNode parent;
         public int x;
@@ -1076,16 +1134,14 @@ public class Board extends JPanel implements ActionListener {
         public int weight;
         public int dist;
 
-        public LocationNode(int x, int y)
-        {
+        public LocationNode(int x, int y) {
             this.x = x;
             this.y = y;
             this.weight = Integer.MAX_VALUE;
             this.dist = 0;
         }
 
-        public void setParent(LocationNode parent)
-        {
+        public void setParent(LocationNode parent) {
             this.parent = parent;
             this.dist = parent.dist + 1;
         }

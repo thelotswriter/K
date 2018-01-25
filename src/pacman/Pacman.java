@@ -146,8 +146,7 @@ public class Pacman extends JFrame
         return board.getGhostSpeeds();
     }
 
-    public void drawTile(List<ColorCoordinate> coloredTiles)
-    {
+    public void drawTile(List<ColorCoordinate> coloredTiles) {
         board.drawTiles(coloredTiles);
 //        board.drawTile(xCoord, yCoord);
         Timer tileTimer = new Timer(0,board);
@@ -155,8 +154,7 @@ public class Pacman extends JFrame
         tileTimer.start();
     }
 
-    public void drawRunningTiles(List<ColorCoordinate> coloredTiles)
-    {
+    public void drawRunningTiles(List<ColorCoordinate> coloredTiles) {
         board.drawTiles(coloredTiles);
 //        board.drawTile(xCoord, yCoord);
 //        Timer tileTimer = new Timer(0,board);
