@@ -48,11 +48,18 @@ public abstract class Grid2D extends Model
                 tileDimensions = AttributeConverter.convertToIntArray(world.getAttribute("grid"));
                 int[] worldDims = AttributeConverter.convertToIntArray(world.getAttribute("dimensions"));
                 allowedSpaces = new boolean[worldDims[0] / tileDimensions[0]][worldDims[1] / tileDimensions[1]];
-                for(boolean[] bolArr : allowedSpaces)
+//                for(boolean[] bolArr : allowedSpaces)
+//                {
+//                    for(boolean b : bolArr)
+//                    {
+//                        b = true;
+//                    }
+//                }
+                for(int i = 0; i < allowedSpaces.length; i++)
                 {
-                    for(boolean b : bolArr)
+                    for(int j = 0; j < allowedSpaces[i].length; j++)
                     {
-                        b = true;
+                        allowedSpaces[i][j] = true;
                     }
                 }
                 platforms = new ArrayList<>();
@@ -97,25 +104,27 @@ public abstract class Grid2D extends Model
                 int yStart = thingLocation[1] / tileDimensions[1];
                 int xEnd = thingLocation[0] + thingDimensions[0];
                 int yEnd = thingLocation[1] + thingDimensions[1];
-                if(xEnd % tileDimensions[0] == 0)
+//                if(xEnd % tileDimensions[0] == 0)
+//                {
+//                    xEnd = xEnd / tileDimensions[0];
+//                    xEnd++;
+//                } else
+//                {
+//                    xEnd = xEnd / tileDimensions[0];
+//                }
+                xEnd = xEnd / tileDimensions[0];
+//                if(yEnd % tileDimensions[1] == 0)
+//                {
+//                    yEnd = yEnd / tileDimensions[1];
+//                    yEnd++;
+//                } else
+//                {
+//                    yEnd = yEnd / tileDimensions[1];
+//                }
+                yEnd = yEnd / tileDimensions[1];
+                for(int x = xStart; x < xEnd; x++)
                 {
-                    xEnd = xEnd / tileDimensions[0];
-                    xEnd++;
-                } else
-                {
-                    xEnd = xEnd / tileDimensions[0];
-                }
-                if(yEnd % tileDimensions[1] == 0)
-                {
-                    yEnd = yEnd / tileDimensions[1];
-                    yEnd++;
-                } else
-                {
-                    yEnd = yEnd / tileDimensions[1];
-                }
-                for(int x = xStart; x <= xEnd; x++)
-                {
-                    for(int y = yStart; y <= yEnd; y++)
+                    for(int y = yStart; y < yEnd; y++)
                     {
                         allowedSpaces[x][y] = false;
                     }
@@ -199,8 +208,8 @@ public abstract class Grid2D extends Model
                         return futureThing;
                     } else
                     {
-                        int moveX = Integer.parseInt(moveParams.get(0));
-                        int moveY = Integer.parseInt(moveParams.get(1));
+                        int moveX = Integer.parseInt(moveParams.get(0)) * tileDimensions[0];
+                        int moveY = Integer.parseInt(moveParams.get(1)) * tileDimensions[1];
                         int distance = (int) Math.sqrt(moveX * moveX + moveY * moveY);
                         int speed = 1;
                         if(getThingBeingModeled().hasAttribute("speed"))
@@ -212,6 +221,14 @@ public abstract class Grid2D extends Model
                         int[] futureLocation = AttributeConverter.convertToIntArray(futureThing.getAttribute("location"));
                         futureLocation[0] += Integer.parseInt(moveParams.get(0)) * distance;
                         futureLocation[1] += Integer.parseInt(moveParams.get(1)) * distance;
+                        futureLocation[0] = Math.max(0, futureLocation[0]);
+
+                        int worldWidth = AttributeConverter.convertToIntArray(world.getAttribute("dimensions"))[0];
+                        int worldHeight = AttributeConverter.convertToIntArray(world.getAttribute("dimensions"))[1];
+
+                        futureLocation[0] = Math.min(worldWidth - 1, futureLocation[0]);
+                        futureLocation[1] = Math.max(0, futureLocation[1]);
+                        futureLocation[1] = Math.min(worldHeight - 1, futureLocation[1]);
                         if(allowedSpaces[futureLocation[0] / tileDimensions[0]][futureLocation[1] / tileDimensions[1]])
                         {
                             futureThing.setAttribute("location", AttributeConverter.convertToAttribute(futureLocation));

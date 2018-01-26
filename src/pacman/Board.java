@@ -27,7 +27,7 @@ import miniMain.MiniMain;
 @SuppressWarnings("serial")
 public class Board extends JPanel implements ActionListener {
 
-    private final int MODE = 2;
+    private final int MODE = 1;
 
     private Dimension d;
     private final Font smallFont = new Font("Helvetica", Font.BOLD, 14);
@@ -92,6 +92,25 @@ public class Board extends JPanel implements ActionListener {
             {true,  false, false, false, false, false, false, false, false, false, false, false, false, false, false},
             {true,  true,  true,  true,  true,  true,  true,  true,  true,  true, false, false, false, false, false}
     };
+
+//    private final boolean[][] wallMap = {
+//            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+//            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+//            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+//            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+//            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+//            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+//            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+//            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+//            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+//            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+//            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+//            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+//            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+//            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+//            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}
+//    };
+
     private int[] wallX;
     private int[] wallY;
     private Timer timer;

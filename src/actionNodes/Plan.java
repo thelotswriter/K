@@ -7,10 +7,12 @@ import kaiExceptions.NotAnActionNodeException;
 import kaiExceptions.UnknownActionException;
 import kaiExceptions.UnreadableActionNodeException;
 import knowledgeAccess.ActionElement;
+import modeling.TempModelAggregator;
 import processTree.*;
 import processTree.subActionNodes.PlannableActionNode;
-import processTree.toolNodes.Model;
-import processTree.toolNodes.ModelPicker;
+//import processTree.toolNodes.Model;
+//import processTree.toolNodes.ModelPicker;
+import processTree.toolNodes.ActionEnumerator;
 import words.Adverb;
 
 import java.io.IOException;
@@ -25,8 +27,8 @@ public class Plan extends ActionNode
 
     private Constructor parentConstructor;
     private Constructor pluralConstructor;
-    private List<Model> models;
-    private List<Instruction> possibleActions;
+//    private List<Model> models;
+    private List<List<Instruction>> possibleActions;
 
     private String subjectName;
     private String directObjectName;
@@ -56,21 +58,22 @@ public class Plan extends ActionNode
     @Override
     public void initialize() throws NotAnActionNodeException, UnknownActionException, UnreadableActionNodeException, IOException
     {
-        models = new ArrayList<>();
-        if(getDirectObject().isPlural())
-        {
-            for(ProcessNode pSingleInstance : getDirectObject().getElements())
-            {
-                ThingNode singleInstance = (ThingNode) pSingleInstance;
-                models.add(ModelPicker.getInstance().getModel((ThingNode) getSubject().getParent(), getSubject(),
-                        singleInstance, getIndirectObject()));
-            }
-        } else
-        {
-            models.add(ModelPicker.getInstance().getModel((ThingNode) getSubject().getParent(), getSubject(),
-                    getDirectObject(), getIndirectObject()));
-        }
-        possibleActions = models.get(0).getPossibleActions();
+//        models = new ArrayList<>();
+//        if(getDirectObject().isPlural())
+//        {
+//            for(ProcessNode pSingleInstance : getDirectObject().getElements())
+//            {
+//                ThingNode singleInstance = (ThingNode) pSingleInstance;
+//                models.add(ModelPicker.getInstance().getModel((ThingNode) getSubject().getParent(), getSubject(),
+//                        singleInstance, getIndirectObject()));
+//            }
+//        } else
+//        {
+//            models.add(ModelPicker.getInstance().getModel((ThingNode) getSubject().getParent(), getSubject(),
+//                    getDirectObject(), getIndirectObject()));
+//        }
+//        possibleActions = models.get(0).getPossibleActions();
+        possibleActions = ActionEnumerator.getInstance().enumeratePossibleActions(getSubject());
         try
         {
             parentConstructor = getParent().getClass().getDeclaredConstructor(CommandNode.class, ActionNode.class,
@@ -96,27 +99,35 @@ public class Plan extends ActionNode
             currentAction.makePlanningNode();
             currentAction.initialize();
             currentAction.run();
-            PlanningNode root = new PlanningNode(null, currentAction, new Instruction(InstructionType.START, null));
+            List<Instruction> startList = new ArrayList<>();
+            startList.add(new Instruction(InstructionType.START, null));
+            PlanningNode root = new PlanningNode(null, currentAction, startList);
 
             int maxDepth = 2;
             Stack<PlanningNode> nodesToExplore = new Stack<>();
             PriorityQueue<PlanningNode> leaves = new PriorityQueue<>();
             nodesToExplore.push(root);
-            System.out.println("----------------Start planning--------------------");
+//            System.out.println("----------------Start planning--------------------");
             while(!nodesToExplore.empty())
             {
                 PlanningNode exploringNode = nodesToExplore.pop();
                 PlannableActionNode exploringNodesAction = exploringNode.getActionNode();
-                Model predictiveModel = ModelPicker.getInstance().getModel((ThingNode) exploringNodesAction.getSubject().getParent(),
-                        exploringNodesAction.getSubject(), exploringNodesAction.getDirectObject(), exploringNodesAction.getIndirectObject());
-                for(Instruction possibleAction : possibleActions)
+//                Model predictiveModel = ModelPicker.getInstance().getModel((ThingNode) exploringNodesAction.getSubject().getParent(),
+//                        exploringNodesAction.getSubject(), exploringNodesAction.getDirectObject(), exploringNodesAction.getIndirectObject());
+                ThingNode world = (ThingNode) exploringNodesAction.getSubject().getParent();
+                while(world != null && !world.hasCategory("world"))
                 {
-                    List<ThingNode> futureWorlds = predictiveModel.getFutureWorldStates(possibleAction);
+                    world = (ThingNode) world.getParent();
+                }
+                TempModelAggregator aggregator = new TempModelAggregator((ThingNode) exploringNodesAction.getSubject(),
+                        world);
+                for(List<Instruction> possibleAction : possibleActions)
+                {
+                    List<ThingNode> futureWorlds = aggregator.generateFutureWorlds(possibleAction); //predictiveModel.getFutureWorldStates(possibleAction);
                     PlannableActionNode highestUrgencyNode = null;
 //                    System.out.println("In the loop");
                     for(ThingNode futureWorld : futureWorlds)
                     {
-//                        System.out.println("Check");
                         PlannableActionNode nextAction = (PlannableActionNode) parentConstructor.newInstance(getRoot(),
                                 exploringNodesAction, futureWorld.getThing(subjectName), futureWorld.getThing(directObjectName),
                                 futureWorld.getThing(indirectObjectName), getAdverbs(), null, getParent().getConfidence(),
@@ -130,7 +141,6 @@ public class Plan extends ActionNode
                             highestUrgencyNode = nextAction;
                         } else if(highestUrgencyNode.getUrgency() < nextAction.getUrgency())
                         {
-//                            System.out.println("Boop");
                             highestUrgencyNode = nextAction;
                         }
                         if(highestUrgencyNode.getUrgency() >= highestUrgencyNode.getMaxUrgency())
@@ -170,82 +180,12 @@ public class Plan extends ActionNode
                         nodeToReach = parent;
                     }
                 }
-                instructions.add(new InstructionPacket(nodeToReach.getActionToState(), getParent()));
+                for(Instruction singleAction : nodeToReach.getActionToState())
+                {
+                    instructions.add(new InstructionPacket(singleAction, getParent()));
+                }
             }
-            System.out.println("-----------------End planning---------------------");
-
-//            List<PlanningNode> leafNodes = new ArrayList<>();
-//            leafNodes.add(root);
-//            int nodeCounter = 0;
-//            while(nodeCounter < MAX_MODELS)
-//            {
-//                List<PlanningNode> newLeaves = new ArrayList<>();
-//                for(PlanningNode oldLeaf : leafNodes)
-//                {
-//                    PlannableActionNode leafsAction = oldLeaf.getActionNode();
-//                    Model predictiveModel = ModelPicker.getInstance().getModel((ThingNode) leafsAction.getSubject().getParent(),
-//                            leafsAction.getSubject(), leafsAction.getDirectObject(), leafsAction.getIndirectObject());
-//                    for(Instruction possibleAction : possibleActions)
-//                    {
-//                        List<ThingNode> futureWorlds = predictiveModel.getFutureWorldStates(possibleAction);
-//                        for(ThingNode futureWorld : futureWorlds)
-//                        {
-//                            PlannableActionNode nextAction = (PlannableActionNode) parentConstructor.newInstance(getRoot(),
-//                                    leafsAction, futureWorld.getThing(subjectName), futureWorld.getThing(directObjectName),
-//                                    futureWorld.getThing(indirectObjectName), getAdverbs(), null, getParent().getConfidence(),
-//                                    getParent().getPriority(), getParent().getUrgency());
-////                            nextAction.makePlanningNode();
-//                            nextAction.makePlanningNode();
-//                            nextAction.initialize();
-////                            System.out.println("Initialized");
-//                            nextAction.run();
-//                            if(nextAction.getUrgency() <= nextAction.getMaxUrgency())
-//                            {
-//                                newLeaves.add(new PlanningNode(oldLeaf, nextAction, possibleAction));
-//                            }
-//                        }
-//                    }
-//                }
-////                System.out.println("Out of the for loop!");
-//                if(newLeaves.isEmpty())
-//                {
-//                    break;
-//                } else
-//                {
-//                    leafNodes.clear();
-//                    leafNodes.addAll(newLeaves);
-//                    nodeCounter += newLeaves.size();
-////                    System.out.println("Current count: " + nodeCounter);
-//                }
-//            }
-//            double lowestUrgency = Double.MAX_VALUE;
-//            PlanningNode bestNode = null;
-//            for(PlanningNode leafNode : leafNodes)
-//            {
-//                double urg = leafNode.getActionNode().getUrgency();
-//                if(urg < lowestUrgency)
-//                {
-//                    lowestUrgency = urg;
-//                    bestNode = leafNode;
-//                }
-//            }
-//            if(bestNode != null)
-//            {
-//                PlanningNode bestParent = bestNode.getParent();
-//                if(bestParent != null)
-//                {
-//                    while(bestParent != root)
-//                    {
-//                        bestNode = bestParent;
-//                        bestParent = bestNode.getParent();
-//                    }
-//                    getParent().setUrgencey(bestNode.getActionNode().getUrgency());
-//                    instructions.add(new InstructionPacket(bestNode.getActionToState(), getParent()));
-//                } else
-//                {
-//                    System.out.println("Best was root?");
-//                }
-//            }
+//            System.out.println("-----------------End planning---------------------");
         } catch (InstantiationException e) {
         } catch (IllegalAccessException e) {
         } catch (InvocationTargetException e) {
@@ -282,10 +222,10 @@ public class Plan extends ActionNode
         private PlanningNode parent;
         private List<PlanningNode> children;
         private PlannableActionNode plannableActionNode;
-        private Instruction actionToState;
+        private List<Instruction> actionToState;
         private int depth;
 
-        public PlanningNode(PlanningNode parent, PlannableActionNode actionNode, Instruction actionToState)
+        public PlanningNode(PlanningNode parent, PlannableActionNode actionNode, List<Instruction> actionToState)
         {
             this.parent = parent;
             this.children = new ArrayList<>();
@@ -320,7 +260,7 @@ public class Plan extends ActionNode
             return children;
         }
 
-        public Instruction getActionToState()
+        public List<Instruction> getActionToState()
         {
             return actionToState;
         }

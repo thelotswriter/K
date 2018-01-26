@@ -21,6 +21,7 @@ public class PacmanPlayer extends ThingNode
 		super(parent, elements, categories, attributes, confidence);
 		setName("Player");
 		setAttribute("move", "both,both");
+		setAttribute("behavior","intelligent");
 //		StringBuilder locationBuilder = new StringBuilder();
 //		locationBuilder.append(locationX);
 //		locationBuilder.append(',');

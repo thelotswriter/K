@@ -34,42 +34,66 @@ public class PlayPacman implements MiniMain
             playNode.initialize();
             Instruction instruction = new Instruction(InstructionType.START, null);
 //            Robot robot = new Robot();
-            int count = 0;
             Pacman pMan = game.getGame();
             while(instruction.getType() != InstructionType.FINISH)
             {
-                count++;
-                if(count == 50)
-                {
-                    System.out.println("Time to debug!");
-                }
                 game.update();
                 List<InstructionPacket> instructionPackets = playNode.run();
-                double[] probabilityVector = generateProbabilityVector(game.getAttribute("dimensions").split(",").length,
-                        instructionPackets);
-                double rand = Math.random();
-//                System.out.println("Just ran");
-                if(rand < probabilityVector[0])
+                int[] direction = new int[2];
+                direction[0] = Integer.parseInt(instructionPackets.get(0).getInstruction().getParameters().get(0));
+                direction[1] = Integer.parseInt(instructionPackets.get(0).getInstruction().getParameters().get(1));
+                StringBuilder bob = new StringBuilder();
+                bob.append(direction[0]);
+                bob.append(",");
+                bob.append(direction[1]);
+                System.out.println(bob.toString());
+                if(Math.abs(direction[0]) > Math.abs(direction[1]))
                 {
-                    pMan.directionGiven(KeyEvent.VK_RIGHT);
-//                    robot.keyPress(KeyEvent.VK_RIGHT);
-                    System.out.println("Right");
-                } else if(rand < probabilityVector[0] + probabilityVector[1])
+                    if(direction[0] > 0)
+                    {
+                        pMan.directionGiven(KeyEvent.VK_RIGHT);
+                    } else
+                    {
+                        pMan.directionGiven(KeyEvent.VK_LEFT);
+                    }
+                } else if(Math.abs(direction[0]) < Math.abs(direction[1]))
                 {
-                    pMan.directionGiven(KeyEvent.VK_LEFT);
-//                    robot.keyPress(KeyEvent.VK_LEFT);
-                    System.out.println("Left");
-                } else if(rand < probabilityVector[0] + probabilityVector[1] + probabilityVector[2])
-                {
-                    pMan.directionGiven(KeyEvent.VK_DOWN);
-//                    robot.keyPress(KeyEvent.VK_DOWN);
-                    System.out.println("Down");
+                    if(direction[1] > 0)
+                    {
+                        pMan.directionGiven(KeyEvent.VK_DOWN);
+                    } else
+                    {
+                        pMan.directionGiven(KeyEvent.VK_UP);
+                    }
                 } else
                 {
-                    pMan.directionGiven(KeyEvent.VK_UP);
-//                    robot.keyPress(KeyEvent.VK_UP);
-                    System.out.println("Up");
+
                 }
+//                double[] probabilityVector = generateProbabilityVector(game.getAttribute("dimensions").split(",").length,
+//                        instructionPackets);
+//                double rand = Math.random();
+////                System.out.println("Just ran");
+//                if(rand < probabilityVector[0])
+//                {
+//                    pMan.directionGiven(KeyEvent.VK_RIGHT);
+////                    robot.keyPress(KeyEvent.VK_RIGHT);
+////                    System.out.println("Right");
+//                } else if(rand < probabilityVector[0] + probabilityVector[1])
+//                {
+//                    pMan.directionGiven(KeyEvent.VK_LEFT);
+////                    robot.keyPress(KeyEvent.VK_LEFT);
+////                    System.out.println("Left");
+//                } else if(rand < probabilityVector[0] + probabilityVector[1] + probabilityVector[2])
+//                {
+//                    pMan.directionGiven(KeyEvent.VK_DOWN);
+////                    robot.keyPress(KeyEvent.VK_DOWN);
+////                    System.out.println("Down");
+//                } else
+//                {
+//                    pMan.directionGiven(KeyEvent.VK_UP);
+////                    robot.keyPress(KeyEvent.VK_UP);
+////                    System.out.println("Up");
+//                }
             }
         } catch (NotAnActionNodeException e)
         {
@@ -97,6 +121,11 @@ public class PlayPacman implements MiniMain
         for(InstructionPacket packet : instructionPackets)
         {
             List<String> params = packet.getInstruction().getParameters();
+//            StringBuilder paramPrint = new StringBuilder();
+//            paramPrint.append(params.get(0));
+//            paramPrint.append(",");
+//            paramPrint.append(params.get(1));
+//            System.out.println(paramPrint.toString());
             if(params != null)
             {
                 double[] paramDoubles = new double[params.size()];
@@ -127,7 +156,7 @@ public class PlayPacman implements MiniMain
                         }
                     }
                 }
-                System.out.print("Urgency: " + packet.getOriginNode().getUrgency() + " | ");
+//                System.out.print("Urgency: " + packet.getOriginNode().getUrgency() + " | ");
             }
         }
         double vectorLength = 0;

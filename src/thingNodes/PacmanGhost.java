@@ -22,6 +22,7 @@ public class PacmanGhost extends ThingNode
 		addCategory("monster");
 		setAttribute("goal", "approach Player");
 		setAttribute("move", "both,both");
+		setAttribute("behavior","intelligent");
 		StringBuilder locationBuilder = new StringBuilder();
 //		locationBuilder.append(locationX);
 //		locationBuilder.append(',');

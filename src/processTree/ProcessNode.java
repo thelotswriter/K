@@ -34,7 +34,10 @@ public abstract class ProcessNode implements Serializable
 //	 */
 //	public abstract ProcessNode get(String nodeName);
 
-    public ProcessNode() {}
+    public ProcessNode()
+	{
+		elements = new ArrayList<>();
+	}
 
 	public ProcessNode(ProcessNode parent, List<ProcessNode> elements, double confidence)
     {
@@ -117,11 +120,13 @@ public abstract class ProcessNode implements Serializable
 	public void addElement(ProcessNode newElement)
     {
         elements.add(newElement);
+        newElement.setParent(this);
     }
 
     public void removeElements()
 	{
-		elements.clear();
+		elements = new ArrayList<>();
+		setParent(null);
 	}
 	
 }

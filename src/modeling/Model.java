@@ -33,17 +33,17 @@ public abstract class Model
 
     public abstract ThingNode generateFutureState(int time);
 
-    public List<ThingNode> modelElements(int time, List<ThingNode> children)
-    {
-        List<ThingNode> modelChildren = new ArrayList<>();
-        TempModelAggregator aggregator = TempModelAggregator.getInstance();
-        for(ThingNode child : children)
-        {
-            Model childModel = aggregator.getModel(child);
-            modelChildren.add(childModel.generateFutureState(time));
-        }
-        return modelChildren;
-    }
+//    public List<ThingNode> modelElements(int time, List<ThingNode> children)
+//    {
+//        List<ThingNode> modelChildren = new ArrayList<>();
+//        TempModelAggregator aggregator = TempModelAggregator.getInstance();
+//        for(ThingNode child : children)
+//        {
+//            Model childModel = aggregator.getModel(child);
+//            modelChildren.add(childModel.generateFutureState(time));
+//        }
+//        return modelChildren;
+//    }
 
     public ThingNode getThingBeingModeled()
     {

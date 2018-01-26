@@ -32,6 +32,8 @@ public class ThingNode extends ProcessNode
     @Expose
     private Map<String, String> attributes;
 
+    private boolean plural;
+
 //	private List<Adjective> adjectives;
 //	@Expose
 //	private ArrayList<String> elementNames;
@@ -132,18 +134,27 @@ public class ThingNode extends ProcessNode
 	public ThingNode(ThingNode thingToCopy)
 	{
         super();
-        ThingNode copy = new ThingNode(null, null, thingToCopy.getCategories(), null, thingToCopy.getConfidence());
+        setName(thingToCopy.getName());
+        this.plural = thingToCopy.isPlural();
+        elements = new ArrayList<>();
+        attributes = new HashMap<String, String>();
+        categories = new ArrayList<>();
+//        ThingNode copy = new ThingNode(null, null, thingToCopy.getCategories(), null, thingToCopy.getConfidence());
 		for(String key : thingToCopy.getAttributes().keySet())
 		{
-			copy.setAttribute(key, thingToCopy.getAttribute(key));
+			setAttribute(key, thingToCopy.getAttribute(key));
 		}
+		for(String category : thingToCopy.getCategories())
+        {
+            addCategory(category);
+        }
 		if(thingToCopy.getThingElements() != null)
 		{
 			for(ThingNode element : thingToCopy.getThingElements())
 			{
 				ThingNode copiedElement = new ThingNode(element);
-				copiedElement.setParent(copy);
-				copy.addElement(copiedElement);
+				copiedElement.setParent(this);
+				addElement(copiedElement);
 			}
 		}
 	}
@@ -244,7 +255,8 @@ public class ThingNode extends ProcessNode
 	public void removeElements()
     {
         super.removeElements();
-        elements.clear();
+//        elements.clear();
+        elements = new ArrayList<>();
     }
 	
 //	/**
@@ -314,6 +326,10 @@ public class ThingNode extends ProcessNode
 	 */
 	public ThingNode getThing(String thing)
 	{
+	    if(thing == null)
+        {
+            return null;
+        }
 		ThingNode theThing = null;
 		for(ThingNode element : elements)
 		{
@@ -432,7 +448,7 @@ public class ThingNode extends ProcessNode
 	
 	public boolean isPlural()
 	{
-		return false;
+		return plural;
 	}
 	
 }
