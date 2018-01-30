@@ -23,6 +23,8 @@ import java.util.*;
 public class Plan extends ActionNode
 {
 
+    private final int MAX_DEPTH = 4;
+
     private final int MAX_MODELS = 100;
 
     private Constructor parentConstructor;
@@ -103,7 +105,6 @@ public class Plan extends ActionNode
             startList.add(new Instruction(InstructionType.START, null));
             PlanningNode root = new PlanningNode(null, currentAction, startList);
 
-            int maxDepth = 2;
             Stack<PlanningNode> nodesToExplore = new Stack<>();
             PriorityQueue<PlanningNode> leaves = new PriorityQueue<>();
             nodesToExplore.push(root);
@@ -154,7 +155,7 @@ public class Plan extends ActionNode
                     if(highestUrgencyNode == null)
                     {
 //                        System.out.println("Null somehow");
-                    } else if((highestUrgencyNode.getUrgency() < highestUrgencyNode.getMaxUrgency()) && (nextNode.getDepth() < maxDepth))
+                    } else if((highestUrgencyNode.getUrgency() < highestUrgencyNode.getMaxUrgency()) && (nextNode.getDepth() < MAX_DEPTH))
                     {
                         nodesToExplore.push(nextNode);
                     } else

@@ -25,13 +25,6 @@ import java.util.List;
 public class Avoid extends PlannableActionNode
 {
 
-    // Weights determining direction. Variable sideWeight is multiplied by the magnitude of the and used to make
-    // instructions to go left/right.
-    private double sideWeight = 0.01;
-    private double momentumWeight = 0.1;
-
-    private List<Model> models;
-
     public Avoid(CommandNode root, ActionNode parent, ThingNode subject, ThingNode directObject, ThingNode indirectObject,
                  List<Adverb> adverbs, List<ActionElement> elements, double confidence, double priority, double urgency)
             throws NotAnActionNodeException, UnknownActionException, IOException, UnreadableActionNodeException
@@ -40,22 +33,9 @@ public class Avoid extends PlannableActionNode
     }
 
     @Override
-    public void initialize() throws NotAnActionNodeException, UnknownActionException, UnreadableActionNodeException, IOException {
+    public void initialize() throws NotAnActionNodeException, UnknownActionException, UnreadableActionNodeException, IOException
+    {
         super.initialize();
-        // Determine which sort of model should be used to avoid. Currently we only have one model to use, so we'll use that.
-        // In the future, this may be expanded to use a search tree or some other method to select the best model
-        models = new ArrayList<>();
-        if(getDirectObject().isPlural())
-        {
-            for(ProcessNode singleObject : getDirectObject().getElements())
-            {
-                models.add(ModelPicker.getInstance().getModel((ThingNode) getDirectObject().getParent(), getSubject(),
-                        (ThingNode) singleObject, getIndirectObject()));
-            }
-        } else
-        {
-            models.add(ModelPicker.getInstance().getModel((ThingNode) getDirectObject().getParent(), getSubject(), getDirectObject(), getIndirectObject()));
-        }
     }
 
     @Override

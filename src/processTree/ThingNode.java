@@ -450,5 +450,47 @@ public class ThingNode extends ProcessNode
 	{
 		return plural;
 	}
+
+	public boolean equals(Object o)
+    {
+        if(o != null && o instanceof ThingNode)
+        {
+            ThingNode otherThing = (ThingNode) o;
+            if((isPlural() != otherThing.isPlural()))
+            {
+                return false;
+            }
+            if(otherThing.getName().equalsIgnoreCase(this.getName()) && otherThing.getAttributes().size() == getAttributes().size()
+                    && otherThing.getCategories().size() == getCategories().size() && otherThing.getElements().size() == getElements().size())
+            {
+                for(String attributeName : getAttributes().keySet())
+                {
+                    if(!otherThing.hasAttribute(attributeName) || !getAttribute(attributeName).equalsIgnoreCase(otherThing.getAttribute(attributeName)))
+                    {
+                        return false;
+                    }
+                }
+                for(String category : getCategories())
+                {
+                    if(!otherThing.hasCategory(category))
+                    {
+                        return false;
+                    }
+                }
+                for(ThingNode element : getThingElements())
+                {
+                    if(!otherThing.getThingElements().contains(element))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        } else
+        {
+            return false;
+        }
+    }
 	
 }
