@@ -18,5 +18,6 @@ public class FroggerCar extends ThingNode
         setAttribute("move", "both,neither");
         setAttribute("dimensions",
                 FroggerMain.BLOCK_SIZE + "," + FroggerMain.BLOCK_SIZE);
+        setAttribute("goal","approach Player");
     }
 }

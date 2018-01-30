@@ -14,5 +14,6 @@ public class FroggerCars extends ThingNode
         super(parent, elements, categories, attributes, confidence);
         setName("cars");
         addCategory("enemy");
+        setAttribute("goal", "approach Player");
     }
 }

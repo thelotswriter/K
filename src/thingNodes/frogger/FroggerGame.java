@@ -6,6 +6,7 @@ import processTree.ProcessNode;
 import processTree.ThingNode;
 import thingNodes.CategoryNodes.GameNode;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ public class FroggerGame extends GameNode
         super(parent, elements, categories, attributes, confidence);
         setName("FroggerGame");
         frogger = null;
+        setAttributes();
     }
 
 
@@ -38,13 +40,16 @@ public class FroggerGame extends GameNode
             frogger = new FroggerMain();
         }
         hooks = frogger.getFroggerHooks();
-        frogger.run();
+        EventQueue.invokeLater(() -> {
+            frogger.run();
+        });
+        addElements();
         //addElements need to add the game elements to the wide world
     }
 
     public void setAttributes()
     {
-        setAttribute("goal", "approach lilypads");
+        setAttribute("goal", "avoid cars");
         setAttribute("dimensions", FroggerMain.WORLD_WIDTH + "," + FroggerMain.WORLD_HEIGHT);
         setAttribute("grid", "13,13");
     }
@@ -55,7 +60,8 @@ public class FroggerGame extends GameNode
         String dimensions = FroggerMain.BLOCK_SIZE + "," + FroggerMain.BLOCK_SIZE;
         player.setAttribute("dimensions", dimensions);
         addElement(player);
-
+        river = new FroggerRiver(this, null, null, null, 1);
+        addElement(river);
         addMovingEntities();
     }
 
@@ -68,10 +74,6 @@ public class FroggerGame extends GameNode
         }
 
         addMovingEntities();
-
-        addElement(cars);
-        addElement(logs);
-        addElement(lilyPads);
 
         addElement(river);
     }
@@ -124,7 +126,11 @@ public class FroggerGame extends GameNode
                 thingNode.setAttribute("speed", speed);
                 thingNode.setAttribute("location", location);
             }
+            addElement(thingNode);
         }
+//        addElement(cars);
+//        addElement(logs);
+//        addElement(lilyPads);
     }
 
     public FroggerMain getGame() {

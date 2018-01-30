@@ -14,5 +14,6 @@ public class FroggerPlayer extends ThingNode
         super(parent, elements, categories, attributes, confidence);
         setName("Player");
         setAttribute("move", "both,both");
+        setAttribute("behavior", "intelligent");
     }
 }

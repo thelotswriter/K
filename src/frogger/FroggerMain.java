@@ -35,6 +35,7 @@ import jig.engine.hli.StaticScreenGame;
 import jig.engine.physics.AbstractBodyLayer;
 import jig.engine.util.Vector2D;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 
 public class FroggerMain extends StaticScreenGame {
@@ -478,7 +479,12 @@ public class FroggerMain extends StaticScreenGame {
     }
 	
 	public static void main (String[] args) {
-		FroggerMain f = new FroggerMain();
-		f.run();
+
+
+		EventQueue.invokeLater(() -> {
+            FroggerMain f = new FroggerMain();
+            f.run();
+        });
+
 	}
 }

@@ -1,6 +1,7 @@
 package miniMain;
 
 import actionNodes.Play;
+import frogger.Frogger;
 import frogger.FroggerAction;
 import frogger.FroggerMain;
 import instructions.Instruction;
@@ -38,28 +39,35 @@ public class PlayFrogger implements MiniMain
                 froggerGame.update();
                 List<InstructionPacket> instructionPackets = playNode.run();
 
-                double[] probabilityVector = PlayPacman.generateProbabilityVector(froggerGame.getAttribute("dimensions").split(",").length,
-                        instructionPackets);
-                double rand = Math.random();
-                if(rand < probabilityVector[0])
+                int[] direction = new int[2];
+                direction[0] = Integer.parseInt(instructionPackets.get(0).getInstruction().getParameters().get(0));
+                direction[1] = Integer.parseInt(instructionPackets.get(0).getInstruction().getParameters().get(1));
+                StringBuilder bob = new StringBuilder();
+                bob.append(direction[0]);
+                bob.append(",");
+                bob.append(direction[1]);
+                System.out.println(bob.toString());
+                if(Math.abs(direction[0]) > Math.abs(direction[1]))
                 {
-                    froggerMain.setPendingAction(FroggerAction.RIGHT);
-                    System.out.println("Right");
-                } else if(rand < probabilityVector[0] + probabilityVector[1])
+                    if(direction[0] > 0)
+                    {
+                        froggerMain.setPendingAction(FroggerAction.RIGHT);
+                    } else
+                    {
+                        froggerMain.setPendingAction(FroggerAction.LEFT);
+                    }
+                } else if(Math.abs(direction[0]) < Math.abs(direction[1]))
                 {
-                    froggerMain.setPendingAction(FroggerAction.LEFT);
-//                    robot.keyPress(KeyEvent.VK_LEFT);
-                    System.out.println("Left");
-                } else if(rand < probabilityVector[0] + probabilityVector[1] + probabilityVector[2])
-                {
-                    froggerMain.setPendingAction(FroggerAction.DOWN);
-//                    robot.keyPress(KeyEvent.VK_DOWN);
-                    System.out.println("Down");
+                    if(direction[1] > 0)
+                    {
+                        froggerMain.setPendingAction((FroggerAction.DOWN));
+                    } else
+                    {
+                        froggerMain.setPendingAction(FroggerAction.UP);
+                    }
                 } else
                 {
-                    froggerMain.setPendingAction(FroggerAction.UP);
-//                    robot.keyPress(KeyEvent.VK_UP);
-                    System.out.println("Up");
+
                 }
             }
         } catch (NotAnActionNodeException e)
