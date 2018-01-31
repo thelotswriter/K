@@ -43,14 +43,21 @@ public class FroggerGame extends GameNode
         EventQueue.invokeLater(() -> {
             frogger.run();
         });
-        addElements();
+        try
+        {
+            Thread.sleep(1000);
+            addElements();
+        } catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
         //addElements need to add the game elements to the wide world
     }
 
     public void setAttributes()
     {
-        setAttribute("goal", "avoid cars");
-        setAttribute("dimensions", FroggerMain.WORLD_WIDTH + "," + FroggerMain.WORLD_HEIGHT);
+        setAttribute("goal", "avoid car");
+        setAttribute("dimensions", (FroggerMain.WORLD_WIDTH) + "," + (FroggerMain.WORLD_HEIGHT));
         setAttribute("grid", "13,13");
     }
 
@@ -60,8 +67,8 @@ public class FroggerGame extends GameNode
         String dimensions = FroggerMain.BLOCK_SIZE + "," + FroggerMain.BLOCK_SIZE;
         player.setAttribute("dimensions", dimensions);
         addElement(player);
-        river = new FroggerRiver(this, null, null, null, 1);
-        addElement(river);
+//        river = new FroggerRiver(this, null, null, null, 1);
+//        addElement(river);
         addMovingEntities();
     }
 
@@ -75,14 +82,14 @@ public class FroggerGame extends GameNode
 
         addMovingEntities();
 
-        addElement(river);
+        //addElement(river);
     }
 
     private Map<String, String> getPlayerAttributes()
     {
         Map<String, String> attributes = new HashMap();
         attributes.put("location", hooks.getPlayerLocation());
-        attributes.put("speed", hooks.getPlayerSpeed());
+//        attributes.put("speed", hooks.getPlayerSpeed());
         return attributes;
     }
 
@@ -93,6 +100,10 @@ public class FroggerGame extends GameNode
         lilyPads = new FroggerLilyPads(this, null, null, null, 1);
         for (MovingEntity me : hooks.getObjects()) {
             String speed = Double.toString(me.getVelocity().getX());
+            if (me.getPosition().getX() < 0 || me.getPosition().getX() > FroggerMain.WORLD_WIDTH ||
+                    me.getPosition().getY() < 0 || me.getPosition().getY() > FroggerMain.WORLD_HEIGHT) {
+                continue;
+            }
             String location = Math.round(me.getPosition().getX()) +
                     "," + Math.round(me.getPosition().getY());
             ThingNode thingNode = null;
@@ -125,8 +136,8 @@ public class FroggerGame extends GameNode
             if (thingNode != null) {
                 thingNode.setAttribute("speed", speed);
                 thingNode.setAttribute("location", location);
+                addElement(thingNode);
             }
-            addElement(thingNode);
         }
 //        addElement(cars);
 //        addElement(logs);

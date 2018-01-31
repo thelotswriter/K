@@ -147,6 +147,12 @@ public abstract class Grid2D extends Model
         int xStart = thingLocation[0] / tileDimensions[0];
         int yStart = thingLocation[1] / tileDimensions[1];
         int xEnd = thingLocation[0] + thingDimensions[0];
+        //Handle platforms that are partially off screen
+        if (xEnd > allowedSpaces.length - 1) {
+            xEnd = allowedSpaces.length - 1;
+        } else if (xEnd < 0) {
+            xEnd = 0;
+        }
         int yEnd = thingLocation[1] + thingDimensions[1];
         if(xEnd % tileDimensions[0] == 0)
         {
@@ -229,7 +235,23 @@ public abstract class Grid2D extends Model
                         futureLocation[0] = Math.min(worldWidth - 1, futureLocation[0]);
                         futureLocation[1] = Math.max(0, futureLocation[1]);
                         futureLocation[1] = Math.min(worldHeight - 1, futureLocation[1]);
-                        if(allowedSpaces[futureLocation[0] / tileDimensions[0]][futureLocation[1] / tileDimensions[1]])
+
+                        int allowedX = futureLocation[0] / tileDimensions[0];
+                        int allowedY = futureLocation[1] / tileDimensions[1];
+
+                        if (allowedX > allowedSpaces.length - 1) {
+                            allowedX = allowedSpaces.length - 1;
+                        } else if (allowedX < 0) {
+                            allowedX = 0;
+                        }
+
+                        if (allowedY > allowedSpaces[0].length - 1) {
+                            allowedY = allowedSpaces[0].length - 1;
+                        } else if (allowedY < 0) {
+                            allowedY = 0;
+                        }
+
+                        if(allowedSpaces[allowedX][allowedY])
                         {
                             futureThing.setAttribute("location", AttributeConverter.convertToAttribute(futureLocation));
                         }

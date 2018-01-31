@@ -96,6 +96,7 @@ public class FroggerMain extends StaticScreenGame {
 
 	private FroggerHooks froggerHooks;
 	private FroggerAction pendingAction;
+	private int upCounter = 0;
 	
     /**
 	 * Initialize game objects
@@ -322,7 +323,7 @@ public class FroggerMain extends StaticScreenGame {
     }
 
     public void setPendingAction(FroggerAction action) {
-
+		pendingAction = action;
     }
 
     public int getGameState() {
@@ -343,7 +344,8 @@ public class FroggerMain extends StaticScreenGame {
 		if (!space_has_been_released)
 			return;
 		
-		if (keyboard.isPressed(KeyEvent.VK_SPACE)) {
+		//if (keyboard.isPressed(KeyEvent.VK_SPACE)) {
+		if (1 == 1) {
 			switch (GameState) {
 			case GAME_INSTRUCTIONS:
 			case GAME_OVER:
@@ -390,6 +392,12 @@ public class FroggerMain extends StaticScreenGame {
             if (pendingAction != FroggerAction.STAY) {
                 froggerVirtualInputHandler(pendingAction);
             }
+            if (upCounter > 5) {
+            	froggerVirtualInputHandler(FroggerAction.UP);
+            	upCounter = 0;
+			} else {
+            	upCounter++;
+			}
 			wind.update(deltaMs);
 			hwave.update(deltaMs);
 			frog.update(deltaMs);
