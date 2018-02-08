@@ -54,11 +54,11 @@ public class ActionEnumerator
         moveRight.add(new Instruction(InstructionType.MOVE, rightParam));
         nonMove.add(new Instruction(InstructionType.MOVE, nonMoveParam));
         List<List<Instruction>> aggregateList = new ArrayList<>();
+        aggregateList.add(nonMove);
         aggregateList.add(moveUp);
         aggregateList.add(moveDown);
         aggregateList.add(moveLeft);
         aggregateList.add(moveRight);
-        aggregateList.add(nonMove);
         return aggregateList;
     }
 

@@ -28,12 +28,13 @@ public class TempModelAggregator
 
     public List<ThingNode> generateFutureWorlds(List<Instruction> action)
     {
+        ThingNode actingWorldCopy = new ThingNode(worldCopy);
         ThingNode futureChosenThing = chosenModel.generateFutureState(1, action);
         int time = chosenModel.determineBestTime(action);
-        worldCopy.removeElement(worldCopy.getThing(futureChosenThing.getName()));
+        actingWorldCopy.removeElement(actingWorldCopy.getThing(futureChosenThing.getName()));
 //        List<ThingNode> worldElements = worldCopy.getThingElements();
         List<ThingNode> worldElements = new ArrayList<>();
-        worldElements.addAll(worldCopy.getThingElements());
+        worldElements.addAll(actingWorldCopy.getThingElements());
         List<ThingNode> futureElements = new ArrayList<>();
         for(ThingNode worldElement : worldElements)
         {
@@ -58,14 +59,14 @@ public class TempModelAggregator
                 futureElements.add(model.generateFutureState(time));
             }
         }
-        worldCopy.removeElements();
+        actingWorldCopy.removeElements();
         for(ThingNode element : futureElements)
         {
-            worldCopy.addElement(element);
+            actingWorldCopy.addElement(element);
         }
-        worldCopy.addElement(futureChosenThing);
+        actingWorldCopy.addElement(futureChosenThing);
         List<ThingNode> futureWorlds = new ArrayList<>();
-        futureWorlds.add(worldCopy);
+        futureWorlds.add(actingWorldCopy);
         return futureWorlds;
     }
 

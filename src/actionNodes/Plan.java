@@ -23,7 +23,7 @@ import java.util.*;
 public class Plan extends ActionNode
 {
 
-    private final int MAX_DEPTH = 4;
+    private final int MAX_DEPTH = 3;
 
     private final int MAX_MODELS = 100;
 
@@ -105,87 +105,125 @@ public class Plan extends ActionNode
             startList.add(new Instruction(InstructionType.START, null));
             PlanningNode root = new PlanningNode(null, currentAction, startList);
 
-            Stack<PlanningNode> nodesToExplore = new Stack<>();
-            PriorityQueue<PlanningNode> leaves = new PriorityQueue<>();
-            nodesToExplore.push(root);
-//            System.out.println("----------------Start planning--------------------");
-            while(!nodesToExplore.empty())
+            PriorityQueue<PlanningNode> nodePQueue = new PriorityQueue<>();
+            nodePQueue.add(root);
+            while(!nodePQueue.isEmpty())
             {
-                PlanningNode exploringNode = nodesToExplore.pop();
-                PlannableActionNode exploringNodesAction = exploringNode.getActionNode();
-//                Model predictiveModel = ModelPicker.getInstance().getModel((ThingNode) exploringNodesAction.getSubject().getParent(),
-//                        exploringNodesAction.getSubject(), exploringNodesAction.getDirectObject(), exploringNodesAction.getIndirectObject());
-                ThingNode world = (ThingNode) exploringNodesAction.getSubject().getParent();
+                PlanningNode currentNode = nodePQueue.poll();
+                PlannableActionNode nodesAction = currentNode.getActionNode();
+                ThingNode world = (ThingNode) nodesAction.getSubject().getParent();
                 while(world != null && !world.hasCategory("world"))
                 {
                     world = (ThingNode) world.getParent();
                 }
-                TempModelAggregator aggregator = new TempModelAggregator((ThingNode) exploringNodesAction.getSubject(),
-                        world);
-                for(List<Instruction> possibleAction : possibleActions)
-                {
-                    List<ThingNode> futureWorlds = aggregator.generateFutureWorlds(possibleAction); //predictiveModel.getFutureWorldStates(possibleAction);
-                    PlannableActionNode highestUrgencyNode = null;
-//                    System.out.println("In the loop");
-                    for(ThingNode futureWorld : futureWorlds)
-                    {
-                        PlannableActionNode nextAction = (PlannableActionNode) parentConstructor.newInstance(getRoot(),
-                                exploringNodesAction, futureWorld.getThing(subjectName), futureWorld.getThing(directObjectName),
-                                futureWorld.getThing(indirectObjectName), getAdverbs(), null, getParent().getConfidence(),
-                                getParent().getPriority(), getParent().getUrgency());
-                        nextAction.makePlanningNode();
-                        nextAction.initialize();
-                        nextAction.run();
-                        if(highestUrgencyNode == null)
-                        {
-//                            System.out.println("Was null...");
-                            highestUrgencyNode = nextAction;
-                        } else if(highestUrgencyNode.getUrgency() < nextAction.getUrgency())
-                        {
-                            highestUrgencyNode = nextAction;
-                        }
-                        if(highestUrgencyNode.getUrgency() >= highestUrgencyNode.getMaxUrgency())
-                        {
-//                            System.out.println("Can't take the pressure!");
-                            break;
-                        }
-                    }
-//                    System.out.println("Out of the loop");
-                    PlanningNode nextNode = new PlanningNode(exploringNode, highestUrgencyNode, possibleAction);
-                    if(highestUrgencyNode == null)
-                    {
-//                        System.out.println("Null somehow");
-                    } else if((highestUrgencyNode.getUrgency() < highestUrgencyNode.getMaxUrgency()) && (nextNode.getDepth() < MAX_DEPTH))
-                    {
-                        nodesToExplore.push(nextNode);
-                    } else
-                    {
-                        leaves.add(nextNode);
-                    }
-                }
+                TempModelAggregator aggregator = new TempModelAggregator((ThingNode) nodesAction.getSubject(), world);
+                //TODO: Pick up coding here
             }
-            PlanningNode nodeToReach = leaves.poll();
-            if(nodeToReach == null || nodeToReach.getParent() == null)
-            {
-//                System.out.print("NULLIFIED!");
-            } else
-            {
-                while(nodeToReach.getParent() != null)
-                {
-                    PlanningNode parent = nodeToReach.getParent();
-                    if(parent.getParent() == null)
-                    {
-                        break;
-                    } else
-                    {
-                        nodeToReach = parent;
-                    }
-                }
-                for(Instruction singleAction : nodeToReach.getActionToState())
-                {
-                    instructions.add(new InstructionPacket(singleAction, getParent()));
-                }
-            }
+
+//            Stack<PlanningNode> nodesToExplore = new Stack<>();
+//            PriorityQueue<PlanningNode> leaves = new PriorityQueue<>();
+//            nodesToExplore.push(root);
+////            System.out.println("----------------Start planning--------------------");
+//            while(!nodesToExplore.empty())
+//            {
+//                PlanningNode exploringNode = nodesToExplore.pop();
+//                PlannableActionNode exploringNodesAction = exploringNode.getActionNode();
+////                Model predictiveModel = ModelPicker.getInstance().getModel((ThingNode) exploringNodesAction.getSubject().getParent(),
+////                        exploringNodesAction.getSubject(), exploringNodesAction.getDirectObject(), exploringNodesAction.getIndirectObject());
+//                ThingNode world = (ThingNode) exploringNodesAction.getSubject().getParent();
+//                while(world != null && !world.hasCategory("world"))
+//                {
+//                    world = (ThingNode) world.getParent();
+//                }
+//                TempModelAggregator aggregator = new TempModelAggregator((ThingNode) exploringNodesAction.getSubject(),
+//                        world);
+//                Set<ThingNode> futureSet = new HashSet<>();
+////                int counter = 0;
+//                for(List<Instruction> possibleAction : possibleActions)
+//                {
+//                    List<ThingNode> futureWorlds = aggregator.generateFutureWorlds(possibleAction); //predictiveModel.getFutureWorldStates(possibleAction);
+//                    PlannableActionNode highestUrgencyNode = null;
+////                    System.out.println("In the loop");
+//                    for(ThingNode futureWorld : futureWorlds)
+//                    {
+//                        boolean sameState = false;
+//                        for(ThingNode addedThing : futureSet)
+//                        {
+//                            if(addedThing.equals(futureWorld))
+//                            {
+//                                sameState = true;
+//                                break;
+//                            }
+//                        }
+////                        if(futureSet.add(futureWorld))
+//                        if(!sameState)
+//                        {
+//                            futureSet.add(futureWorld);
+//                            PlannableActionNode nextAction = (PlannableActionNode) parentConstructor.newInstance(getRoot(),
+//                                    exploringNodesAction, futureWorld.getThing(subjectName), futureWorld.getThing(directObjectName),
+//                                    futureWorld.getThing(indirectObjectName), getAdverbs(), null, getParent().getConfidence(),
+//                                    getParent().getPriority(), getParent().getUrgency());
+//                            nextAction.makePlanningNode();
+//                            nextAction.initialize();
+//                            nextAction.run();
+//                            if(highestUrgencyNode == null)
+//                            {
+////                            System.out.println("Was null...");
+//                                highestUrgencyNode = nextAction;
+//                            } else if(highestUrgencyNode.getUrgency() < nextAction.getUrgency())
+//                            {
+//                                highestUrgencyNode = nextAction;
+//                            }
+//                            if(highestUrgencyNode.getUrgency() >= highestUrgencyNode.getMaxUrgency())
+//                            {
+////                            System.out.println("Can't take the pressure!");
+//                                break;
+//                            }
+//                        } //else
+////                        {
+////                            counter++;
+////                        }
+//                    }
+////                    if(counter > 0)
+////                    {
+////                        System.out.println("Trimmed " + counter + " states!");
+////                    }
+////                    System.out.println("Out of the loop");
+//                    PlanningNode nextNode = new PlanningNode(exploringNode, highestUrgencyNode, possibleAction);
+//                    if(highestUrgencyNode == null)
+//                    {
+////                        System.out.println("Null somehow");
+//                    } else if((highestUrgencyNode.getUrgency() < highestUrgencyNode.getMaxUrgency()) && (nextNode.getDepth() < MAX_DEPTH))
+//                    {
+//                        nodesToExplore.push(nextNode);
+//                    } else
+//                    {
+//                        leaves.add(nextNode);
+//                    }
+//                }
+//            }
+//            PlanningNode nodeToReach = leaves.poll();
+//            if(nodeToReach == null || nodeToReach.getParent() == null)
+//            {
+////                System.out.print("NULLIFIED!");
+//            } else
+//            {
+//                while(nodeToReach.getParent() != null)
+//                {
+//                    PlanningNode parent = nodeToReach.getParent();
+//                    if(parent.getParent() == null)
+//                    {
+//                        break;
+//                    } else
+//                    {
+//                        nodeToReach = parent;
+//                    }
+//                }
+//                for(Instruction singleAction : nodeToReach.getActionToState())
+//                {
+//                    instructions.add(new InstructionPacket(singleAction, getParent()));
+//                }
+//            }
 //            System.out.println("-----------------End planning---------------------");
         } catch (InstantiationException e) {
         } catch (IllegalAccessException e) {

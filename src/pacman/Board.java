@@ -77,7 +77,7 @@ public class Board extends JPanel implements ActionListener {
     private ArrayList<Point> pellets; // Tracks the pellets left on the board
     private final boolean[][] wallMap = {
             {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, true,  true,  true,  false, false, false, false, false, false, false, false, false, false, false},
+            {true, true,  true,  true,  false, false, false, false, false, false, false, false, false, false, false},
             {false, true,  true,  true,  false, false, false, false, false, false, false, false, false, false, false},
             {false, true,  true,  true,  false, false, false, false, false, false, false, false, false, false, false},
             {false, false, false, false, false, false, false, true,  false, false, false, false, false, false, false},

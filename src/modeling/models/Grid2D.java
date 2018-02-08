@@ -211,6 +211,7 @@ public abstract class Grid2D extends Model
                         futureLocation[0] += momentum[0];
                         futureLocation[1] += momentum[1];
                         futureThing.setAttribute("location", AttributeConverter.convertToAttribute(futureLocation));
+                        futureThing.setAttribute("momentum", AttributeConverter.convertToAttribute(momentum));
                         return futureThing;
                     } else
                     {
