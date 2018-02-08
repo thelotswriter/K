@@ -66,11 +66,29 @@ public class Avoid extends PlannableActionNode
 ////        System.out.println(urgencyTotal);
 //        setUrgencey(urgencyTotal);
         int[] subjectLocation = AttributeConverter.convertToIntArray(getSubject().getAttribute("location"));
+        double speed = 1;
+        if(getSubject().hasAttribute("speed"))
+        {
+            speed = AttributeConverter.convertToInt(getSubject().getAttribute("speed"));
+            if(speed == 0)
+            {
+                speed = 1;
+            }
+        }
         double urgencyTotal = 0;
         if(getDirectObject().isPlural())
         {
             for(ThingNode singleThing : getDirectObject().getThingElements())
             {
+                double thingSpeed = 1;
+                if(singleThing.hasAttribute("speed"))
+                {
+                    thingSpeed = AttributeConverter.convertToInt(singleThing.getAttribute("speed"));
+                    if(thingSpeed == 0)
+                    {
+                        thingSpeed = 1;
+                    }
+                }
                 int[] thingLocation = AttributeConverter.convertToIntArray(singleThing.getAttribute("location"));
                 double dist = 0;
                 for(int i = 0; i < subjectLocation.length; i++)
@@ -82,12 +100,21 @@ public class Avoid extends PlannableActionNode
                     urgencyTotal = Double.MAX_VALUE;
                 } else
                 {
-                    urgencyTotal += 1 / (dist * dist);
+                    urgencyTotal += thingSpeed / (speed * dist * dist);
                 }
             }
         } else
         {
             int[] thingLocation = AttributeConverter.convertToIntArray(getDirectObject().getAttribute("location"));
+            double thingSpeed = 1;
+            if(getDirectObject().hasAttribute("speed"))
+            {
+                thingSpeed = AttributeConverter.convertToInt(getDirectObject().getAttribute("speed"));
+                if(thingSpeed == 0)
+                {
+                    thingSpeed = 1;
+                }
+            }
             double dist = 0;
             for(int i = 0; i < subjectLocation.length; i++)
             {
@@ -98,7 +125,7 @@ public class Avoid extends PlannableActionNode
                 urgencyTotal = Double.MAX_VALUE;
             } else
             {
-                urgencyTotal += 1 / (dist * dist);
+                urgencyTotal += thingSpeed / (speed * dist * dist);
             }
         }
         setUrgencey(urgencyTotal);

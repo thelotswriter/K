@@ -23,9 +23,7 @@ import java.util.*;
 public class Plan extends ActionNode
 {
 
-    private final int MAX_DEPTH = 3;
-
-    private final int MAX_MODELS = 100;
+    private final int MAX_DEPTH = 40;
 
     private Constructor parentConstructor;
     private Constructor pluralConstructor;
@@ -105,19 +103,78 @@ public class Plan extends ActionNode
             startList.add(new Instruction(InstructionType.START, null));
             PlanningNode root = new PlanningNode(null, currentAction, startList);
 
+            double startTime = System.nanoTime()  / 1000000;
+
             PriorityQueue<PlanningNode> nodePQueue = new PriorityQueue<>();
+            double rootUrgency = currentAction.getUrgency();
             nodePQueue.add(root);
             while(!nodePQueue.isEmpty())
             {
                 PlanningNode currentNode = nodePQueue.poll();
                 PlannableActionNode nodesAction = currentNode.getActionNode();
-                ThingNode world = (ThingNode) nodesAction.getSubject().getParent();
-                while(world != null && !world.hasCategory("world"))
+                double nodesUrgency = nodesAction.getUrgency();
+//                if(currentNode.getDepth() >= MAX_DEPTH)
+//                {
+//                    int x = 0;
+//                }
+                if(nodesAction.getUrgency() >= nodesAction.getMaxUrgency() || (currentNode.getDepth() >= MAX_DEPTH))// && nodesUrgency <= rootUrgency))
                 {
-                    world = (ThingNode) world.getParent();
+                    while(currentNode.getParent() != null)
+                    {
+                        PlanningNode parent = currentNode.getParent();
+                        if(parent.getParent() == null)
+                        {
+                            break;
+                        } else
+                        {
+                            currentNode = parent;
+                        }
+                    }
+                    for(Instruction singleAction : currentNode.getActionToState())
+                    {
+                        instructions.add(new InstructionPacket(singleAction, getParent()));
+                    }
+//                    return instructions;
+                    break;
+                } else if(currentNode.getDepth() < MAX_DEPTH)
+                {
+                    ThingNode world = (ThingNode) nodesAction.getSubject().getParent();
+                    while(world != null && !world.hasCategory("world"))
+                    {
+                        world = (ThingNode) world.getParent();
+                    }
+                    TempModelAggregator aggregator = new TempModelAggregator((ThingNode) nodesAction.getSubject(), world);
+                    Collection<ThingNode> worldsAdded = new ArrayList<>();
+                    for(List<Instruction> possibleAction : possibleActions)
+                    {
+                        List<ThingNode> futureWorlds = aggregator.generateFutureWorlds(possibleAction); //predictiveModel.getFutureWorldStates(possibleAction);
+                        for(ThingNode futureWorld : futureWorlds)
+                        {
+                            boolean addNode = true;
+                            for(ThingNode addedWorld : worldsAdded)
+                            {
+                                if(addedWorld.equals(futureWorld))
+                                {
+                                    addNode = false;
+                                    break;
+                                }
+                            }
+                            if(addNode)
+                            {
+                                worldsAdded.add(futureWorld);
+                                PlannableActionNode nextAction = (PlannableActionNode) parentConstructor.newInstance(getRoot(),
+                                        nodesAction, futureWorld.getThing(subjectName), futureWorld.getThing(directObjectName),
+                                        futureWorld.getThing(indirectObjectName), getAdverbs(), null, getParent().getConfidence(),
+                                        getParent().getPriority(), getParent().getUrgency());
+                                nextAction.makePlanningNode();
+                                nextAction.initialize();
+                                nextAction.run();
+                                PlanningNode nextNode = new PlanningNode(currentNode, nextAction, possibleAction);
+                                nodePQueue.add(nextNode);
+                            }
+                        }
+                    }
                 }
-                TempModelAggregator aggregator = new TempModelAggregator((ThingNode) nodesAction.getSubject(), world);
-                //TODO: Pick up coding here
             }
 
 //            Stack<PlanningNode> nodesToExplore = new Stack<>();
@@ -225,6 +282,8 @@ public class Plan extends ActionNode
 //                }
 //            }
 //            System.out.println("-----------------End planning---------------------");
+            double endTime = System.nanoTime() / 1000000;
+            System.out.println("Took " + (endTime - startTime) + " milliseconds");
         } catch (InstantiationException e) {
         } catch (IllegalAccessException e) {
         } catch (InvocationTargetException e) {

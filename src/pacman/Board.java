@@ -61,7 +61,7 @@ public class Board extends JPanel implements ActionListener {
     private Image pacman4up, pacman4down, pacman4left, pacman4right;
 
     private int[] pacStart = {0,0};
-    private int[] ghostStart = {10,0};
+    private int[] ghostStart = {13,0};
 
     private int pacman_x, pacman_y, pacmand_x, pacmand_y;
     private int req_dx, req_dy, view_dx, view_dy;
@@ -77,7 +77,7 @@ public class Board extends JPanel implements ActionListener {
     private ArrayList<Point> pellets; // Tracks the pellets left on the board
     private final boolean[][] wallMap = {
             {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-            {true, true,  true,  true,  false, false, false, false, false, false, false, false, false, false, false},
+            {false, true,  true,  true,  false, false, false, false, false, false, false, false, false, false, false},
             {false, true,  true,  true,  false, false, false, false, false, false, false, false, false, false, false},
             {false, true,  true,  true,  false, false, false, false, false, false, false, false, false, false, false},
             {false, false, false, false, false, false, false, true,  false, false, false, false, false, false, false},
