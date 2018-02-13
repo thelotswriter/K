@@ -42,29 +42,6 @@ public class Avoid extends PlannableActionNode
     public List<InstructionPacket> planningRun()
     {
         List<InstructionPacket> instructionPackets = new ArrayList<>();
-//        String[] subjectLocationStrings = getSubject().getAttribute("location").split(",");
-//        int[] subjectLocation = new int[subjectLocationStrings.length];
-//        for(int i = 0; i < subjectLocation.length; i++)
-//        {
-//            subjectLocation[i] = Integer.parseInt(subjectLocationStrings[i]);
-////            System.out.print(subjectLocation[i]);
-////            System.out.print(", ");
-//        }
-//        double urgencyTotal = 0;
-//        for(Model model : models)
-//        {
-//            double cUrcency = model.getDistance(subjectLocation);
-////            System.out.print("Single Distance: " + cUrcency + " | ");
-//            if(cUrcency == 0)
-//            {
-//                urgencyTotal = Double.MAX_VALUE;
-//            } else
-//            {
-//                urgencyTotal += 1 / cUrcency;
-//            }
-//        }
-////        System.out.println(urgencyTotal);
-//        setUrgencey(urgencyTotal);
         int[] subjectLocation = AttributeConverter.convertToIntArray(getSubject().getAttribute("location"));
         double speed = 1;
         if(getSubject().hasAttribute("speed"))

@@ -23,7 +23,7 @@ import java.util.*;
 public class Plan extends ActionNode
 {
 
-    private final int MAX_DEPTH = 40;
+    private final int MAX_DEPTH = 20;
 
     private Constructor parentConstructor;
     private Constructor pluralConstructor;
@@ -119,6 +119,7 @@ public class Plan extends ActionNode
 //                }
                 if(nodesAction.getUrgency() >= nodesAction.getMaxUrgency() || (currentNode.getDepth() >= MAX_DEPTH))// && nodesUrgency <= rootUrgency))
                 {
+                    getParent().setUrgencey(nodesUrgency);
                     while(currentNode.getParent() != null)
                     {
                         PlanningNode parent = currentNode.getParent();

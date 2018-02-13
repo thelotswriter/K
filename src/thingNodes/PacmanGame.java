@@ -3,8 +3,11 @@ package thingNodes;
 import pacman.Pacman;
 import processTree.ProcessNode;
 import processTree.ThingNode;
+import processTree.toolNodes.AttributeConverter;
 import thingNodes.CategoryNodes.GameNode;
 
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +23,7 @@ public class PacmanGame extends GameNode
 	Pacman pMan;
 	PacmanPlayer player;
 	PacmanGhosts ghosts;
+	PacmanPellets pellets;
 
 //	public PacmanGame()
 //    {
@@ -57,7 +61,7 @@ public class PacmanGame extends GameNode
 	
 	private void setAttributes()
 	{
-		setAttribute("goal", "avoid ghosts");
+		setAttribute("goal", "avoid ghosts & approach pellets");
 		setAttribute("dimensions", "360,360");
 		setAttribute("grid", "24,24");
 	}
@@ -88,6 +92,19 @@ public class PacmanGame extends GameNode
 			walls.addElement(wall);
 		}
 		addElement(walls);
+		pellets = new PacmanPellets(this, null, null, null, 1);
+		List<Point> pelletLocations = pMan.getPelletLocationss();
+		for(Point pelletLocation : pelletLocations)
+        {
+            PacmanPellet pellet = new PacmanPellet(pellets, null, null, null, 1);
+            StringBuilder locationBuilder = new StringBuilder();
+            locationBuilder.append(pelletLocation.x);
+            locationBuilder.append(",");
+            locationBuilder.append(pelletLocation.y);
+            pellet.setAttribute("location", locationBuilder.toString());
+            pellets.addElement(pellet);
+        }
+        addElement(pellets);
 		ghosts = new PacmanGhosts(this, null, null, null, 1);
         int[] ghostXs = pMan.getGhostXs();
         ghosts.setAttribute("dimensions", dimensionsBuilder.toString());
@@ -107,6 +124,29 @@ public class PacmanGame extends GameNode
 	    for(String key : pAttributes.keySet())
         {
             player.setAttribute(key, pAttributes.get(key));
+        }
+        List<Point> currentPellets = pMan.getPelletLocationss();
+	    List<ThingNode> eatenPellets = new ArrayList<>();
+	    for(ThingNode pellet : pellets.getThingElements())
+        {
+            int[] pelletLocation = AttributeConverter.convertToIntArray(pellet.getAttribute("location"));
+            boolean eaten = true;
+            for(Point currentPellet : currentPellets)
+            {
+                if(pelletLocation[0] == currentPellet.x && pelletLocation[1] == currentPellet.y)
+                {
+                    eaten = false;
+                    break;
+                }
+            }
+            if(eaten)
+            {
+                eatenPellets.add(pellet);
+            }
+        }
+        for(ThingNode eatenPellet : eatenPellets)
+        {
+            pellets.removeElement(eatenPellet);
         }
 //		player.updateLocation(pMan.getPacmanX(), pMan.getPacmanY());
 //		player.updateSpeed(pMan.getPacmanSpeed());

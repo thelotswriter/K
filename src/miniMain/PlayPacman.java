@@ -39,13 +39,31 @@ public class PlayPacman implements MiniMain
             {
                 game.update();
                 List<InstructionPacket> instructionPackets = playNode.run();
-                int[] direction = new int[2];
-                direction[0] = Integer.parseInt(instructionPackets.get(0).getInstruction().getParameters().get(0));
-                direction[1] = Integer.parseInt(instructionPackets.get(0).getInstruction().getParameters().get(1));
+                double[] direction = new double[2];
+//                if(instructionPackets.get(1).getInstruction().getType().equals(InstructionType.MOVE))
+//                {
+//                    int x = 0;
+//                }
+                for(InstructionPacket instructionPacket : instructionPackets)
+                {
+                    if(instructionPacket.getInstruction().getType().equals(InstructionType.MOVE))
+                    {
+                        double urgency = instructionPacket.getOriginNode().getUrgency();
+                        System.out.println("Urgency: " + urgency);
+                        direction[0] += Double.parseDouble(instructionPacket.getInstruction().getParameters().get(0)) * urgency;
+                        direction[1] += Double.parseDouble(instructionPacket.getInstruction().getParameters().get(1)) * urgency;
+                        StringBuilder bob = new StringBuilder();
+                        bob.append("Single: ");
+                        bob.append((int) direction[0]);
+                        bob.append(",");
+                        bob.append((int) direction[1]);
+                        System.out.println(bob.toString());
+                    }
+                }
                 StringBuilder bob = new StringBuilder();
-                bob.append(direction[0]);
+                bob.append((int) direction[0]);
                 bob.append(",");
-                bob.append(direction[1]);
+                bob.append((int) direction[1]);
                 System.out.println(bob.toString());
                 if(Math.abs(direction[0]) > Math.abs(direction[1]))
                 {

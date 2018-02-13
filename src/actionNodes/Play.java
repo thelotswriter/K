@@ -51,7 +51,10 @@ public class Play extends ActionNode
         {
             String[] goalArray = goal.split(" ");
             ActionNode goalNode = getAction(goalArray);
-            addElement(goalNode);
+            if(goalNode != null)
+            {
+                addElement(goalNode);
+            }
         }
     }
 
@@ -59,6 +62,10 @@ public class Play extends ActionNode
         if(goal[0].equalsIgnoreCase("avoid"))
         {
             return new Avoid(getRoot(), this, getDirectObject().getThing("Player"), getDirectObject().getThing(goal[1]), getIndirectObject(),
+                    getAdverbs(), null,1, 1, 1);
+        } else if(goal[0].equalsIgnoreCase("approach"))
+        {
+            return new Approach(getRoot(), this, getDirectObject().getThing("Player"), getDirectObject().getThing(goal[1]), getIndirectObject(),
                     getAdverbs(), null,1, 1, 1);
         }
         return null;
