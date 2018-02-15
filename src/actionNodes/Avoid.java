@@ -53,6 +53,7 @@ public class Avoid extends PlannableActionNode
             }
         }
         double urgencyTotal = 0;
+        double closestWeightedDist = Double.MAX_VALUE;
         if(getDirectObject().isPlural())
         {
             for(ThingNode singleThing : getDirectObject().getThingElements())
@@ -79,6 +80,10 @@ public class Avoid extends PlannableActionNode
                 {
                     urgencyTotal += thingSpeed / (speed * dist * dist);
                 }
+                if(closestWeightedDist > dist * speed / thingSpeed)
+                {
+                    closestWeightedDist = dist * speed / thingSpeed;
+                }
             }
         } else
         {
@@ -104,9 +109,17 @@ public class Avoid extends PlannableActionNode
             {
                 urgencyTotal += thingSpeed / (speed * dist * dist);
             }
+            closestWeightedDist = dist * speed / thingSpeed;
         }
-        setUrgencey(urgencyTotal);
+        setUrgencey(sigmoid(closestWeightedDist, 24*5, 24));
+//        setUrgencey(urgencyTotal);
         return instructionPackets;
+    }
+
+    private double sigmoid(double x, double safeDist, double spread)
+    {
+        double s = 1 - (1 / (1 + Math.exp((safeDist - x) / spread)));
+        return s;
     }
 
 }

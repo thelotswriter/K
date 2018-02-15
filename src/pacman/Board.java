@@ -50,7 +50,7 @@ public class Board extends JPanel implements ActionListener {
     private int pacAnimCount = PAC_ANIM_DELAY;
     private int pacAnimDir = 1;
     private int pacmanAnimPos = 0;
-    private int N_GHOSTS = 2;
+    private int N_GHOSTS = 0;
     private int pacsLeft, score;
     private int[] dx, dy;
     private int[] ghost_x, ghost_y, ghost_dx, ghost_dy, ghostSpeed;
@@ -75,23 +75,23 @@ public class Board extends JPanel implements ActionListener {
     private int currentSpeed = 3;
     private short[] screenData;
     private ArrayList<Point> pellets; // Tracks the pellets left on the board
-    private final boolean[][] wallMap = {
-            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-            {false, true,  true,  true,  false, false, false, false, false, false, false, false, false, false, false},
-            {false, true,  true,  true,  false, false, false, false, false, false, false, false, false, false, false},
-            {false, true,  true,  true,  false, false, false, false, false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, true,  false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, true,  false, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, true,  false, false, false, false, false, true,  false},
-            {true,  false, false, false, true,  true,  true,  true,  true,  true,  true,  false, false, true,  false},
-            {true,  false, false, false, false, false, false, true,  false, false, false, false, false, true,  false},
-            {true,  false, false, false, false, false, false, true,  false, false, false, false, false, true,  false},
-            {true,  false, false, false, false, false, false, true,  false, false, false, false, false, true,  false},
-            {true,  false, false, false, false, false, false, false, false, false, false, false, false, true,  false},
-            {true,  false, false, false, false, false, false, false, false, false, false, false, false, true,  false},
-            {true,  false, false, false, false, false, false, false, false, false, false, false, false, false, false},
-            {true,  true,  true,  true,  true,  true,  true,  true,  true,  true, false, false, false, false, false}
-    };
+//    private final boolean[][] wallMap = {
+//            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+//            {false, true,  true,  true,  false, false, false, false, false, false, false, false, false, false, false},
+//            {false, true,  true,  true,  false, false, false, false, false, false, false, false, false, false, false},
+//            {false, true,  true,  true,  false, false, false, false, false, false, false, false, false, false, false},
+//            {false, false, false, false, false, false, false, true,  false, false, false, false, false, false, false},
+//            {false, false, false, false, false, false, false, true,  false, false, false, false, false, false, false},
+//            {false, false, false, false, false, false, false, true,  false, false, false, false, false, true,  false},
+//            {true,  false, false, false, true,  true,  true,  true,  true,  true,  true,  false, false, true,  false},
+//            {true,  false, false, false, false, false, false, true,  false, false, false, false, false, true,  false},
+//            {true,  false, false, false, false, false, false, true,  false, false, false, false, false, true,  false},
+//            {true,  false, false, false, false, false, false, true,  false, false, false, false, false, true,  false},
+//            {true,  false, false, false, false, false, false, false, false, false, false, false, false, true,  false},
+//            {true,  false, false, false, false, false, false, false, false, false, false, false, false, true,  false},
+//            {true,  false, false, false, false, false, false, false, false, false, false, false, false, false, false},
+//            {true,  true,  true,  true,  true,  true,  true,  true,  true,  true, false, false, false, false, false}
+//    };
 
 //    private final boolean[][] wallMap = {
 //            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
@@ -110,6 +110,24 @@ public class Board extends JPanel implements ActionListener {
 //            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
 //            {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}
 //    };
+
+    private final boolean[][] wallMap = {
+            {false, false, false,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true},
+            {true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true},
+            {true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true},
+            {true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true},
+            {true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true},
+            {true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true},
+            {true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true},
+            {true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true},
+            {true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true},
+            {true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true},
+            {true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true},
+            {true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true},
+            {true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true},
+            {true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true},
+            {true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true}
+    };
 
     private int[] wallX;
     private int[] wallY;
@@ -642,7 +660,7 @@ public class Board extends JPanel implements ActionListener {
                 Point pel = null;
                 for(Point pellet : pellets)
                 {
-                	if(pellet.x == pos % N_BLOCKS && pellet.y == pos / N_BLOCKS)
+                	if(pellet.x == BLOCK_SIZE *pos % N_BLOCKS && BLOCK_SIZE * pellet.y == pos / N_BLOCKS)
                 	{
                 		pel = pellet;
                 	}
@@ -821,7 +839,7 @@ public class Board extends JPanel implements ActionListener {
             // If the current datapoint includes a pellet, and a point to our pellet tracker
             if((screenData[i] & 48) != 0)
             {
-            	pellets.add(new Point(i % N_BLOCKS, i / N_BLOCKS));
+            	pellets.add(new Point(BLOCK_SIZE * i % N_BLOCKS, BLOCK_SIZE * i / N_BLOCKS));
             }
         }
 

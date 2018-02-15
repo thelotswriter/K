@@ -19,7 +19,7 @@ public abstract class PlannableActionNode extends ActionNode
 
     private Plan plan;
     private boolean planningNode;
-    private final double MAX_URGENCY = 0.8;
+    private final double MAX_URGENCY = 1000;
 
     public PlannableActionNode(CommandNode root, ActionNode parent, ThingNode subject, ThingNode directObject, ThingNode indirectObject,
                                List<Adverb> adverbs, List<ActionElement> elements, double confidence, double priority, double urgency)

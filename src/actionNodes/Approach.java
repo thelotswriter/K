@@ -28,7 +28,7 @@ public class Approach extends PlannableActionNode
 
     public double getMaxUrgency()
     {
-        return 100;
+        return 1000;
     }
 
     @Override
@@ -37,6 +37,7 @@ public class Approach extends PlannableActionNode
         List<InstructionPacket> instructionPackets = new ArrayList<>();
         int[] subjectLocation = AttributeConverter.convertToIntArray(getSubject().getAttribute("location"));
         double speed = 1;
+        double maxDistance = 0;
         if(getSubject().hasAttribute("speed"))
         {
             speed = AttributeConverter.convertToInt(getSubject().getAttribute("speed"));
@@ -70,12 +71,17 @@ public class Approach extends PlannableActionNode
                 {
                     dist += Math.abs(subjectLocation[i] - thingLocation[i]);
                 }
-                if(dist == 0)
+                if(dist < thingSpeed / speed)
                 {
-                    urgencyTotal = Double.MAX_VALUE;
+                    urgencyTotal += 0;
                 } else
                 {
-                    urgencyTotal += 1 - thingSpeed / (speed * dist * dist);
+//                    urgencyTotal += 1 - thingSpeed / (speed * dist * dist);
+                    urgencyTotal += dist * speed / thingSpeed;
+                }
+                if(dist * speed / thingSpeed > maxDistance)
+                {
+                    maxDistance = dist * speed / thingSpeed;
                 }
             }
             urgencyTotal /= nThings;
@@ -98,13 +104,23 @@ public class Approach extends PlannableActionNode
             }
             if(dist == 0)
             {
-                urgencyTotal = 0;
+                urgencyTotal += 0;
             } else
             {
                 urgencyTotal += 1 - (thingSpeed / (speed * dist * dist));
+//                urgencyTotal += dist * speed / thingSpeed;
             }
+            maxDistance = dist * speed / thingSpeed;
         }
+//        setUrgencey(sigmoid(urgencyTotal, 2 * 24, 3 * 24));
         setUrgencey(urgencyTotal);
         return instructionPackets;
     }
+
+    private double sigmoid(double x, double greedyDist, double spread)
+    {
+        double s = 1 / ((Math.exp(greedyDist - x) + 1) / spread);
+        return s;
+    }
+
 }
